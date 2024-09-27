@@ -1,0 +1,40 @@
+
+RAVAGER ENEMIES V0.01
+This mod requires the Ravager_Framework mod. It adds a bunch of enemies I created that use it.
+The only enemy that's verbosely commented is the "bandit ravager", a basic ravager enemy.
+
+----
+
+Here are the current plans:
+
+[MADE]
+	Bandits :: Ravager - common futa, just wants to have fun with the player. No restraints/effects.
+
+[WIP]
+	Slime :: Slimegirl - common futa, spreads and hardens slime
+		- needs writing, but works
+
+	Nevermere :: Alpha - futa, will collar/leash specifically.
+		- needs writing, but works
+
+[NOT MADE YET]
+	Bast :: Priestess - Boss/elite futa, applies mummy bindings each turn, summons a sarcophagus or petsuit when done (sub-based)
+	Elementals :: Lust Elemental - elite futa - summons elemental imp-girls that help strip and hold PC down
+	Bounty Hunters :: Elite Ninja - miniboss futa. Stealthy, fully strips and steals while ravaging. Summons ninjas to jail player if low BH rep
+	Dollmakers :: Dollbreaker - Boss futa, intended for jails only. Spreads rubber and increase submissiveness
+	Witches :: Lust Witch - futa, with an AoE spell that can cause orgasms
+	Elves :: Elder Dryad - Boss futa, ties up PC in vines when she's done with the intention of going again. Gradually turns skin plant-green (corruption?)
+	Ghost :: Needy Banshee - possesses the PC. Forced to submit fully to next ravage
+	Demon :: Succubus - Boss futa, gives a 'lewd mark' that summons her periodically when the player is alone (disappearing afterwards)
+
+	(these two stationary ones should have "loose tethers" - easily broken large-distance leashes that decrease in distance each turn)
+		modify "tether" part of item definition actively
+	Plant :: Tentacle Pit - Stationary enemy that pulls the player in. Ravaging causes tentacles to spawn, which will also ravage the player. Guaranteed pass-out.
+	Dollmaker Robots :: Auto-trainer - Stationary machine (like rubber thrower) that throws collars and leashes. Will leash the player and gradually pull them closer until it can force kneel and start brainwashing. Summons a dollmaker apprentice on 100% submissiveness.
+	
+	Latex (Alchemists) :: ??? (something with potions)
+	Maidforce :: '???'
+	Dressmakers :: '???'
+	Angel :: '???'
+	Zombies :: '???'
+	Natural/Stone :: '???' (things like the statue enemy - some kind of trap maybe?)

@@ -1,3 +1,3 @@
-# ravagerFramework
-
-Kinky Dungeon mod
+TODO
+	- README
+		- I'll get to it eventually, maybe

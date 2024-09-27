@@ -1,0 +1,11 @@
+{
+	"modname": "Ravager Framework",
+	"moddesc": "(NON-CON) Framework/enemies to sexually use the player - Originally created by Hogus Bogus",
+	"author": "CTN",
+	"modbuild": 5,
+	"gamemajor": 5,
+	"gameminor": 3,
+	"gamepatch_min": 38,
+	"gamepatch_max": -1,
+	"priority": 90
+}

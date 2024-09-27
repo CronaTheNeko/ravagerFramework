@@ -1,0 +1,7 @@
+- Figure out a good way to change what restraints are added to player during fallback (such as making the slime girl apply slime restraints)
+- Instead of only grope damage during fallback, sometimes add restraints to player -- Implimented, but only uses jail restraints; will try to add custom restraints soon
+- Impliment the plant ravager and probably other ravagers, using Bogus' ideas as a base
+	- See https://discord.com/channels/938203644023685181/1183991709768622090/1184331756783030372
+	- I really like the plant ravager idea
+- I like the ideas presented here: https://discord.com/channels/938203644023685181/1183991709768622090/1187386814718279720
+- "Borrow" some plans from "PLANS AND DETAILS.txt"
