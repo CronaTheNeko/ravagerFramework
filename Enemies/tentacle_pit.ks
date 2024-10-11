@@ -140,9 +140,9 @@ let pit = {
 		}
 	],
 	visionRadius: 10,
-	maxhp: 2,
+	maxhp: 20,
 	minLevel: 0,
-	weight: 10,
+	weight: 2,
 	movePoints: 0,
 	//
 	attackPoints: 3,
@@ -163,7 +163,7 @@ let pit = {
 		'passage': -60,
 		'increaseWeight': 1
 	},
-	floors: KDMapInit(['jng', 'cry', 'tmp']),
+	floors: KDMapInit(['jng']),
 	shrines: [],
 	dropTable: [
 		{
@@ -200,11 +200,11 @@ let summonSpell = {
 	sfx: 'Evil',
 	castCondition: 'tentaclePitSummon',
 	manacost: 2,
-	specialCD: 4,
+	specialCD: 15,
 	components: ['Verbal'],
 	level: 1,
 	projectileTargeting: true,
-	castRange: 5,
+	castRange: 2,
 	type: 'inert',
 	onhit: 'summon',
 	summon: [{
@@ -277,7 +277,7 @@ let tendril = {
 	weight: -1000,
 	movePoints: 1,
 	attackPoints: 2,
-	attack: 'MelleEffect',
+	attack: 'MeleeEffect',
 	attackWidth: 2,
 	attackRange: 1.5,
 	attackLock: 'White', // What colors are available to pick?
@@ -317,6 +317,7 @@ let tendril = {
 		onomatopoeia: ['ono 1', 'ono 2'],
 		doneTaunts: ['happy writhing'],
 		fallbackNarration: ['fallback narration'],
+		completionCallback: 'pitTendrilCompletion',
 		ranges: [
 			[1, {
 				taunts: ['taunt 1 1', 'taunt 2 1'],
@@ -344,7 +345,8 @@ let tendril = {
 		effect: {
 			name: 'Ravage'
 		}
-	}
+	},
+	focusPlayer: true
 }
 
 KinkyDungeonEnemies.push(tendril)
