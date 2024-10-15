@@ -110,7 +110,7 @@ let exampleEnemy = {
 	specialCDonAttack: true, 
 	specialAttackPoints: 2, // Telegraph time, just like the standard attack's attackPoints
 	specialRange: 4, // Max dash range
-	specialMinrange: 1.5, // Min dash range
+	specialMinRange: 1.5, // Min dash range
 	specialsfx: "Miss",
 	specialWidth: 2, 
 	specialRemove: "Effect", // We don't want them also immediately pinning. That could be a bit unfair

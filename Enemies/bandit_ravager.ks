@@ -93,7 +93,7 @@ let banditRavager = {
 	specialCDonAttack: true, 
 	specialAttackPoints: 2, 
 	specialRange: 4,
-	specialMinrange: 1.5,
+	specialMinRange: 1.5,
 	specialsfx: "Miss",
 	specialWidth: 2, 
 	specialRemove: "Effect", // don't want them also immediately pinning - unfair!!

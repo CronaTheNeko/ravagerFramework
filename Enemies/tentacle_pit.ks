@@ -88,7 +88,7 @@ function AddCallback(key, func) {
 let pit = {
 	name: 'TentaclePit',
 	faction: 'Plant',
-	clusterWith: 'nature',
+	clusterWith: 'plant',
 	color: '#085c0e',
 	tags: KDMapInit([
 		'immobile',
@@ -112,6 +112,7 @@ let pit = {
 	nopickpocket: true,
 	ignorechance: 0.5,
 	followRange: 1,
+	// AI: 'ambush',
 	AI: 'hunt',
 	summon: [{
 		enemy: 'RavagerTendril',
@@ -141,20 +142,31 @@ let pit = {
 	],
 	visionRadius: 10,
 	maxhp: 20,
-	minLevel: 0,
-	weight: 2,
+	minLevel: 2,
+	weight: 1,
 	movePoints: 0,
 	//
-	attackPoints: 3,
-	attack: 'SpellMeleePullStun',
-	attackWidth: 1,
-	attackMinRange: 2.5,
-	attackRange: 10,
-	power: 20,
+	attackPoints: 2,
+	// attack: 'MeleeWill',
+	attack: 'SpellMeleeWill',
+	attackWidth: 2.5,
+	// attackMinRange: 2.5,
+	attackRange: 2,
+	power: 0.8,
+	dmgType: 'pain',
+	attackLock: 'White',
+	//
+	specialAttack: 'PullStun',
 	stunTime: 3,
 	pullDist: 10,
 	pullTowardSelf: true,
-	dmgType: 'grope',
+	specialWidth: 1,
+	specialMinRange: 2,
+	specialRange: 10,
+	specialCD: 4,
+	specialCDonAttack: true,
+	specialsfx: 'Grab',
+	specialAttackPoints: 2,
 	//
 	terrainTags: {
 		'secondhalf': 16,
@@ -242,6 +254,12 @@ let summonCondition = (enemy, target) => {
 KDCastConditions['tentaclePitSummon'] = summonCondition
 KinkyDungeonSpellListEnemies.push(summonSpell)
 KinkyDungeonEnemies.push(pit)
+// Text keys
+addTextKey('NameTentaclePit', 'Tentacle Pit')
+addTextKey('AttackTentaclePitStun', 'A strong tentacle wraps around your torso and pulls you towards the pit')
+addTextKey('KillTentaclePit', 'The tentacles writhe in pain and retreat into the ground')
+addTextKey('AttackTentaclePit', 'A tentacle swings and whips your body')
+addTextKey('KinkyDungeonSummonSingleRavagerTendril', 'An eager tentacle bursts out of the ground nearby')
 // END Tentacle Pit
 
 // BEGIN Ravaging Tendril
@@ -261,7 +279,8 @@ let tendril = {
 		'hunter',
 		'minor',
 		'pittendril',
-		'nosub'
+		'nosub',
+		'immobile'
 	]),
 	ignorechance: 0,
 	followRange: 2,
@@ -350,4 +369,8 @@ let tendril = {
 }
 
 KinkyDungeonEnemies.push(tendril)
+// Text keys
+addTextKey('NameRavagerTendril', 'Dripping Tentacle')
+addTextKey('KillRavagerTendril', 'The tentacle thrashes and vanishes below the ground')
+addTextKey('AttackRavagerTendril', 'The tentacle roughly gropes you')
 // END Ravaging Tendril
