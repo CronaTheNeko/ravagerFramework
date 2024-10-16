@@ -170,6 +170,33 @@ function ravagerFrameworkRefreshEnemies(reason) {
 			KinkyDungeonEnemies.push(KDEventMapEnemy['ravagerCallbacks']['definitionWolfgirlRavager'])
 		}
 	}
+	// Checking for Tentacle Pit
+	var tentacleFoundIndex = KinkyDungeonEnemies.findIndex((val) => {if (val.name == 'TentaclePit' && val.addedByMod == 'RavagerFramework') return true })
+	var tendrilFoundIndex = KinkyDungeonEnemies.findIndex((val) => {if (val.name == 'RavagerTendril' && val.addedByMod == 'RavagerFramework') return true })
+	if (settings.ravagerDisableTentaclePit) {
+		if (tentacleFoundIndex >= 0) {
+			console.log('[Ravager Framework] Removing Tentacle Pit')
+			KinkyDungeonEnemies.splice(tentacleFoundIndex, 1)
+		}
+		if (tendrilFoundIndex >= 0) {
+			console.log('[Ravager Framework] Removing Pit Tendril')
+			KinkyDungeonEnemies.splice(tendrilFoundIndex, 1)
+		}
+		tendrilFoundIndex = KinkyDungeonEnemies.findIndex((val) => {if (val.name == 'RavagerTendril' && val.addedByMod == 'RavagerFramework') return true })
+		if (tendrilFoundIndex >= 0) {
+			console.log('[Ravager Framework] Removing Pit Tendril')
+			KinkyDungeonEnemies.splice(tendrilFoundIndex, 1)
+		}
+	} else {
+		if (tentacleFoundIndex < 0 || tentacleFoundIndex == undefined) {
+			console.log('[Ravager Framework] Adding Tentacle Pit')
+			KinkyDungeonEnemies.push(KDEventMapEnemy['ravagerCallbacks']['definitionTentaclePit'])
+		}
+		if (tendrilFoundIndex < 0 || tendrilFoundIndex == undefined) {
+			console.log('[Ravager Framework] Adding Pit Tendril')
+			KinkyDungeonEnemies.push(KDEventMapEnemy['ravagerCallbacks']['definitionPitTendril'])
+		}
+	}
 	// Refresh enemy cache
 	console.log('[Ravager Framework] Refreshing enemy cache')
 	KinkyDungeonRefreshEnemiesCache()
@@ -202,6 +229,13 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 					name: 'Disable Slimegirl Ravager',
 					type: 'boolean',
 					refvar: 'ravagerDisableSlimegirl',
+					default: false,
+					block: undefined
+				},
+				{
+					name: 'Disable Tentacle Pit',
+					type: 'boolean',
+					refvar: 'ravagerDisableTentaclePit',
 					default: false,
 					block: undefined
 				}

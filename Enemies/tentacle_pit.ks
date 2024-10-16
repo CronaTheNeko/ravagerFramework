@@ -18,74 +18,10 @@ function AddCallback(key, func) {
 	}
 }
 
-// Working on immobile tentacle pit which summons tendrils to ravage the player
-
-// This seems like too much work to get the pit to strip the player
-// AddCallback('tentaclePitStrip', (entity, target) => {
-// 	let ravageEquipmentSlotTargets = {
-// 		ItemButt: ["ItemPelvis", "ItemButt"],
-// 		ItemVulva: ["ItemPelvis", "ItemVulva"],
-// 		ItemMouth: ["ItemHead", "ItemMouth"],
-// 		ItemHead: ["ItemHead"]
-// 	}
-// 	let clothingTargetsPelvis = KDGetDressList()[KinkyDungeonCurrentDress].filter(article => {
-// 		if (article.Lost)
-// 			return false
-// 		if (article.Group == 'Uniform')
-// 			return true
-// 		if (['Shorts', 'Bikini', 'Panties', 'Leotard', 'Swimsuit'].some(str => article.Item.includes(str)))
-// 			return true
-// 	})
-// 	let clothingTargetsMouth = KDGetDressList()[KinkyDungeonCurrentDress].filter(article => {
-// 		if (article.Lost)
-// 			return false
-// 		if (['Mask', 'Visor', 'Gag'].some(str => article.Item.includes(str)))
-// 			return true
-// 	})
-// 	let stripOptions = {
-// 		equipment: {
-// 			ItemButt: [],
-// 			ItemMouth: [],
-// 			ItemVulva: []
-// 		},
-// 		clothing: {
-// 			ItemButt: clothingTargetsPelvis,
-// 			ItemMouth: clothingTargetsMouth,
-// 			ItemVulva: clothingTargetsPelvis
-// 		}
-// 	}
-// 	for (const slot in stripOptions.equipment) {
-// 		ravageEquipmentSlotTargets[slot].forEach(groupName => {
-// 			let restraintInSlot = KinkyDungeonGetRestraintItem(groupName)
-// 			if(
-// 				restraintInSlot && 
-// 				restraintInSlot.name != "Stripped" && 
-// 				!restraintInSlot.name.includes("RavagerOccupied") &&
-// 				!restraintInSlot.name.includes('Blindfold')
-// 			) stripOptions.equipment[slot].push(groupName) // Since easiest removal is via group name
-// 		})
-
-// 		// Special check for mouth since collars can also affect this
-// 		for (let inv of KinkyDungeonAllRestraint()) {
-// 			if (
-// 				KDRestraint(inv).gag && 
-// 				!KDRestraint(inv).name.includes("RavagerOccupied") &&
-// 				!inv.name.includes('Blindfold')
-// 			) {
-// 				stripOptions.equipment.ItemMouth.push(inv)
-// 			}
-// 		}
-// 	}
-
-// 	// KinkyDungeonAddRestraintIfWeaker('Stripped')
-
-// 	console.log('[TentaclePit] Finishing strip callback')
-// 	return true
-// })
-
 // BEGIN Tentacle Pit
 // Tentacle Pit definition
 let pit = {
+	addedByMod: 'RavagerFramework',
 	name: 'TentaclePit',
 	faction: 'Plant',
 	clusterWith: 'plant',
@@ -143,7 +79,7 @@ let pit = {
 	visionRadius: 10,
 	maxhp: 20,
 	minLevel: 2,
-	weight: 1,
+	weight: 2,
 	movePoints: 0,
 	//
 	attackPoints: 2,
@@ -158,11 +94,11 @@ let pit = {
 	//
 	specialAttack: 'PullStun',
 	stunTime: 3,
-	pullDist: 10,
+	pullDist: 8,
 	pullTowardSelf: true,
 	specialWidth: 1,
 	specialMinRange: 2,
-	specialRange: 10,
+	specialRange: 8,
 	specialCD: 4,
 	specialCDonAttack: true,
 	specialsfx: 'Grab',
@@ -254,6 +190,7 @@ let summonCondition = (enemy, target) => {
 KDCastConditions['tentaclePitSummon'] = summonCondition
 KinkyDungeonSpellListEnemies.push(summonSpell)
 KinkyDungeonEnemies.push(pit)
+KDEventMapEnemy['ravagerCallbacks']['definitionTentaclePit'] = pit
 // Text keys
 addTextKey('NameTentaclePit', 'Tentacle Pit')
 addTextKey('AttackTentaclePitStun', 'A strong tentacle wraps around your torso and pulls you towards the pit')
@@ -264,6 +201,7 @@ addTextKey('KinkyDungeonSummonSingleRavagerTendril', 'An eager tentacle bursts o
 
 // BEGIN Ravaging Tendril
 let tendril = {
+	addedByMod: 'RavagerFramework',
 	name: 'RavagerTendril',
 	faction: 'Plant',
 	color: '#99ff99',
@@ -369,6 +307,7 @@ let tendril = {
 }
 
 KinkyDungeonEnemies.push(tendril)
+KDEventMapEnemy['ravagerCallbacks']['definitionPitTendril'] = tendril
 // Text keys
 addTextKey('NameRavagerTendril', 'Dripping Tentacle')
 addTextKey('KillRavagerTendril', 'The tentacle thrashes and vanishes below the ground')
