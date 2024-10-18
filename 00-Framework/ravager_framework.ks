@@ -101,7 +101,49 @@ for (var key in debugCallbacks) {
 	KDEventMapEnemy['ravagerCallbacks'][key] = debugCallbacks[key]
 }
 
-
+// Base settings function, simplifying reloading settings
+function ravagerSettingsRefresh(reason) {
+	console.log('[Ravager Framework] Running settings functions for reason: ' + reason)
+	ravagerFrameworkRefreshEnemies(reason)
+	ravagerFrameworkApplySpicyTendril(reason)
+}
+// Mod settings for changing spicy dialogue for tendril
+// This NEEDS to be run AFTER ravagerFrameworkRefreshEnemies, as this relies on enemy enabled state being consistent with the relevant setting
+function ravagerFrameworkApplySpicyTendril(reason) {
+	console.log('[Ravager Framework] ravagerFrameworkApplySpicyTendril(' + reason + ')')
+	// Shortcut for settings
+	var settings = KDModSettings['RavagerFramework']
+	// Check index for tendril
+	var tendrilIndex = KinkyDungeonEnemies.findIndex(val => { if (val.name == 'RavagerTendril' && val.addedByMod == 'RavagerFramework') return true })
+	// Only run if tendril is not disabled and is present
+	if (!settings.ravagerDisableTentaclePit && tendrilIndex >= 0) {
+		// Shortcut for tendril
+		var tendril = KinkyDungeonEnemies[tendrilIndex]
+		// Check whether spicy or not
+		if (settings.ravagerSpicyTendril) {
+			// Change to spicy
+			// console.log(tendril.ravage.ranges[0])
+			for (var range of tendril.ravage.ranges) {
+				// console.log(range)
+				range[1].narration.ItemVulva = range[1].narration.SpicyItemVulva
+				range[1].narration.ItemButt = range[1].narration.SpicyItemButt
+				range[1].narration.ItemMouth = range[1].narration.SpicyItemMouth
+			}
+		} else {
+			// Change to tame
+			// console.log('ass')
+			for (var range of tendril.ravage.ranges) {
+				// console.log(range)
+				range[1].narration.ItemVulva = range[1].narration.TameItemVulva
+				range[1].narration.ItemButt = range[1].narration.TameItemButt
+				range[1].narration.ItemMouth = range[1].narration.TameItemMouth
+			}
+		}
+		console.log(tendril.ravage.ranges)
+		KinkyDungeonRefreshEnemiesCache()
+		console.log(tendril.ravage.ranges)
+	}
+}
 // Mod Settings for disabling ravagers
 function ravagerFrameworkRefreshEnemies(reason) {
 	console.log('[Ravager Framework] ravagerFrameworkRefreshEnemies(' + reason + ')')
@@ -238,6 +280,13 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 					refvar: 'ravagerDisableTentaclePit',
 					default: false,
 					block: undefined
+				},
+				{
+					name: 'Spicy Ravager Tendril Dialogue',
+					type: 'boolean',
+					refvar: 'ravagerSpicyTendril',
+					default: false,
+					block: undefined
 				}
 			]
 		}
@@ -248,13 +297,17 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 				KDModSettings['RavagerFramework'][i.refvar] = i.default
 			}
 		}
-		ravagerFrameworkRefreshEnemies('load')
+		// ravagerFrameworkRefreshEnemies('load')
+		// ravagerFrameworkApplySpicyTendril('load')
+		ravagerSettingsRefresh('load')
 	}
 }
 
 if (KDEventMapGeneric['afterModConfig'] != undefined) {
 	KDEventMapGeneric['afterModConfig']['RavagerFramework'] = (e, data) => {
-		ravagerFrameworkRefreshEnemies('config')
+		// ravagerFrameworkRefreshEnemies('config')
+		// ravagerFrameworkApplySpicyTendril('config')
+		ravagerSettingsRefresh('refresh')
 	}
 }
 //
@@ -299,7 +352,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 		// console.log('[Ravager Framework] Running effectCallback with enemy: ', entity, '; target: ', target)
 		skipEverything = KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.effectCallback](entity, target)
 	}
-
+	// console.log('skipEverything: ', skipEverything)
 	if (!skipEverything) {
 		//clothing targts
 		let clothingTargetsPelvis = KDGetDressList()[KinkyDungeonCurrentDress].filter(article=> {
@@ -442,7 +495,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 		// TODO!!! prioritize oral if target is belted
 		let canRavage = true
 		if(!entity.ravage.slot || (typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object" && KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity)) {
-			//console.log(validSlots, entity.ravage.slot, KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity, KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot])
+			// console.log(validSlots, entity.ravage.slot, KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity, KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot])
 			if(validSlots.length) entity.ravage.slot = ravRandom(validSlots)
 			else canRavage = false
 		}
@@ -492,7 +545,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				KDEventMapEnemy['ravagerCallbacks'] &&
 				typeof KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.submitChanceModifierCallback] == 'function'
 			) {
-				console.log('[Ravager Framework] Calling submitChanceModifierCallback from ravager ', entity, ' ...')
+				// console.log('[Ravager Framework] Calling submitChanceModifierCallback from ravager ', entity, ' ...')
 				let tmp_baseSubmitChance = KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.submitChanceModifierCallback](entity, target, baseSubmitChance)
 				switch (typeof tmp_baseSubmitChance) {
 				case 'undefined':
@@ -500,7 +553,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					break
 				case 'number':
 					baseSubmitChance = tmp_baseSubmitChance
-					console.log('[Ravager Framework] Base submit chance changed to ', baseSubmitChance)
+					// console.log('[Ravager Framework] Base submit chance changed to ', baseSubmitChance)
 					break
 				default:
 					console.log('[Ravager Framework] WARNING: Ravager ', entity.Enemy.name, '(', TextGet('name' + entity.Enemy.name), ') used a submitChanceModifierCallback which returned a non-number value (', tmp_baseSubmitChance, ')! This result will be ignored. Please report this issue to the author of this ravager!')
@@ -685,6 +738,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					possibleRestraints = possibleRestraints.filter((item) => {
 						return KDCanAddRestraint(KinkyDungeonGetRestraintByName(item.Name))
 					})
+					// console.log('[Ravager Framework] Valid restraints for fallback: ', possibleRestraints)
 					// Check that the possible restraints list is not empty
 					if (possibleRestraints.length > 0) {
 						// Pick a random restraint from possibilities
@@ -919,6 +973,7 @@ KDEventMapInventory["tickAfter"]["RavagerCheckForPinned"] = (e, item, data) => {
 // We handle narration in an event since it's easier to get everything across multiple enemies grouped nicely this way
 KDEventMapInventory["tickAfter"]["ravagerNarration"] = (e, item, data) => {
 	let playerRavage = KinkyDungeonPlayerEntity.ravage
+	// console.log('[Ravager Framework][ravagerNarration] ', playerRavage)
 	if(playerRavage) {
 		playerRavage.narrationBuffer.forEach(narration=>{
 			KinkyDungeonSendActionMessage(20, narration, "#ff00ff", 1, false, true);
