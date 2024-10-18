@@ -117,27 +117,33 @@ let pit = {
 		{
 			name: 'VinePlantArms',
 			amountMin: 1,
-			amountMax: 10,
+			amountMax: 5,
 			weight: 12
 		},
 		{
 			name: 'VinePlantLegs',
 			amountMin: 1,
-			amountMax: 10,
+			amountMax: 5,
 			weight: 12
 		},
 		{
 			name: 'VinePlantFeet',
 			amountMin: 1,
-			amountMax: 10,
+			amountMax: 5,
 			weight: 12
 		},
 		{
 			name: 'VinePlantTorso',
 			amountMin: 1,
-			amountMax: 10,
+			amountMax: 5,
 			weight: 12
 		},
+		{ // --- Haven't implemented yet, but my idea is to make a consumable that can repel humanoid ravagers (some kind of dialog like 'an abomination already used you')
+			name: 'ravagerTendrilCum',
+			amountMin: 1,
+			amountMax: 5,
+			weight: 1
+		}
 	]
 }
 // Summon spell definition
@@ -148,7 +154,7 @@ let summonSpell = {
 	sfx: 'Evil',
 	castCondition: 'tentaclePitSummon',
 	manacost: 2,
-	specialCD: 15,
+	specialCD: 30,
 	components: ['Verbal'],
 	level: 1,
 	projectileTargeting: true,
@@ -200,6 +206,25 @@ addTextKey('KinkyDungeonSummonSingleRavagerTendril', 'An eager tentacle bursts o
 // END Tentacle Pit
 
 // BEGIN Ravaging Tendril
+// Effect callback for groping before ravaging
+AddCallback('pitTendrilEffectCallback', (enemy, target) => {
+	// console.log('tendirl test')
+	// return false
+	if (enemy.ravage && enemy.ravage.progress == 1 && !enemy.ravage.finishedCarressing) {
+		// KinkyDungeonSendFloater(enemy, 'carress', '#ffffff', 2)
+		// return true
+		if (Math.random() < enemy.Enemy.ravage.carressChance) {
+			console.log('[Ravager Framework][RavagerTendril] Carressing player before ravaging')
+			KinkyDungeonSendFloater(enemy, 'carress', '#ffffff', 2)
+			return true
+		} else {
+			console.log('[Ravager Framework][RavagerTendril] Finished carressing')
+			enemy.ravage.finishedCarressing = true
+		}
+	}
+	return false
+})
+// Tendril definition
 let tendril = {
 	addedByMod: 'RavagerFramework',
 	name: 'RavagerTendril',
@@ -269,27 +294,74 @@ let tendril = {
 	allFloors: true,
 	shrines: [], // Tentacle Kraken minion used rope, but wanted to change to a shrine relating to dryads, so figure out what shrine that is and put here
 	ravage: {
+		carressChance: 0.5,
 		targets: ['ItemVulva', 'ItemButt', 'ItemMouth'],
-		refactory: 5,
-		onomatopoeia: ['ono 1', 'ono 2'],
-		doneTaunts: ['happy writhing'],
-		fallbackNarration: ['fallback narration'],
-		completionCallback: 'pitTendrilCompletion',
+		refactory: 5, // Planning to make the tendril despawn on completion, so this shouldn't matter
+		needsEyes: false, // Could try to hypno player to 'addict' them by adding a debuff after a while of not being ravaged by plant; maybe a good use for the ravagerTendrilCum; maybe better done through an aphrodisiac for the plant
+		onomatopoeia: ['*Excited wriggling*', 'CLAP...', 'PLAP...'],
+		doneTaunts: ['*Happy carressing*'],
+		fallbackNarration: ['The tendril carresses your curves (damage taken)'],
+		completionCallback: 'pitTendrilCompletion', // Callback to despawn tendril after ravaging, maybe after ravaging twice
+		effectCallback: 'pitTendrilEffectCallback', // Callback to allow the tendril to carress the player (fallback style) for a bit before using her
 		ranges: [
 			[1, {
-				taunts: ['taunt 1 1', 'taunt 2 1'],
+				taunts: [ '*Preemtive dripping*', '*Wriggling and pulsing*' ],
 				narration: {
-					ItemVulva: ['vulva 1'],
-					ItemButt: ['butt 1'],
-					ItemMouth: ['mouth 1']
+					ItemVulva: [ 'The EnemyName rubs its\' wet tip against your pussy...' ],
+					ItemButt: [ 'The EnemyName rubs its\' wet tip against your ass...' ],
+					ItemMouth: [ 'The EnemyName presses its\' tip against your lips...' ]
 				}
 			}],
 			[5, {
-				taunts: ['taunt 5 1', 'taunt 5 2'],
+				taunts: [ '*Passionate squirming*', '*Wriggling and pulsing*' ],
 				narration: {
-					ItemVulva: ['vulva 5'],
-					ItemButt: ['butt 5'],
-					ItemMouth: ['mouth 5']
+					ItemVulva: [ 'Your pussy is forced to stretch as the thick tendril plunges inside of you...' ],
+					ItemButt: [ 'Your ass is forced to stretch as the thick tendril plunges inside of you...' ],
+					ItemMouth: [ 'You gag as your throat is filled by the tendril...' ]
+				},
+				sp: -0.1,
+				dp: 1,
+				orgasmBonus: 0
+			}],
+			[12, {
+				taunts: [ '*Rough thrusting*', '*Slow pulsating*' ],
+				narration: {
+					ItemVulva: [ 'More tendrils emerge to grip your legs while your pussy is pounded...' ],
+					ItemButt: [ 'More tendrils emerge to grip your waist while your ass is abused...' ],
+					ItemMouth: [ 'Another tendril emerges to cradle your head and wrap around your throat...' ]
+				},
+				sp: -0.15,
+				dp: 1.5,
+				orgasmBonus: 1
+			}],
+			[16, {
+				taunts: [ '*Rough thrusting*', '*Deep thrusting*' ],
+				narration: {
+					ItemVulva: [ 'You cry out with each deep thrust, smothered by tentacles!' ],
+					ItemButt: [ 'The tendril\'s rough thrusts drive pathetic whimpers out of you!' ],
+					ItemMouth: [ 'You choke and feel weak, the tendril filling your throat with every thrust!' ]
+				},
+				sp: -0.2,
+				dp: 2,
+				orgasmBonus: 2
+			}],
+			[17, {
+				taunts: [ '*Massively pulsating*', '*Pumping cum*' ],
+				narration: {
+					ItemVulva: [ 'With deeply penatrating final thrusts, the tendril pulsates quickly, it\'s about to--!!' ],
+					ItemButt: [ 'The tendril invades your ass to extreme depths, it\'s about to--!!' ],
+					ItemMouth: [ 'You gag and resist as the tendril thrusts deep into your throat, it\'s about to--!!' ]
+				},
+				sp: -0.2,
+				dp: 5,
+				orgasmBonus: 3
+			}],
+			[20, {
+				taunts: [ '*Satisfied pulsing*', '*Pumping cum*' ],
+				narration: {
+					ItemVulva: [ 'You moan loudly, your belly stretching as your womb is filled with the tendril\'s seed...!' ],
+					ItemButt: [ 'Your belly grows as you\'re filled with tentacle seed, laying limp in her tentacles...' ],
+					ItemMouth: [ 'You helplessly swallow wave after wave of the tendril\'s cum...' ]
 				},
 				dp: 10,
 				wp: -1,
