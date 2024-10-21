@@ -90,7 +90,7 @@ let pit = {
 	attackWidth: 2.5,
 	// attackMinRange: 2.5,
 	attackRange: 2,
-	power: 0.8,
+	power: 0.1,
 	dmgType: 'pain',
 	attackLock: 'White',
 	//
