@@ -5,3 +5,23 @@
 	- I really like the plant ravager idea
 - I like the ideas presented here: https://discord.com/channels/938203644023685181/1183991709768622090/1187386814718279720
 - "Borrow" some plans from "PLANS AND DETAILS.txt"
+
+From community:
+	- During V6 dev:
+		- 'Occupied' restraints apply skirt lift (like crotch rope) / mouth open (like invis gag) - https://discord.com/channels/938203644023685181/1183991709768622090/1298403509338640450
+		- Remove all clothing so there isn't scenarios where you get stripped but there's no visual difference; scenarios fixable via above; example outfits with issues: https://discord.com/channels/938203644023685181/1183991709768622090/1297893018992644247 - https://discord.com/channels/938203644023685181/1183991709768622090/1297598589555445912
+		- Enemy portraits - https://discord.com/channels/938203644023685181/1183991709768622090/1297212342714499074
+		- (Mouth?) occupation puts character in kneeling pose - https://discord.com/channels/938203644023685181/1183991709768622090/1297205431113875526
+		- Lower dodge while pinned - https://discord.com/channels/938203644023685181/1183991709768622090/1296897530277134387
+		- 'Private Time' status to repel non-ravagers while being ravaged - https://discord.com/channels/938203644023685181/1183991709768622090/1296897530277134387
+		- Modifier perks; increase ravager stats, more common ravagers, guarantee restraint after use (maybe only one guaranteed) - https://discord.com/channels/938203644023685181/1183991709768622090/1296897530277134387
+		- Option to strip all clothes, but not restraints; almost have this, just split {enemy}.ravage.bypassAll into two additional settings: bypassRestraints and bypassClothes - https://discord.com/channels/938203644023685181/1183991709768622090/1296897530277134387
+		- Make sure 'Have fun with me' flirting option triggers ravaging correctly - https://discord.com/channels/938203644023685181/1183991709768622090/1296897530277134387
+		- Flirting option to be 'taken home' / jailed to a custom map (another suggestion) where only/mostly ravagers spawn - https://discord.com/channels/938203644023685181/1183991709768622090/1296897632354172968
+		- Trap rooms in the custom map that would trap the player in the room with a ravager - https://discord.com/channels/938203644023685181/1183991709768622090/1296898496229544111
+		- Check for cross-mod incompat; Post: https://discord.com/channels/938203644023685181/1183991709768622090/1296759755611574303; Mod list: https://discord.com/channels/938203644023685181/1183991709768622090/1296803426390380564
+		- Drag player to a bed / other furniture trap if available instead of passing out - https://discord.com/channels/938203644023685181/1183991709768622090/1296203259924578405
+		- Ravager visits in jail; might be intended already for bandit, but haven't tested; make sure it works and add other non-immobile ravagers - https://discord.com/channels/938203644023685181/1183991709768622090/1295866151695548457
+		- Modifier perk to increase restrain chance of ravagers; exclusive with guaranteed perk above? - https://discord.com/channels/938203644023685181/1183991709768622090/1295851910351552532
+		- Tentacle Pit rare interaction to engulf the player (like my unreleased tentacle ravager), then continue spawning ravager tendrils to continuously ravage the player until either escape or pass out; would require manually adding the restraint instead of tentacle ravager's method; highly thumb-up'd suggestion, but might feel jank without reworking the pass out mechanic; high priority nonetheless - https://discord.com/channels/938203644023685181/1183991709768622090/1295060266181984256
+		- Custom 'ravager-filled' floor to potentially be dragged to instead of passing out; maybe take the method of the SarcoKraken's engulf spell, which allows for some custom narration to happen along the lines of "Let's get you home to your new family~" and allowing the player to attempt an escape - https://discord.com/channels/938203644023685181/1183991709768622090/1295941022076899341
