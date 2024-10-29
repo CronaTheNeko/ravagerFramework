@@ -29,7 +29,7 @@ Here are the current plans:
 
 	(these two stationary ones should have "loose tethers" - easily broken large-distance leashes that decrease in distance each turn)
 		modify "tether" part of item definition actively
-	Plant :: Tentacle Pit - Stationary enemy that pulls the player in. Ravaging causes tentacles to spawn, which will also ravage the player. Guaranteed pass-out.
+	Plant :: Tentacle Pit - Stationary enemy that pulls the player in. Ravaging causes tentacles to spawn, which will also ravage the player. Guaranteed pass-out. -- Made by CTN
 	Dollmaker Robots :: Auto-trainer - Stationary machine (like rubber thrower) that throws collars and leashes. Will leash the player and gradually pull them closer until it can force kneel and start brainwashing. Summons a dollmaker apprentice on 100% submissiveness.
 	
 	Latex (Alchemists) :: ??? (something with potions)
