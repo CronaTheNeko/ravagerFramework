@@ -216,4 +216,4 @@ addTextKey("KillSlimeRavager", "The slime girl scrambles away, waiting for her n
 addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandAssault', 'You shouldn\'t be out here on your own~')
 addTextKey('KinkyDungeonRemindJailSlimeAdvHitPlayer', 'We\'ll take good care of you~')
 addTextKey('KinkyDungeonRemindJailPlaySlimeAdv2', 'What\'s a pretty thing like you doing here?~')
-// Text keys still needed: 
+// Text keys still needed: KinkyDungeonRemindJailChaseSlimeAdvDefendHonor2 KinkyDungeonRemindJailChaseSlimeAdvDefend2 KinkyDungeonRemindJailChaseSlimeAdvAttack0
