@@ -30,3 +30,9 @@ V005
 	- Added mod settings for disabling any ravager you wish to not experience. This functionality is available as of 5.3.38
 	- Added Mod Info file to provide game with mod info and ensure load priority. This functionality is available as of 5.3.38
 	- Fixed issues causing mod to be detected as malware on some systems
+V006
+	- Added the new Tentacle Pit enemy and accompanying Ravager Tendrils
+	- Small handful of fixes
+V6.0.1
+	- Fixed missing text keys for Slimegirl
+	- Change to semantic versioning
