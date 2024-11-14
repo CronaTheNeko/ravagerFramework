@@ -216,4 +216,26 @@ addTextKey("KillSlimeRavager", "The slime girl scrambles away, waiting for her n
 addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandAssault', 'You shouldn\'t be out here on your own~')
 addTextKey('KinkyDungeonRemindJailSlimeAdvHitPlayer', 'We\'ll take good care of you~')
 addTextKey('KinkyDungeonRemindJailPlaySlimeAdv2', 'What\'s a pretty thing like you doing here?~')
-// Text keys still needed: KinkyDungeonRemindJailChaseSlimeAdvDefendHonor2 KinkyDungeonRemindJailChaseSlimeAdvDefend2 KinkyDungeonRemindJailChaseSlimeAdvAttack0
+// Text keys still needed:
+// KinkyDungeonRemindJailChaseSlimeAdvDefendHonor2
+addTextKey('KinkyDungeonRemindJailChaseSlimeAdvDefendHonor2', 'You won\'t get away this time~')
+// KinkyDungeonRemindJailChaseSlimeAdvAttack0
+addTextKey('KinkyDungeonRemindJailChaseSlimeAdvAttack0', 'Why don\'t you make this easy?~')
+// KinkyDungeonRemindJailChaseSlimeAdvAttack1
+addTextKey('KinkyDungeonRemindJailChaseSlimeAdvAttack1', 'Ooh, a feisty one!~')
+// KinkyDungeonRemindJailChaseSlimeAdvAttack2
+addTextKey('KinkyDungeonRemindJailChaseSlimeAdvAttack2', 'You\'re gonna get yourself into trouble~')
+// KinkyDungeonRemindJailChaseSlimeAdvAttack3
+addTextKey('KinkyDungeonRemindJailChaseSlimeAdvAttack3', 'Mmm let\'s train you to be good~')
+// Assuming this one will be needed, but hasn't been reported so far
+addTextKey('KinkyDungeonRemindJailChaseSlimeAdvDefend1', 'Aww, give in and I\'ll take good care of you~')
+// KinkyDungeonRemindJailChaseSlimeAdvDefend2
+addTextKey('KinkyDungeonRemindJailChaseSlimeAdvDefend2', 'That\'s enough trouble, miss')
+// KinkyDungeonRemindJailChaseSlimeAdvDefend3
+addTextKey('KinkyDungeonRemindJailChaseSlimeAdvDefend3', 'You\'re in for it now, honey~')
+// KinkyDungeonRemindJailSlimeAdvMissedMe
+addTextKey('KinkyDungeonRemindJailSlimeAdvMissedMe', 'Nuh uh uh, sweetie~')
+// KinkyDungeonRemindJailSlimeAdvMiss
+addTextKey('KinkyDungeonRemindJailSlimeAdvMiss', 'Playing hard to get?~')
+// KinkyDungeonRemindJailChaseSlimeAdvCommandBlock
+addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandBlock', 'Get back here, sweetie~')
