@@ -216,7 +216,6 @@ addTextKey("KillSlimeRavager", "The slime girl scrambles away, waiting for her n
 addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandAssault', 'You shouldn\'t be out here on your own~')
 addTextKey('KinkyDungeonRemindJailSlimeAdvHitPlayer', 'We\'ll take good care of you~')
 addTextKey('KinkyDungeonRemindJailPlaySlimeAdv2', 'What\'s a pretty thing like you doing here?~')
-// Text keys still needed:
 // KinkyDungeonRemindJailChaseSlimeAdvDefendHonor2
 addTextKey('KinkyDungeonRemindJailChaseSlimeAdvDefendHonor2', 'You won\'t get away this time~')
 // KinkyDungeonRemindJailChaseSlimeAdvAttack0
@@ -239,3 +238,6 @@ addTextKey('KinkyDungeonRemindJailSlimeAdvMissedMe', 'Nuh uh uh, sweetie~')
 addTextKey('KinkyDungeonRemindJailSlimeAdvMiss', 'Playing hard to get?~')
 // KinkyDungeonRemindJailChaseSlimeAdvCommandBlock
 addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandBlock', 'Get back here, sweetie~')
+// KinkyDungeonRemindJailChaseSlimeAdvCommandDefend
+addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandDefend', '') // Based on vanilla text entries, 'CommandDefend' seems to be shown when showing up to assist another npc. Might just leave this empty (as Fuuka does)
+// Text keys still needed: 
