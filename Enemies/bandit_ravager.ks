@@ -38,7 +38,7 @@ let banditRavager = {
 		"opendoors", 
 		"closedoors", 
 		"bandit", 
-		"imprisonable", 
+		// "imprisonable", 
 		"melee",
 		"miniboss",
 		"cacheguard", 
@@ -72,7 +72,7 @@ let banditRavager = {
 	dmgType: "grope",
 	attack: "MeleeEffectBlind", // "MeleeEffect" is the only necessary part
 	attackLock: "White",
-	power: 20, //i don't think this actually does anything with this enemy's setup - on theory, affects how strong their hits are
+	power: 2, //i don't think this actually does anything with this enemy's setup - on theory, affects how strong their hits are -- This being 20, plus the imprisonable tag, allowed the bandit rav to be found in Fuuka's prison and recruited as a overly powerful ally
 	attackPoints: 2, //set this to 0 for it to happen instantly on contact, no telegraph
 	attackWidth: 2, 
 	attackRange: 2.5, 

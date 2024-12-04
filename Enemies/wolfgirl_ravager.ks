@@ -68,7 +68,7 @@ let wolfRavager = {
 		"melee",
 		"elite",
 		"trainer",
-		"imprisonable",
+		// "imprisonable",
 		"glueweakness", 
 		"ticklesevereweakness", 
 		"iceresist", 
