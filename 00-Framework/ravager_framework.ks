@@ -591,12 +591,12 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				let rangeData = range[1]
 
 				// Handle stat changes
-				if(rangeData.sp) KinkyDungeonChangeStamina(pRav.submitting ? rangeData.sp * 0.25 : rangeData.sp)
-				if(rangeData.wp) KinkyDungeonChangeWill(rangeData.wp)
+				if(rangeData.sp) KDChangeStamina(pRav.submitting ? rangeData.sp * 0.25 : rangeData.sp)
+				if(rangeData.wp) KDChangeWill(rangeData.wp)
 				if(rangeData.sub) KinkyDungeonChangeRep("Ghost", rangeData.sub); // "Ghost" is submissiveness for some reason
 					else if(pRav.submitting) KinkyDungeonChangeRep("Ghost", 0.25)
 				if(rangeData.dp) { // We only try orgasm if DP is affected
-					KinkyDungeonChangeDistraction(rangeData.dp)
+					KDChangeDistraction(rangeData.dp)
 					KinkyDungeonDoTryOrgasm((rangeData.orgasmBonus || 0) + slotsOccupied, 1)
 				}
 
@@ -613,7 +613,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				if (!entity.Enemy.ravage.bypassAll) KinkyDungeonAddRestraintIfWeaker("Stripped") // Stay stripped
 
 				if(pRav.submitting) { // When submitting, offset the "self-play" cost associated with doTryOrgasm
-					if(KinkyDungeonStatStamina > 3) KinkyDungeonChangeStamina(KinkyDungeonEdgeCost * -1)
+					if(KinkyDungeonStatStamina > 3) KDChangeStamina(KinkyDungeonEdgeCost * -1)
 					KinkyDungeonSendActionMessage(20, pRav.submissionReason + ` (Reduced SP loss)`, "#dd00dd", 1, false, true);
 				}
 				if(pRav.submitting == "forced") {

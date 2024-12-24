@@ -4,8 +4,8 @@
 	"author": "CTN",
 	"modbuild": "6.0.1",
 	"gamemajor": 5,
-	"gameminor": 3,
-	"gamepatch_min": 38,
+	"gameminor": 4,
+	"gamepatch_min": 25,
 	"gamepatch_max": -1,
 	"priority": 90
 }
