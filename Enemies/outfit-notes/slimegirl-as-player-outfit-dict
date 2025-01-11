@@ -1,0 +1,1251 @@
+[
+  {
+    "Model": {
+      "Name": "KoiBlush",
+      "Folder": "FaceKoi",
+      "TopLevel": true,
+      "Protected": true,
+      "Categories": [
+        "Face"
+        ],
+      "Layers": {
+        "Blush": {
+          "Name": "Blush",
+          "Layer": "Blush",
+          "Pri": 0,
+          "Sprite": "",
+          "OffsetX": 942,
+          "OffsetY": 200,
+          "Poses": {
+            "BlushLow": true,
+            "BlushMedium": true,
+            "BlushHigh": true,
+            "BlushExtreme": true
+          }
+        }
+      }
+    },
+    "Difficulty": 0,
+    "Color": "Default"
+  },
+  {
+    "Model": {
+      "Name": "KjusBrows",
+      "Folder": "FaceKjus",
+      "TopLevel": true,
+      "Protected": true,
+      "Categories": [
+        "Eyes",
+        "Face"
+        ],
+      "Layers": {
+        "Brows": {
+          "Name": "Brows",
+          "Layer": "Brows",
+          "Pri": 0,
+          "Sprite": "",
+          "Poses": {
+            "BrowsNeutral": true,
+            "BrowsAngry": true,
+            "BrowsAnnoyed": true,
+            "BrowsSad": true,
+            "BrowsSurprised": true
+          },
+          "HidePoses": {
+            "EncaseHead": true
+          }
+        },
+        "Brows2": {
+          "Name": "Brows2",
+          "Layer": "Brows",
+          "Pri": 0,
+          "Sprite": "",
+          "Poses": {
+            "Brows2Neutral": true,
+            "Brows2Angry": true,
+            "Brows2Annoyed": true,
+            "Brows2Sad": true,
+            "Brows2Surprised": true
+          },
+          "HidePoses": {
+            "EncaseHead": true
+          }
+        }
+      }
+    },
+    "Difficulty": 0,
+    "Color": "Default"
+  },
+  {
+    "Model": {
+      "Name": "KjusMouth",
+      "Folder": "FaceKjus",
+      "TopLevel": true,
+      "Protected": true,
+      "Group": "Mouth",
+      "Categories": [
+        "Mouth",
+        "Face"
+        ],
+      "Layers": {
+        "Mouth": {
+          "Name": "Mouth",
+          "Layer": "Mouth",
+          "Pri": 0,
+          "Sprite": "",
+          "Poses": {
+            "MouthNeutral": true,
+            "MouthDazed": true,
+            "MouthDistracted": true,
+            "MouthEmbarrassed": true,
+            "MouthFrown": true,
+            "MouthSmile": true,
+            "MouthSurprised": true,
+            "MouthPout": true
+          },
+          "HidePoses": {
+            "HideMouth": true
+          }
+        }
+      },
+      "Filters": {
+        "Mouth": {
+          "gamma": 1,
+          "saturation": 1,
+          "contrast": 1,
+          "brightness": 1,
+          "red": 1,
+          "green": 1,
+          "blue": 1,
+          "alpha": 1
+        }
+      }
+    },
+    "Difficulty": 0,
+    "Color": "Default",
+    "Filters": {
+      "Mouth": {
+        "gamma": 1,
+        "saturation": 1,
+        "contrast": 1,
+        "brightness": 1,
+        "red": 1,
+        "green": 1,
+        "blue": 1,
+        "alpha": 1
+      }
+    }
+  },
+  {
+    "Model": {
+      "Name": "KjusEyes3",
+      "Folder": "EyesK3",
+      "TopLevel": true,
+      "Protected": true,
+      "Categories": [
+        "Eyes",
+        "Face"
+        ],
+      "AddPose": [
+        "Eyes"
+        ],
+      "Layers": {
+        "Eyes": {
+          "Name": "Eyes",
+          "Layer": "Eyes",
+          "Pri": 0,
+          "Sprite": "",
+          "Poses": {
+            "EyesNeutral": true,
+            "EyesSurprised": true,
+            "EyesDazed": true,
+            "EyesClosed": true,
+            "EyesAngry": true,
+            "EyesSly": true,
+            "EyesHeart": true
+          }
+        },
+        "Eyes2": {
+          "Name": "Eyes2",
+          "Layer": "Eyes",
+          "Pri": 0,
+          "Sprite": "",
+          "Poses": {
+            "Eyes2Neutral": true,
+            "Eyes2Surprised": true,
+            "Eyes2Dazed": true,
+            "Eyes2Closed": true,
+            "Eyes2Angry": true,
+            "Eyes2Sly": true,
+            "Eyes2Heart": true
+          }
+        },
+        "Whites": {
+          "Name": "Whites",
+          "Layer": "Eyes",
+          "Pri": -1,
+          "NoColorize": true,
+          "Poses": {
+            "EyesNeutral": true,
+            "EyesSurprised": true,
+            "EyesDazed": true,
+            "EyesClosed": true,
+            "EyesAngry": true,
+            "EyesSly": true,
+            "EyesHeart": true
+          }
+        },
+        "Whites2": {
+          "Name": "Whites2",
+          "Layer": "Eyes",
+          "Pri": -1,
+          "Sprite": "Whites",
+          "NoColorize": true,
+          "Poses": {
+            "Eyes2Neutral": true,
+            "Eyes2Surprised": true,
+            "Eyes2Dazed": true,
+            "Eyes2Closed": true,
+            "Eyes2Angry": true,
+            "Eyes2Sly": true,
+            "Eyes2Heart": true
+          }
+        }
+      },
+      "Filters": {
+        "Eyes": {
+          "gamma": 1,
+          "saturation": 0,
+          "contrast": 0.96,
+          "brightness": 1,
+          "red": 0.4117647058823529,
+          "green": 1.0980392156862746,
+          "blue": 1.7843137254901962,
+          "alpha": 1
+        },
+        "Eyes2": {
+          "gamma": 1,
+          "saturation": 0,
+          "contrast": 0.96,
+          "brightness": 1,
+          "red": 0.4117647058823529,
+          "green": 1.0980392156862746,
+          "blue": 1.7843137254901962,
+          "alpha": 1
+        }
+      }
+    },
+    "Difficulty": 0,
+    "Color": "Default",
+    "Filters": {
+      "Eyes": {
+        "gamma": 1,
+        "saturation": 0,
+        "contrast": 0.96,
+        "brightness": 1,
+        "red": 0.4117647058823529,
+        "green": 1.0980392156862746,
+        "blue": 1.7843137254901962,
+        "alpha": 1
+      },
+      "Eyes2": {
+        "gamma": 1,
+        "saturation": 0,
+        "contrast": 0.96,
+        "brightness": 1,
+        "red": 0.4117647058823529,
+        "green": 1.0980392156862746,
+        "blue": 1.7843137254901962,
+        "alpha": 1
+      }
+    }
+  },
+  {
+    "Model": {
+      "Name": "Curly",
+      "Folder": "Hair",
+      "TopLevel": true,
+      "Protected": true,
+      "Categories": [
+        "Hairstyles",
+        "FrontHair"
+        ],
+      "AddPose": [
+        "Hair"
+        ],
+      "Layers": {
+        "Curly": {
+          "Name": "Curly",
+          "Layer": "Hair",
+          "Pri": 0,
+          "SwapLayerPose": {
+            "HoodMask": "HairOver"
+          }
+        },
+        "Curly_Overstrap": {
+          "Name": "Curly_Overstrap",
+          "Layer": "HairFront",
+          "Pri": 0,
+          "InheritColor": "Curly"
+        }
+      },
+      "Filters": {
+        "Curly": {
+          "gamma": 1,
+          "saturation": 0,
+          "contrast": 1,
+          "brightness": 1,
+          "red": 1.6666666666666667,
+          "green": 0.3333333333333333,
+          "blue": 0.6274509803921569,
+          "alpha": 1
+        }
+      },
+      "Properties": {
+        "Curly": {}
+      }
+    },
+    "Difficulty": 0,
+    "Color": "Default",
+    "Filters": {
+      "Curly": {
+        "gamma": 1,
+        "saturation": 0,
+        "contrast": 1,
+        "brightness": 1,
+        "red": 1.6666666666666667,
+        "green": 0.3333333333333333,
+        "blue": 0.6274509803921569,
+        "alpha": 1
+      }
+    },
+    "Properties": {
+      "Curly": {}
+    }
+  },
+  {
+    "Model": {
+      "Name": "Body",
+      "Group": "Body",
+      "TopLevel": true,
+      "Protected": true,
+      "Categories": [
+        "Body"
+        ],
+      "Folder": "Body",
+      "AddPose": [
+        "Body"
+        ],
+      "Layers": {
+        "Head": {
+          "Name": "Head",
+          "Layer": "Head",
+          "Pri": 0,
+          "MorphPoses": {
+            "AnimalEars": "NoEar",
+            "HideEars": "NoEar"
+          },
+          "AppendPose": {
+            "FaceCoverGag": "",
+            "FaceBigGag": "BigGag",
+            "FaceGag": "Gag"
+          }
+        },
+        "ArmRight": {
+          "Name": "ArmRight",
+          "Layer": "ArmRight",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "InheritColor": "Torso",
+          "Poses": {
+            "Free": true,
+            "Boxtie": true,
+            "Wristtie": true,
+            "Yoked": true,
+            "Front": true,
+            "Up": true,
+            "Crossed": true
+          },
+          "GlobalDefaultOverride": {
+            "Front": true,
+            "Crossed": true
+          }
+        },
+        "ArmLeft": {
+          "Name": "ArmLeft",
+          "Layer": "ArmLeft",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "InheritColor": "Torso",
+          "Poses": {
+            "Free": true,
+            "Boxtie": true,
+            "Wristtie": true,
+            "Yoked": true,
+            "Front": true,
+            "Up": true,
+            "Crossed": true
+          },
+          "GlobalDefaultOverride": {
+            "Front": true,
+            "Crossed": true
+          },
+          "ErasePoses": [
+            "HideHands"
+            ],
+          "EraseLayers": {
+            "RightHand": true
+          },
+          "EraseSprite": "HideBoxtieHand",
+          "EraseInvariant": true
+        },
+        "ShoulderRight": {
+          "Name": "ShoulderRight",
+          "Layer": "ShoulderRight",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "InheritColor": "Torso",
+          "Poses": {
+            "Up": true
+          }
+        },
+        "ShoulderLeft": {
+          "Name": "ShoulderLeft",
+          "Layer": "ShoulderLeft",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "InheritColor": "Torso",
+          "Poses": {
+            "Up": true
+          }
+        },
+        "ForeArmRight": {
+          "Name": "ForeArmRight",
+          "Layer": "ForeArmRight",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "InheritColor": "Torso",
+          "Poses": {
+            "Front": true,
+            "Crossed": true
+          },
+          "GlobalDefaultOverride": {
+            "Front": true,
+            "Crossed": true
+          },
+          "SwapLayerPose": {
+            "Crossed": "CrossArmRight"
+          }
+        },
+        "ForeArmLeft": {
+          "Name": "ForeArmLeft",
+          "Layer": "ForeArmLeft",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "InheritColor": "Torso",
+          "Poses": {
+            "Front": true,
+            "Crossed": true
+          },
+          "GlobalDefaultOverride": {
+            "Front": true,
+            "Crossed": true
+          },
+          "SwapLayerPose": {
+            "Crossed": "CrossArmLeft"
+          }
+        },
+        "HandRight": {
+          "Name": "HandRight",
+          "Layer": "HandRight",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "InheritColor": "Torso",
+          "Poses": {
+            "Free": true,
+            "Boxtie": true,
+            "Yoked": true
+          },
+          "GlobalDefaultOverride": {
+            "Front": true
+          },
+          "HidePoses": {
+            "HideHands": true,
+            "EncaseHandRight": true
+          }
+        },
+        "HandLeft": {
+          "Name": "HandLeft",
+          "Layer": "HandLeft",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "InheritColor": "Torso",
+          "Poses": {
+            "Free": true,
+            "Yoked": true
+          },
+          "GlobalDefaultOverride": {
+            "Front": true
+          },
+          "HidePoses": {
+            "HideHands": true,
+            "EncaseHandLeft": true
+          }
+        },
+        "ForeHandRight": {
+          "Name": "ForeHandRight",
+          "Layer": "ForeHandRight",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "Sprite": "HandRight",
+          "InheritColor": "Torso",
+          "Poses": {
+            "Front": true
+          },
+          "GlobalDefaultOverride": {
+            "Front": true
+          },
+          "HidePoses": {
+            "HideHands": true,
+            "EncaseHandRight": true
+          }
+        },
+        "ForeHandLeft": {
+          "Name": "ForeHandLeft",
+          "Layer": "ForeHandLeft",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "Sprite": "HandLeft",
+          "InheritColor": "Torso",
+          "Poses": {
+            "Front": true
+          },
+          "GlobalDefaultOverride": {
+            "Front": true
+          },
+          "HidePoses": {
+            "HideHands": true,
+            "EncaseHandLeft": true
+          }
+        },
+        "LegLeft": {
+          "Name": "LegLeft",
+          "Layer": "LegLeft",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "InheritColor": "Torso",
+          "Poses": {
+            "Spread": true,
+            "Closed": true,
+            "Kneel": true,
+            "KneelClosed": true,
+            "Hogtie": true
+          },
+          "GlobalDefaultOverride": {
+            "Hogtie": true,
+            "KneelClosed": true
+          }
+        },
+        "Torso": {
+          "Name": "Torso",
+          "Layer": "Torso",
+          "Pri": 0,
+          "InheritColor": "Torso",
+          "MorphPoses": {
+            "Closed": "Closed",
+            "Spread": "Spread",
+            "Hogtie": "Closed"
+          },
+          "EraseLayers": {
+            "BustierPoses": true
+          },
+          "EraseSprite": "EraseCorset",
+          "EraseInvariant": true,
+          "EraseZBonus": 1000
+        },
+        "Chest": {
+          "Name": "Chest",
+          "Layer": "Chest",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "InheritColor": "Torso"
+        },
+        "FootRightKneel": {
+          "Name": "FootRightKneel",
+          "Sprite": "FootRight",
+          "Layer": "FootRightKneel",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "InheritColor": "Torso",
+          "HidePoses": {
+            "FeetLinked": true,
+            "FeetCovered": true
+          },
+          "Poses": {
+            "Kneel": true
+          }
+        },
+        "FootLeftHogtie": {
+          "Name": "FootLeftHogtie",
+          "Layer": "FootLeftHogtie",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "InheritColor": "Torso",
+          "Poses": {
+            "Hogtie": true
+          },
+          "MorphPoses": {
+            "Hogtie": ""
+          }
+        },
+        "LegRight": {
+          "Name": "LegRight",
+          "Layer": "LegRight",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "InheritColor": "Torso",
+          "Poses": {
+            "Spread": true,
+            "Closed": true,
+            "Kneel": true,
+            "KneelClosed": true,
+            "Hogtie": true
+          },
+          "GlobalDefaultOverride": {
+            "Hogtie": true,
+            "KneelClosed": true
+          }
+        },
+        "Butt": {
+          "Name": "Butt",
+          "Layer": "Butt",
+          "Pri": 0,
+          "InheritColor": "Torso",
+          "Poses": {
+            "Kneel": true,
+            "KneelClosed": true
+          },
+          "EraseLayers": {
+            "BustierPoses2": true
+          },
+          "EraseSprite": "EraseCorsetKneel",
+          "EraseInvariant": true,
+          "EraseZBonus": 1000
+        },
+        "Butt2": {
+          "Name": "Butt2",
+          "Layer": "Butt",
+          "Pri": 0,
+          "InheritColor": "Torso",
+          "Poses": {
+            "Kneel": true,
+            "KneelClosed": true
+          },
+          "EraseLayers": {
+            "ButtSleeves": true
+          },
+          "EraseSprite": "ButtSleeves",
+          "EraseZBonus": 1000,
+          "EraseInvariant": true,
+          "Invariant": true
+        },
+        "Nipples": {
+          "Name": "Nipples",
+          "Layer": "Nipples",
+          "Pri": 0,
+          "HideWhenOverridden": true,
+          "InheritColor": "Nipples",
+          "Invariant": true,
+          "HidePoses": {
+            "HideNipples": true
+          }
+        }
+      },
+      "Filters": {
+        "Torso": {
+          "gamma": 1,
+          "saturation": 0,
+          "contrast": 1.3599999999999999,
+          "brightness": 1,
+          "red": 1,
+          "green": 0.23529411764705882,
+          "blue": 0.4117647058823529,
+          "alpha": 1
+        },
+        "Head": {
+          "gamma": 1,
+          "saturation": 0,
+          "contrast": 1.3599999999999999,
+          "brightness": 1,
+          "red": 1,
+          "green": 0.23529411764705882,
+          "blue": 0.4117647058823529,
+          "alpha": 1
+        },
+        "Nipples": {
+          "gamma": 1,
+          "saturation": 0,
+          "contrast": 0.03,
+          "brightness": 1,
+          "red": 1.8627450980392157,
+          "green": 0.39215686274509803,
+          "blue": 0.8235294117647058,
+          "alpha": 1
+        }
+      },
+      "Properties": {
+        "Head": {},
+        "Torso": {}
+      }
+    },
+    "Difficulty": 0,
+    "Color": "Default",
+    "Filters": {
+      "Torso": {
+        "gamma": 1,
+        "saturation": 0,
+        "contrast": 1.3599999999999999,
+        "brightness": 1,
+        "red": 1,
+        "green": 0.23529411764705882,
+        "blue": 0.4117647058823529,
+        "alpha": 1
+      },
+      "Head": {
+        "gamma": 1,
+        "saturation": 0,
+        "contrast": 1.3599999999999999,
+        "brightness": 1,
+        "red": 1,
+        "green": 0.23529411764705882,
+        "blue": 0.4117647058823529,
+        "alpha": 1
+      },
+      "Nipples": {
+        "gamma": 1,
+        "saturation": 0,
+        "contrast": 0.03,
+        "brightness": 1,
+        "red": 1.8627450980392157,
+        "green": 0.39215686274509803,
+        "blue": 0.8235294117647058,
+        "alpha": 1
+      }
+    },
+    "Properties": {
+      "Head": {},
+      "Torso": {}
+    }
+  },
+  {
+    "Model": {
+      "Name": "FashionLatexMittens",
+      "Folder": "Mittens",
+      "TopLevel": true,
+      "Categories": [
+        "Gloves",
+        "Mittens",
+        "Restraints",
+        "FashionRestraints"
+        ],
+      "Restraint": false,
+      "AddPose": [
+        "Mittens"
+        ],
+      "Layers": {
+        "LatexLeft": {
+          "Name": "LatexLeft",
+          "Layer": "MittenLeft",
+          "Pri": 100,
+          "Poses": {
+            "Free": true,
+            "Yoked": true,
+            "Front": true,
+            "Crossed": true
+          },
+          "GlobalDefaultOverride": {
+            "Front": true,
+            "Crossed": true
+          },
+          "SwapLayerPose": {
+            "Crossed": "CrossMittenLeft",
+            "Front": "ForeMittenLeft"
+          },
+          "InheritColor": "Mitten",
+          "EraseSprite": "Mitts",
+          "EraseLayers": {
+            "Mitts": true
+          }
+        },
+        "ZipperLeft": {
+          "Name": "ZipperLeft",
+          "Layer": "MittenLeft",
+          "Pri": 100.1,
+          "Poses": {
+            "Free": true,
+            "Yoked": true,
+            "Front": true,
+            "Crossed": true
+          },
+          "GlobalDefaultOverride": {
+            "Front": true,
+            "Crossed": true
+          },
+          "SwapLayerPose": {
+            "Crossed": "CrossMittenLeft",
+            "Front": "ForeMittenLeft"
+          },
+          "TieToLayer": "LatexLeft",
+          "NoOverride": true,
+          "InheritColor": "Zipper"
+        },
+        "LatexRight": {
+          "Name": "LatexRight",
+          "Layer": "MittenRight",
+          "Pri": 100,
+          "Poses": {
+            "Free": true,
+            "Boxtie": true,
+            "Yoked": true,
+            "Front": true,
+            "Crossed": true
+          },
+          "GlobalDefaultOverride": {
+            "Front": true,
+            "Crossed": true
+          },
+          "SwapLayerPose": {
+            "Crossed": "CrossMittenRight",
+            "Front": "ForeMittenRight"
+          },
+          "InheritColor": "Mitten"
+        },
+        "ZipperRight": {
+          "Name": "ZipperRight",
+          "Layer": "MittenRight",
+          "Pri": 100.1,
+          "Poses": {
+            "Free": true,
+            "Yoked": true,
+            "Front": true,
+            "Crossed": true
+          },
+          "GlobalDefaultOverride": {
+            "Front": true,
+            "Crossed": true
+          },
+          "SwapLayerPose": {
+            "Crossed": "CrossMittenRight",
+            "Front": "ForeMittenRight"
+          },
+          "TieToLayer": "LatexRight",
+          "NoOverride": true,
+          "InheritColor": "Zipper"
+        }
+      },
+      "Parent": "Fashionundefined",
+      "Filters": {
+        "LatexLeft": {
+          "gamma": 1,
+          "saturation": 0,
+          "contrast": 1,
+          "brightness": 1,
+          "red": 1.6666666666666667,
+          "green": 0.3333333333333333,
+          "blue": 0.6274509803921569,
+          "alpha": 1
+        },
+        "Mitten": {
+          "gamma": 1,
+          "saturation": 0,
+          "contrast": 0.81,
+          "brightness": 1,
+          "red": 4.176470588235294,
+          "green": 0.9215686274509803,
+          "blue": 1.6470588235294117,
+          "alpha": 1
+        }
+      },
+      "Properties": {
+        "LatexLeft": {},
+        "Zipper": {
+          "Protected": "0",
+          "ExtraHidePoses": [
+            "Xray"
+            ],
+          "XOffset": 57.62,
+          "YOffset": -153.68,
+          "ExtraRequirePoses": [
+            "Xray"
+            ]
+        },
+        "Mitten": {}
+      }
+    },
+    "Difficulty": 0,
+    "Color": "Default",
+    "Filters": {
+      "LatexLeft": {
+        "gamma": 1,
+        "saturation": 0,
+        "contrast": 1,
+        "brightness": 1,
+        "red": 1.6666666666666667,
+        "green": 0.3333333333333333,
+        "blue": 0.6274509803921569,
+        "alpha": 1
+      },
+      "Mitten": {
+        "gamma": 1,
+        "saturation": 0,
+        "contrast": 0.81,
+        "brightness": 1,
+        "red": 4.176470588235294,
+        "green": 0.9215686274509803,
+        "blue": 1.6470588235294117,
+        "alpha": 1
+      }
+    },
+    "Properties": {
+      "LatexLeft": {},
+      "Zipper": {
+        "Protected": "0",
+        "ExtraHidePoses": [
+          "Xray"
+          ],
+        "XOffset": 57.62,
+        "YOffset": -153.68,
+        "ExtraRequirePoses": [
+          "Xray"
+          ]
+      },
+      "Mitten": {}
+    }
+  },
+  {
+    "Model": {
+      "Name": "Ponytail",
+      "Folder": "Hair",
+      "TopLevel": true,
+      "Protected": true,
+      "Categories": [
+        "Hairstyles",
+        "BackHair"
+        ],
+      "Layers": {
+        "Ponytail": {
+          "Name": "Ponytail",
+          "Layer": "HairBack",
+          "Pri": 0
+        }
+      },
+      "Filters": {
+        "Ponytail": {
+          "gamma": 1,
+          "saturation": 0,
+          "contrast": 1,
+          "brightness": 1,
+          "red": 1.6666666666666667,
+          "green": 0.3333333333333333,
+          "blue": 0.6274509803921569,
+          "alpha": 1
+        }
+      },
+      "Properties": {
+        "Ponytail": {
+          "Protected": "",
+          "LayerBonus": "0",
+          "XOffset": 1501.45,
+          "YOffset": 479.31,
+          "XPivot": 1390,
+          "YPivot": 245,
+          "XScale": 2,
+          "YScale": 2
+        }
+      }
+    },
+    "Difficulty": 0,
+    "Color": "Default",
+    "Filters": {
+      "Ponytail": {
+        "gamma": 1,
+        "saturation": 0,
+        "contrast": 1,
+        "brightness": 1,
+        "red": 1.6666666666666667,
+        "green": 0.3333333333333333,
+        "blue": 0.6274509803921569,
+        "alpha": 1
+      }
+    },
+    "Properties": {
+      "Ponytail": {
+        "Protected": "",
+        "LayerBonus": "0",
+        "XOffset": 1501.45,
+        "YOffset": 479.31,
+        "XPivot": 1390,
+        "YPivot": 245,
+        "XScale": 2,
+        "YScale": 2
+      }
+    }
+  },
+  {
+    "Model": {
+      "Name": "Fear",
+      "Folder": "Expressions",
+      "TopLevel": true,
+      "Protected": true,
+      "Categories": [
+        "Face"
+        ],
+      "Layers": {
+        "Fear": {
+          "Name": "Fear",
+          "Layer": "Fear",
+          "Pri": 0,
+          "Invariant": true,
+          "RequirePoses": {
+            "FearPose": true
+          }
+        }
+      }
+    },
+    "Difficulty": 0,
+    "Color": "Default"
+  },
+  {
+    "Model": {
+      "Name": "RavLargeHeartHairpin",
+      "Folder": "Hair",
+      "Parent": "HeartHairPins",
+      "Protected": true,
+      "Categories": [
+        "Hairstyles",
+        "Accessories"
+        ],
+      "Layers": {
+        "LargeHeartHairpin": {
+          "Name": "LargeHeartHairpin",
+          "Layer": "HairFront",
+          "Pri": 20
+        }
+      },
+      "Filters": {
+        "LargeHeartHairpin": {
+          "gamma": 1,
+          "saturation": 0,
+          "contrast": 1,
+          "brightness": 1,
+          "red": 0.6470588235294118,
+          "green": 0,
+          "blue": 2,
+          "alpha": 1
+        }
+      },
+      "Properties": {
+        "LargeHeartHairpin": {
+          "XScale": 1.8,
+          "XOffset": -1000,
+          "YScale": 1.8,
+          "YOffset": -330
+        }
+      }
+    },
+    "Difficulty": 0,
+    "Color": "Default",
+    "Filters": {
+      "LargeHeartHairpin": {
+        "gamma": 1,
+        "saturation": 0,
+        "contrast": 1,
+        "brightness": 1,
+        "red": 0.6470588235294118,
+        "green": 0,
+        "blue": 2,
+        "alpha": 1
+      }
+    },
+    "Properties": {
+      "LargeHeartHairpin": {
+        "XScale": 1.8,
+        "XOffset": -1000,
+        "YScale": 1.8,
+        "YOffset": -330
+      }
+    }
+  },
+  {
+    "Model": {
+      "Name": "FluffyPonytail",
+      "Parent": "Ponytail",
+      "Folder": "Hair",
+      "TopLevel": true,
+      "Protected": true,
+      "Categories": [
+        "Hairstyles",
+        "BackHair"
+        ],
+      "Layers": {
+        "Ponytail2": {
+          "Name": "Ponytail2",
+          "Layer": "HairBack",
+          "Pri": 0
+        }
+      },
+      "Filters": {
+        "Ponytail2": {
+          "gamma": 1,
+          "saturation": 0,
+          "contrast": 1,
+          "brightness": 1,
+          "red": 1.392156862745098,
+          "green": 0.3137254901960784,
+          "blue": 0.49019607843137253,
+          "alpha": 1
+        }
+      },
+      "Properties": {
+        "Ponytail2": {
+          "Rotation": -90,
+          "YOffset": 1750,
+          "XOffset": 950
+        }
+      }
+    },
+    "Difficulty": 0,
+    "Color": "Default",
+    "Filters": {
+      "Ponytail2": {
+        "gamma": 1,
+        "saturation": 0,
+        "contrast": 1,
+        "brightness": 1,
+        "red": 1.392156862745098,
+        "green": 0.3137254901960784,
+        "blue": 0.49019607843137253,
+        "alpha": 1
+      }
+    },
+    "Properties": {
+      "Ponytail2": {
+        "Rotation": -90,
+        "YOffset": 1750,
+        "XOffset": 950
+      }
+    }
+  },
+  {
+    "Model": {
+      "Name": "FluffyPonytailRav",
+      "Parent": "Ponytail",
+      "Folder": "Hair",
+      "TopLevel": true,
+      "Protected": true,
+      "Layers": {
+        "Ponytail2": {
+          "Name": "Ponytail2",
+          "Layer": "HairBack",
+          "Pri": 0
+        }
+      },
+      "Filters": {
+        "Ponytail2": {
+          "gamma": 1,
+          "saturation": 0,
+          "contrast": 1,
+          "brightness": 1,
+          "red": 1.392156862745098,
+          "green": 0.3137254901960784,
+          "blue": 0.49019607843137253,
+          "alpha": 1
+        }
+      },
+      "Properties": {
+        "Ponytail2": {
+          "Rotation": -90,
+          "XOffset": 1090,
+          "YOffset": 1900
+        }
+      }
+    },
+    "Difficulty": 0,
+    "Color": "Default",
+    "Filters": {
+      "Ponytail2": {
+        "gamma": 1,
+        "saturation": 0,
+        "contrast": 1,
+        "brightness": 1,
+        "red": 1.392156862745098,
+        "green": 0.3137254901960784,
+        "blue": 0.49019607843137253,
+        "alpha": 1
+      }
+    },
+    "Properties": {
+      "Ponytail2": {
+        "Rotation": -90,
+        "XOffset": 1090,
+        "YOffset": 1900
+      }
+    }
+  },
+  {
+    "Model": {
+      "Name": "FluffyPonytailRav2",
+      "Parent": "Ponytail",
+      "Folder": "Hair",
+      "TopLevel": true,
+      "Protected": true,
+      "Layers": {
+        "Ponytail2": {
+          "Name": "Ponytail2",
+          "Layer": "HairBack",
+          "Pri": 0
+        }
+      },
+      "Filters": {
+        "Ponytail2": {
+          "gamma": 1,
+          "saturation": 0,
+          "contrast": 1,
+          "brightness": 1,
+          "red": 1.392156862745098,
+          "green": 0.3137254901960784,
+          "blue": 0.49019607843137253,
+          "alpha": 1
+        }
+      },
+      "Properties": {
+        "Ponytail2": {
+          "Rotation": -45,
+          "XOffset": 60,
+          "YOffset": 1400
+        }
+      }
+    },
+    "Difficulty": 0,
+    "Color": "Default",
+    "Filters": {
+      "Ponytail2": {
+        "gamma": 1,
+        "saturation": 0,
+        "contrast": 1,
+        "brightness": 1,
+        "red": 1.392156862745098,
+        "green": 0.3137254901960784,
+        "blue": 0.49019607843137253,
+        "alpha": 1
+      }
+    },
+    "Properties": {
+      "Ponytail2": {
+        "Rotation": -45,
+        "XOffset": 60,
+        "YOffset": 1400
+      }
+    }
+  }
+]
