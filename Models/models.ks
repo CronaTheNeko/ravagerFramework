@@ -13,5 +13,42 @@ AddModel({
 	}])
 });
 
+AddModel({
+	Name: "WolfgirlAlpha",
+	Folder: "WolfCatsuit",
+	Parent: "WolfgirlAlpha",
+	TopLevel: true,
+	// Categories: ["Uniforms"],
+	Layers: ToLayerMap([
+		...GetModelLayers("WolfCollarSmallTag"),
+		...GetModelLayers("WolfHeels"),
+		...GetModelLayers("WolfTorsoUpper"),
+		...GetModelLayers("WolfSocks"),
+		...GetModelLayers("WolfGloveLeft"),
+	])
+})
+
+AddModel({
+	Name: "FluffyPonytailRav",
+	Parent: "Ponytail",
+	Folder: "Hair",
+	TopLevel: true,
+	Protected: true,
+	Layers: ToLayerMap([
+		...GetModelLayers("FluffyPonytail")
+	])
+})
+
+AddModel({
+	Name: "FluffyPonytailRav2",
+	Parent: "Ponytail",
+	Folder: "Hair",
+	TopLevel: true,
+	Protected: true,
+	Layers: ToLayerMap([
+		...GetModelLayers("FluffyPonytailRav")
+	])
+})
+
 addTextKey('m_RavLargeHeartHairpin', 'Bandit Hairpin')
 addTextKey('l_RavLargeHeartHairpin_LargeHeartHairpin', 'Hairpin')
