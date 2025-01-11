@@ -7,4 +7,4 @@ cd $(dirname $0)
 # Remove old archive
 [ -f "${file}" ] && rm "${file}"
 # Zip mod to ravagerFramework.zip in the parent directory
-zip -qr "${file}" * -x "*.sh"
+zip -qr "${file}" * -x "*.sh" -x "Enemies/outfit-notes/*"
