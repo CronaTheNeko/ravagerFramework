@@ -2,7 +2,8 @@
 AddModel({
 	Name: "RavLargeHeartHairpin",
 	Folder: "Hair",
-	Parent: "HeartHairPins",
+	// Parent: "HairPins",
+	TopLevel: true,
 	Protected: true,
 	Categories: ["Hairstyles", "Accessories"],
 	Layers: ToLayerMap([
@@ -18,7 +19,6 @@ AddModel({
 	Folder: "WolfCatsuit",
 	Parent: "WolfgirlAlpha",
 	TopLevel: true,
-	// Categories: ["Uniforms"],
 	Layers: ToLayerMap([
 		...GetModelLayers("WolfCollarSmallTag"),
 		...GetModelLayers("WolfHeels"),
@@ -30,7 +30,7 @@ AddModel({
 
 AddModel({
 	Name: "FluffyPonytailRav",
-	Parent: "Ponytail",
+	// Parent: "Ponytail",
 	Folder: "Hair",
 	TopLevel: true,
 	Protected: true,
@@ -41,7 +41,7 @@ AddModel({
 
 AddModel({
 	Name: "FluffyPonytailRav2",
-	Parent: "Ponytail",
+	// Parent: "Ponytail",
 	Folder: "Hair",
 	TopLevel: true,
 	Protected: true,
@@ -50,5 +50,5 @@ AddModel({
 	])
 })
 
-addTextKey('m_RavLargeHeartHairpin', 'Bandit Hairpin')
+addTextKey('m_RavLargeHeartHairpin', 'Ravager Hairpin')
 addTextKey('l_RavLargeHeartHairpin_LargeHeartHairpin', 'Hairpin')
