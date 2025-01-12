@@ -36,3 +36,10 @@ V006
 V6.0.1
 	- Fixed missing text keys for Slimegirl
 	- Change to semantic versioning
+V6.0.2
+	- Updated function names for KD5.4.25
+v6.0.3
+	- Added outfits for the Bandit, Wolfgirl, and Slimegirl Ravagers
+	- Modified 'RavagerOccupiedMouth' to use the Invisible Gag model (mouth open without gag)
+	- Modified 'RavagerOccupiedVulva' to use a blank model which lifts the skirt like crotch rope
+	- Added debug logging option
