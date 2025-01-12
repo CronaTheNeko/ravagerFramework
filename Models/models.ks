@@ -35,7 +35,7 @@ AddModel({
 		...GetModelLayers("WolfSocks"),
 		...GetModelLayers("WolfGloveLeft"),
 	])
-})
+});
 
 AddModel({
 	Name: "FluffyPonytailRav",
@@ -45,7 +45,7 @@ AddModel({
 	Layers: ToLayerMap([
 		...GetModelLayers("FluffyPonytail")
 	])
-})
+});
 
 AddModel({
 	Name: "FluffyPonytailRav2",
@@ -55,7 +55,7 @@ AddModel({
 	Layers: ToLayerMap([
 		...GetModelLayers("FluffyPonytailRav")
 	])
-})
+});
 
 AddModel({
 	Name: "RavLiftedSkirt",
