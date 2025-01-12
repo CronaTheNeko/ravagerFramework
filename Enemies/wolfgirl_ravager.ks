@@ -43,6 +43,25 @@ AddCallback('wolfgirlRavagerEffectCallback', (entity, target) => {
 	return false
 })
 
+// Outfit declaration
+KDModelDresses['WolfgirlRavager'] = [{"Item":"CyberPanties","Group":"Chastity","Filters":{"Lining":{"gamma":1.0166666666666666,"saturation":0,"contrast":0.88,"brightness":1,"red":0.11764705882352941,"green":0.11764705882352941,"blue":0.11764705882352941,"alpha":0.9833333333333333}}},{"Item":"VBikini","Group":"Swimsuit","Filters":{"VBikini":{"gamma":1,"saturation":0,"contrast":1,"brightness":1,"red":0.29411764705882354,"green":0.29411764705882354,"blue":0.27450980392156865,"alpha":1}},"Properties":{"VBikini":{"YScale":0.6,"YOffset":700,"XScale":1.11,"XOffset":-120,"LayerBonus":-100}}},{"Item":"ElfPanties","Group":"Elf","Properties":{"Panties":{"YOffset":25,"LayerBonus":-8000}}},{"Item":"LatexWhip","Group":"Weapon","Filters":{"LatexWhip":{"gamma":1,"saturation":0,"contrast":1.27,"brightness":1,"red":0,"green":0.5098039215686274,"blue":0.058823529411764705,"alpha":1}}},{"Item":"WolfgirlAlpha","Group":"WolfCatsuit",}]
+
+KDModelCosplay['WolfgirlRavager'] = [{"Item":"FoxEars","Group":"Ears","Filters":{"Ears":{"gamma":1,"saturation":0,"contrast":2.24,"brightness":1,"red":0.29411764705882354,"green":0.29411764705882354,"blue":0.5686274509803921,"alpha":1},"Fox":{"gamma":1,"saturation":0,"contrast":2.24,"brightness":1,"red":0.29411764705882354,"green":0.29411764705882354,"blue":0.5686274509803921,"alpha":1},"InnerEars":{"gamma":1,"saturation":0,"contrast":2.24,"brightness":1,"red":0.058823529411764705,"green":0.058823529411764705,"blue":0.13725490196078433,"alpha":1}},"Properties":{"Ears":{"Rotation":5,"XOffset":40,"YOffset":-100},"InnerEars":{"Rotation":5,"XOffset":40,"YOffset":-100}}},{"Item":"WolfTail","Group":"Tails","Filters":{"Tail":{"gamma":1,"saturation":0,"contrast":2.24,"brightness":1,"red":0.19607843137254902,"green":0.19607843137254902,"blue":0.43137254901960786,"alpha":1}}}]
+
+KDModelHair['WolfgirlRavager'] = [{"Item":"MessyBack","Group":"Hair","Filters":{"Messy":{"gamma":1,"saturation":0,"contrast":2.24,"brightness":1,"red":0.29411764705882354,"green":0.29411764705882354,"blue":0.5686274509803921,"alpha":1}}},{"Item":"Straight","Group":"Hair","Filters":{"Straight":{"gamma":1,"saturation":0,"contrast":2.24,"brightness":1,"red":0.29411764705882354,"green":0.29411764705882354,"blue":0.5686274509803921,"alpha":1}}},{"Item":"RavLargeHeartHairpin","Group":"Hair","Filters":{"LargeHeartHairpin":{"gamma":1,"saturation":0,"contrast":1,"brightness":1,"red":0.6470588235294118,"green":0,"blue":2,"alpha":1}},"Properties":{"LargeHeartHairpin":{"XScale":1.8,"XOffset":-950,"YScale":1.8,"YOffset":-330}}}]
+
+KDModelBody['WolfgirlRavager'] = [{"Item":"Body","Group":"Body","Filters":{"Head":{"gamma":1,"saturation":0,"contrast":1.76,"brightness":1,"red":0.8627450980392157,"green":0.6470588235294118,"blue":0.5686274509803921,"alpha":1},"Torso":{"gamma":1,"saturation":0,"contrast":1.76,"brightness":1,"red":0.8627450980392157,"green":0.6470588235294118,"blue":0.5686274509803921,"alpha":1},"Nipples":{"gamma":1,"saturation":0,"contrast":1,"brightness":1,"red":0.23529411764705882,"green":0.23529411764705882,"blue":0.21568627450980393,"alpha":1}}}]
+
+KDModelFace['WolfgirlRavager'] = [{"Item":"Fear","Group":"Expressions",},{"Item":"KjusBrows","Group":"FaceKjus",},{"Item":"KjusBlush","Group":"FaceKjus",},{"Item":"KjusMouth","Group":"FaceKjus",},{"Item":"KjusEyes","Group":"FaceKjus","Filters":{"Eyes2":{"gamma":0.8500000000000001,"saturation":0.43333333333333335,"contrast":1,"brightness":1,"red":2.6862745098039214,"green":2.843137254901961,"blue":4.607843137254902,"alpha":1},"Eyes":{"gamma":0.8500000000000001,"saturation":0.43333333333333335,"contrast":1,"brightness":1,"red":2.6862745098039214,"green":2.843137254901961,"blue":4.607843137254902,"alpha":1}}}]
+
+
+KDModelStyles['WolfgirlRavager'] = {
+	Cosplay: [ 'WolfgirlRavager' ],
+	Hairstyle: [ 'WolfgirlRavager' ],
+	Bodystyle: [ 'WolfgirlRavager' ],
+	Facestyle: [ 'WolfgirlRavager' ],
+}
+
 /**********************************************
  * Enemy definition: NEVERMERE ALPHA
 	A wolfgirl clone, that...
@@ -51,6 +70,8 @@ AddCallback('wolfgirlRavagerEffectCallback', (entity, target) => {
 		- Has an aura that gradually increases a "Heat" level in the player, boosting submit chance.
 */
 let wolfRavager = {
+	style: 'WolfgirlRavager',
+	outfit: 'WolfgirlRavager',
 	// Key to signal we added this so we can make sure we don't remove an enemy with the same name added by someone else (such as someone else making a mod to modify the bandit ravager)
 	// If you're making your own ravager, change this key or just remove it
 	addedByMod: 'RavagerFramework',
