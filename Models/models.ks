@@ -57,6 +57,17 @@ AddModel({
 	])
 })
 
+AddModel({
+	Name: "RavLiftedSkirt",
+	Folder: "Rope",
+	TopLevel: false,
+	Restraint: true,
+	AddPoseConditional: {
+		OptionCrotchRope: [ "CrotchStrap" ]
+	},
+	Layers: ToLayerMap([])
+});
+
 
 // This didn't fix the delayed loading either
 // KinkyDungeonRefreshEnemiesCache()
