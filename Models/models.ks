@@ -1,8 +1,15 @@
+// This didn't fix the delayed loading of the hairpin on ravagers
+// console.log(KDModFiles)
+// for (var i = 0; i < 100000; i++) {
+// 	try {
+// 		PIXI.Texture.fromURL(KDModFiles['Models/Hair/LargeHeartHairpin.png'])
+// 	} catch {}
+// }
+
 // This hairpin model was snagged from Arconox's Asset Pack: https://discord.com/channels/938203644023685181/1247315650238746655/1253067649970343946
 AddModel({
 	Name: "RavLargeHeartHairpin",
 	Folder: "Hair",
-	// Parent: "HairPins",
 	TopLevel: true,
 	Protected: true,
 	Categories: ["Hairstyles", "Accessories"],
@@ -13,6 +20,8 @@ AddModel({
 		Pri: 20
 	}])
 });
+addTextKey('m_RavLargeHeartHairpin', 'Ravager Hairpin')
+addTextKey('l_RavLargeHeartHairpin_LargeHeartHairpin', 'Hairpin')
 
 AddModel({
 	Name: "WolfgirlAlpha",
@@ -30,7 +39,6 @@ AddModel({
 
 AddModel({
 	Name: "FluffyPonytailRav",
-	// Parent: "Ponytail",
 	Folder: "Hair",
 	TopLevel: true,
 	Protected: true,
@@ -41,7 +49,6 @@ AddModel({
 
 AddModel({
 	Name: "FluffyPonytailRav2",
-	// Parent: "Ponytail",
 	Folder: "Hair",
 	TopLevel: true,
 	Protected: true,
@@ -50,5 +57,6 @@ AddModel({
 	])
 })
 
-addTextKey('m_RavLargeHeartHairpin', 'Ravager Hairpin')
-addTextKey('l_RavLargeHeartHairpin_LargeHeartHairpin', 'Hairpin')
+
+// This didn't fix the delayed loading either
+// KinkyDungeonRefreshEnemiesCache()
