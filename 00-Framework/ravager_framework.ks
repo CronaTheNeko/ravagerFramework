@@ -245,6 +245,11 @@ function ravagerFrameworkRefreshEnemies(reason) {
 }
 
 addTextKey('KDModButtonRavagerFramework', 'Ravager Framework')
+addTextKey('KDModButtonravagerDisableBandit', 'Disable Bandit Ravager')
+addTextKey('KDModButtonravagerDisableWolfgirl', 'Disable Wolfgirl Ravager')
+addTextKey('KDModButtonravagerDisableSlimegirl', 'Disable Slimegirl Ravager')
+addTextKey('KDModButtonravagerDisableTentaclePit', 'Disable Tentacle Pit')
+addTextKey('KDModButtonravagerSpicyTendril', 'Spicy Ravager Tendril Dialogue')
 if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 	KDEventMapGeneric['afterModSettingsLoad']['RavagerFramework'] = (e, data) => {
 		if (KDModSettings == null) {
@@ -254,35 +259,35 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 		if (KDModConfigs != undefined) {
 			KDModConfigs['RavagerFramework'] = [
 				{
-					name: 'Disable Bandit Ravager',
+					// name: 'Disable Bandit Ravager',
 					type: 'boolean',
 					refvar: 'ravagerDisableBandit',
 					default: false,
 					block: undefined
 				},
 				{
-					name: 'Disable Wolfgirl Ravager',
+					// name: 'Disable Wolfgirl Ravager',
 					type: 'boolean',
 					refvar: 'ravagerDisableWolfgirl',
 					default: false,
 					block: undefined
 				},
 				{
-					name: 'Disable Slimegirl Ravager',
+					// name: 'Disable Slimegirl Ravager',
 					type: 'boolean',
 					refvar: 'ravagerDisableSlimegirl',
 					default: false,
 					block: undefined
 				},
 				{
-					name: 'Disable Tentacle Pit',
+					// name: 'Disable Tentacle Pit',
 					type: 'boolean',
 					refvar: 'ravagerDisableTentaclePit',
 					default: false,
 					block: undefined
 				},
 				{
-					name: 'Spicy Ravager Tendril Dialogue',
+					// name: 'Spicy Ravager Tendril Dialogue',
 					type: 'boolean',
 					refvar: 'ravagerSpicyTendril',
 					default: false,
