@@ -948,7 +948,8 @@ KinkyDungeonRestraints.push(
 			{trigger: "tick", type: "ravagerCheckForPinned", power: -1},
 		],
 		failSuffix: {"Remove": "RavagerOccupied", "Struggle": "RavagerOccupied", "Cut": "RavagerOccupied"},
-		customEquip: 'RavagerOccupied'
+		customEquip: 'RavagerOccupied',
+		Model: "RavLiftedSkirt"
 	},
 )
 ////////////////
