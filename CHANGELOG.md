@@ -43,3 +43,4 @@ v6.0.3
 	- Modified 'RavagerOccupiedMouth' to use the Invisible Gag model (mouth open without gag)
 	- Modified 'RavagerOccupiedVulva' to use a blank model which lifts the skirt like crotch rope
 	- Added debug logging option
+	- Fixed RavagerTendril's crash from having no dialogue if the mod settings have never been loaded before
