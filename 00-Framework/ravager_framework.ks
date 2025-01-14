@@ -114,7 +114,7 @@ function ravagerFrameworkApplySpicyTendril(reason) {
 	console.log('[Ravager Framework] ravagerFrameworkApplySpicyTendril(' + reason + ')')
 	// Shortcut for settings
 	var settings = KDModSettings['RavagerFramework']
-	var dbg = settings.ravagerDebug;
+	var dbg = settings && settings.ravagerDebug;
 	dbg && console.log('[Ravager Framework] Tentacle Pit Spicy Dialogue set to ', settings.ravagerSpicyTendril)
 	// Check index for tendril
 	var tendrilIndex = KinkyDungeonEnemies.findIndex(val => { if (val.name == 'RavagerTendril' && val.addedByMod == 'RavagerFramework') return true })
@@ -148,7 +148,7 @@ function ravagerFrameworkRefreshEnemies(reason) {
 	console.log('[Ravager Framework] ravagerFrameworkRefreshEnemies(' + reason + ')')
 	// Shortcut for settings
 	var settings = KDModSettings['RavagerFramework']
-	let dbg = settings.ravagerDebug;
+	let dbg = settings && settings.ravagerDebug;
 	// Checking for bandit
 	var banditFoundIndex = KinkyDungeonEnemies.findIndex((val) => { if (val.name == 'BanditRavager' && val.addedByMod == 'RavagerFramework') return true })
 	// Check if we're supposed to be removing or adding the ravager
@@ -253,7 +253,7 @@ addTextKey('KDModButtonravagerDisableTentaclePit', 'Disable Tentacle Pit')
 addTextKey('KDModButtonravagerSpicyTendril', 'Spicy Ravager Tendril Dialogue')
 if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 	KDEventMapGeneric['afterModSettingsLoad']['RavagerFramework'] = (e, data) => {
-		let dbg = KDModSettings['RavagerFramework'].ravagerDebug;
+		let dbg = KDModSettings['RavagerFramework'] && KDModSettings['RavagerFramework'].ravagerDebug;
 		if (KDModSettings == null) {
 			KDModSettings = {}
 			dbg && console.log('[Ravager Framework] KDModSettings was null.')
@@ -347,7 +347,7 @@ let ravageEquipmentSlotTargets = {
 }
 
 KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bullet, entity) => {
-	let dbg = KDModSettings['RavagerFramework'].ravagerDebug;
+	let dbg = KDModSettings['RavagerFramework'] && KDModSettings['RavagerFramework'].ravagerDebug;
 	dbg && console.log('[Ravager Framework]: Effect: Ravage; Ravaging entity is', entity, 'target is', target)
 	let enemy = entity.Enemy
 	if(!enemy.ravage) throw 'Ravaging enemies need to have ravage settings!'
@@ -992,7 +992,7 @@ KDEventMapInventory["tickAfter"]["RavagerCheckForPinned"] = (e, item, data) => {
 // We handle narration in an event since it's easier to get everything across multiple enemies grouped nicely this way
 KDEventMapInventory["tickAfter"]["ravagerNarration"] = (e, item, data) => {
 	let playerRavage = KinkyDungeonPlayerEntity.ravage
-	KDModSettings['RavagerFramework'].ravagerDebug && console.log('[Ravager Framework][ravagerNarration] ', playerRavage)
+	KDModSettings['RavagerFramework'] && KDModSettings['RavagerFramework'].ravagerDebug && console.log('[Ravager Framework][ravagerNarration] ', playerRavage)
 	if(playerRavage) {
 		playerRavage.narrationBuffer.forEach(narration=>{
 			KinkyDungeonSendActionMessage(20, narration, "#ff00ff", 1, false, true);
