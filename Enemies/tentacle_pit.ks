@@ -377,9 +377,9 @@ let tendril = {
 					TameItemMouth: [ 'The EnemyName presses its\' tip against your lips...' ],
 					//
 					// Active narration
-					ItemVulva: [],
-					ItemButt: [],
-					ItemMouth: []
+					ItemVulva: [ 'The EnemyName rubs its\' wet tip against your pussy...' ],
+					ItemButt: [ 'The EnemyName rubs its\' wet tip against your ass...' ],
+					ItemMouth: [ 'The EnemyName presses its\' tip against your lips...' ],
 					//
 				}
 			}],
@@ -397,9 +397,9 @@ let tendril = {
 					TameItemMouth: [ 'You gag as your throat is filled by the tendril...' ],
 					//
 					// Active narration
-					ItemVulva: [],
-					ItemButt: [],
-					ItemMouth: []
+					ItemVulva: [ 'Your pussy is stretched as the thick tendril plunges inside of you...' ],
+					ItemButt: [ 'Your ass is stretched as the thick tendril plunges inside of you...' ],
+					ItemMouth: [ 'You gag as your throat is filled by the tendril...' ],
 					//
 				},
 				sp: -0.1,
@@ -420,9 +420,9 @@ let tendril = {
 					TameItemMouth: [ 'Another tendril emerges to cradle your head and wrap around your throat...' ],
 					//
 					// Active narration
-					ItemVulva: [],
-					ItemButt: [],
-					ItemMouth: []
+					ItemVulva: [ 'More tendrils emerge to grip your legs while your pussy is pounded...' ],
+					ItemButt: [ 'More tendrils emerge to grip your waist while your ass is pounded...' ],
+					ItemMouth: [ 'Another tendril emerges to cradle your head and wrap around your throat...' ],
 					//
 				},
 				sp: -0.15,
@@ -443,9 +443,9 @@ let tendril = {
 					TameItemMouth: [ 'You feel weak, the tendril filling your throat with each thrust!' ],
 					//
 					// Active narration
-					ItemVulva: [],
-					ItemButt: [],
-					ItemMouth: []
+					ItemVulva: [ 'You cry out with each thrust, smothered by tentacles!' ],
+					ItemButt: [ 'The tendril\'s rough thrusts drive pathetic whimpers out of you!' ],
+					ItemMouth: [ 'You feel weak, the tendril filling your throat with each thrust!' ],
 					//
 				},
 				sp: -0.2,
@@ -466,9 +466,9 @@ let tendril = {
 					TameItemMouth: [ 'You gag as the tendril thrusts into your throat, it\'s about to--!!' ],
 					//
 					// Active narration
-					ItemVulva: [],
-					ItemButt: [],
-					ItemMouth: []
+					ItemVulva: [ 'With rough final thrusts, the tendril pulsates quickly, it\'s about to--!!' ],
+					ItemButt: [ 'The tendril thrusts hard into your ass, it\'s about to--!!' ],
+					ItemMouth: [ 'You gag as the tendril thrusts into your throat, it\'s about to--!!' ],
 					//
 				},
 				sp: -0.2,
@@ -490,9 +490,9 @@ let tendril = {
 					TameItemMouth: [ 'You helplessly swallow wave after wave of the tendril\'s cum...' ],
 					//
 					// Active narration
-					ItemVulva: [],
-					ItemButt: [],
-					ItemMouth: []
+					ItemVulva: [ 'You moan loudly as your womb is flooded with the tendril\'s seed...!' ],
+					ItemButt: [ 'Your belly grows warm as you\'re filled with tentacle seed...' ],
+					ItemMouth: [ 'You helplessly swallow wave after wave of the tendril\'s cum...' ],
 					//
 				},
 				dp: 10,
