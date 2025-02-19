@@ -5,6 +5,8 @@
 	- DONE IN V006 - I really like the plant ravager idea
 - I like the ideas presented here: https://discord.com/channels/938203644023685181/1183991709768622090/1187386814718279720
 - "Borrow" some plans from "PLANS AND DETAILS.txt"
+- Bast ravager that turns the player into a catgirl?
+- Jail guard ravager that takes the player to a torture dungeon?
 
 From community:
 	- DONE IN V6.0.3 - 'Occupied' restraints apply skirt lift (like crotch rope) / mouth open (like invis gag) - https://discord.com/channels/938203644023685181/1183991709768622090/1298403509338640450
@@ -15,7 +17,7 @@ From community:
 	- Lower dodge while pinned - Just need to readjust variables that already exist (RavagerNoDodge) (Setting to 1000 penalty resulted in ~20% chance with ~-9900 evasion and ~-100000% penalty) - https://discord.com/channels/938203644023685181/1183991709768622090/1296897530277134387
 	- Option to strip all clothes, but not restraints; almost have this, just split {enemy}.ravage.bypassAll into two additional settings: bypassRestraints and bypassClothes - https://discord.com/channels/938203644023685181/1183991709768622090/1296897530277134387
 
-	- Remove all clothing so there isn't scenarios where you get stripped but there's no visual difference; scenarios fixable via above; example outfits with issues: https://discord.com/channels/938203644023685181/1183991709768622090/1297893018992644247 - https://discord.com/channels/938203644023685181/1183991709768622090/1297598589555445912
+	- Remove all clothing so there isn't scenarios where you get stripped but there's no visual difference; scenarios fixable via above ('Occupied' restraints with models); example outfits with issues: https://discord.com/channels/938203644023685181/1183991709768622090/1297893018992644247 - https://discord.com/channels/938203644023685181/1183991709768622090/1297598589555445912
 	- (Mouth?) occupation puts character in kneeling pose - None of the in-game poses work well for this idea - https://discord.com/channels/938203644023685181/1183991709768622090/1297205431113875526
 	- 'Private Time' status to repel non-ravagers while being ravaged - https://discord.com/channels/938203644023685181/1183991709768622090/1296897530277134387
 	- Make sure 'Have fun with me' flirting option triggers ravaging correctly - https://discord.com/channels/938203644023685181/1183991709768622090/1296897530277134387
@@ -32,6 +34,7 @@ From community:
 	- 'Harem Demon' to summon lesser demons as ravagers to only grope you. Once weakened/'captured', 'harem lord' comes to take advantage - https://discord.com/channels/938203644023685181/1183991709768622090/1310026935258185759
 	- Mimics that use the player for some amount of time/until a condition - https://discord.com/channels/938203644023685181/1183991709768622090/1310389721649909813
 	- Ruined makeup after being ravaged would need a model as some sort of makeup that can't be hidden by blindfolds that cover a smaller area than the makeup - https://discord.com/channels/938203644023685181/1183991709768622090/1316222771453235221
+	- Add sound effects to ravaging - use `Object.values(KDAllModFiles).map((mod) => mod.filename).includes('GirlSound.ks')` to check if the current Sound Effect mod is loaded in order to avoid playing multiple sound effects (also check for 'girlsound.ks' to check for death_comsos' old sound effect mod) - https://discord.com/channels/938203644023685181/1183991709768622090/1329505099705487411
 
 
 Known Issues:
