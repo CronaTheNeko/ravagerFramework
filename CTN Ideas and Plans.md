@@ -38,6 +38,8 @@ Planned features may or may not adhere to a planned version. Ideas are not firm 
 - Check for cross-mod incompat; See known issues;
 	- [Post](https://discord.com/channels/938203644023685181/1183991709768622090/1296759755611574303)
 	- [Mod list](https://discord.com/channels/938203644023685181/1183991709768622090/1296803426390380564)
+- Ravagers using player while keeping them in furniture restraint
+	- [Post](https://discord.com/channels/938203644023685181/1183991709768622090/1343741161277489184)
 
 ## Ideas
 - I like the ideas presented here: https://discord.com/channels/938203644023685181/1183991709768622090/1187386814718279720
