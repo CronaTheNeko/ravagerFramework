@@ -9,7 +9,12 @@ function AddCallback(key, func) {
 }
 // Moved the All Range Callback so it'll actually work
 AddCallback('slimegirlRavagerAllRangeCallback', (entity, target) => {
-	let roll = Math.random() < 0.05
+	console.log(entity)
+	console.log(entity.Enemy.ravage.addSlimeChance)
+	console.log(KDModSettings['RavagerFramework'].ravagerSlimeAddChance)
+	// let roll = Math.random() < 0.05
+	let roll = Math.random() < entity.Enemy.ravage.addSlimeChance
+	// let roll = Math.random() < KDModSettings['RavagerFramework']
 	if(roll) {
 		let restraintAdd = KinkyDungeonGetRestraint({tags: ["slimeRestraintsRandom"]}, MiniGameKinkyDungeonLevel + 1, KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint])
 		// console.log('[Ravager Framework] SlimeGirl chose to add ', restraintAdd)
@@ -114,6 +119,7 @@ let slimeRavager = {
 		Ravage setup
 	*/
 	ravage: { // custom ravage settings
+		addSlimeChance: 0.05, // Chance to add slime restraint to player
 		targets: ["ItemVulva", "ItemMouth", "ItemButt"],
 		refractory: 50, 
 		needsEyes: false,

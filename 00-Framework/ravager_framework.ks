@@ -106,7 +106,22 @@ function ravagerSettingsRefresh(reason) {
 	console.log('[Ravager Framework] Running settings functions for reason: ' + reason)
 	ravagerFrameworkRefreshEnemies(reason)
 	ravagerFrameworkApplySpicyTendril(reason)
+	ravagerFrameworkApplySlimeRestrictChance(reason)
 	console.log('[Ravager Framework] Finished running settings functions')
+}
+// Change slime girl's chance to add slime to the player
+function ravagerFrameworkApplySlimeRestrictChance(reason) {
+	console.log('[Ravager Framework] ravagerFrameworkApplySlimeRestrictChance(' + reason + ')')
+	var settings = KDModSettings['RavagerFramework'];
+	var dbg = settings && settings.ravagerDebug;
+	dbg && console.log('[Ravager Framework] Setting Slime Girl\'s restrict chance to ' + settings.ravagerSlimeAddChance)
+	var slimeIndex = KinkyDungeonEnemies.findIndex(val => { if (val.name == 'SlimeRavager' && val.addedByMod == 'RavagerFramework') return true });
+	if (!settings.ravagerDisableSlimegirl && slimeIndex >= 0) {
+		var slime = KinkyDungeonEnemies[slimeIndex]
+		slime.ravage.addSlimeChance = settings.ravagerSlimeAddChance
+		dbg && console.log('[Ravager Framework] Refreshing enemy cache')
+		KinkyDungeonRefreshEnemiesCache()
+	}
 }
 // Mod settings for changing spicy dialogue for tendril
 // This NEEDS to be run AFTER ravagerFrameworkRefreshEnemies, as this relies on enemy enabled state being consistent with the relevant setting
@@ -251,6 +266,7 @@ addTextKey('KDModButtonravagerDisableWolfgirl', 'Disable Wolfgirl Ravager')
 addTextKey('KDModButtonravagerDisableSlimegirl', 'Disable Slimegirl Ravager')
 addTextKey('KDModButtonravagerDisableTentaclePit', 'Disable Tentacle Pit')
 addTextKey('KDModButtonravagerSpicyTendril', 'Spicy Ravager Tendril Dialogue')
+addTextKey('KDModButtonravagerSlimeAddChance', 'Slimegirl Restrict Chance')
 if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 	KDEventMapGeneric['afterModSettingsLoad']['RavagerFramework'] = (e, data) => {
 		let dbg = KDModSettings['RavagerFramework'] && KDModSettings['RavagerFramework'].ravagerDebug;
@@ -299,6 +315,15 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 					type: 'boolean',
 					refvar: 'ravagerSpicyTendril',
 					default: false,
+					block: undefined
+				},
+				{
+					type: 'range',
+					refvar: 'ravagerSlimeAddChance',
+					default: 0.05,
+					rangelow: 0,
+					rangehigh: 1,
+					stepcount: 0.01,
 					block: undefined
 				}
 			]
