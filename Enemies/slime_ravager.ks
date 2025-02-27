@@ -56,22 +56,22 @@ let slimeRavager = {
 	// If you're making your own ravager, change this key or just remove it
 	addedByMod: 'RavagerFramework',
 	// id data
-	name: "SlimeRavager", 
-	faction: "Slime", 
-	clusterWith: "slime", 
+	name: "SlimeRavager",
+	faction: "Slime",
+	clusterWith: "slime",
 	playLine: "SlimeAdv",
 	bound: "SlimeAdv", // Not sure what this will end up requiring, we'll see eventually
 	squeeze: true,
 	color: "#FF00FF",
 	tags: KDMapInit([ 
-		"opendoors", 
-		"closedoors", 
+		"opendoors",
+		"closedoors",
 		"slime",  
 		"melee",
 		"elite",
-		"meleeresist", 
-		"electricweakness", 
-		"acidresist", 
+		"meleeresist",
+		"electricweakness",
+		"acidresist",
 		"chainimmune",
 		"iceweakness",
 		"unflinching", // makes enemy unable to be pulled/pushed. maybe don't remove this
@@ -80,17 +80,17 @@ let slimeRavager = {
 	]),
 
 	// AI
-	ignorechance: 0, 
-	followRange: 1, 
+	ignorechance: 0,
+	followRange: 1,
 	AI: "hunt",
 	Animations: ["squishy"],
 
 	// core stats
-	armor: 1.5, 
-	maxhp: 10, 
+	armor: 1.5,
+	maxhp: 10,
 	minLevel:0, //notably this affects the earliest floor they can spawn on
 	weight: 2,
-	visionRadius: 5, 
+	visionRadius: 5,
 	blindSight: 2.5,
 	movePoints: 3,
 	evasion: 0.3,
@@ -103,15 +103,15 @@ let slimeRavager = {
 	attackLock: "White",
 	power: 1, //i don't think this actually does anything with this enemy's setup - on theory, affects how strong their hits are
 	attackPoints: 2, //set this to 0 for it to happen instantly on contact, no telegraph
-	attackWidth: 1, 
-	attackRange: 1, 
+	attackWidth: 1,
+	attackRange: 1,
 	fullBoundBonus: 0,
 	disarm: 0.2,
 	hitsfx: "Grab",
 
 	// spawning/drops, i made this enemy drop a bunch of cash as reward
-	terrainTags: {"increasingWeight":-1, "slime": 4, "slimeOptOut": -2, "slimePref": 2, "jungle": 20, "alchemist": 4}, 
-	allFloors: true, 
+	terrainTags: {"increasingWeight":-1, "slime": 4, "slimeOptOut": -2, "slimePref": 2, "jungle": 20, "alchemist": 4},
+	allFloors: true,
 	shrines: ["Latex"],
 	dropTable: [{name: "Nothing", weight: 10}, {name: "StaffGlue", weight: 3, ignoreInInventory: true}, {name: 'SlimeSword', weight: 3, ignoreInInventory: true}],
 
@@ -121,7 +121,7 @@ let slimeRavager = {
 	ravage: { // custom ravage settings
 		addSlimeChance: 0.05, // Chance to add slime restraint to player
 		targets: ["ItemVulva", "ItemMouth", "ItemButt"],
-		refractory: 50, 
+		refractory: 50,
 		needsEyes: false,
 		bypassSpecial: ["Slime", "Rubber", "Liquid Metal"],
 		
