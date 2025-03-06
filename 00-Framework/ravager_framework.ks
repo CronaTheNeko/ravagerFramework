@@ -855,7 +855,8 @@ KinkyDungeonRestraints.push(
 			{trigger: "tickAfter", type: "ravagerNarration", power: -100},
 			{trigger: "tickAfter", type: "ravagerPinCheck", power: -100},
 			{trigger: "passout", type: "ravagerRemove", power: -100},
-			{trigger: "remove", type: "ravagerRemove", power: -100}
+			{trigger: "remove", type: "ravagerRemove", power: -100},
+			{ trigger: "tickAfter", type: "sitDownAndShutUp" }
 		],
 		failSuffix: {"Remove": "RavagerPinned", "Struggle": "RavagerPinned", "Cut": "RavagerPinned"},
 		customEquip: 'RavagerPinned',
@@ -979,6 +980,17 @@ KinkyDungeonRestraints.push(
 )
 ////////////////
 // Events
+
+KDEventMapInventory["tickAfter"]["sitDownAndShutUp"] = (e, item, data) => {
+	console.log("[RavagerFramework] [sitDownAndShutUp]\ne: ", e, "\nitem: ", item, "\ndata: ", data)
+	let nearby = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 5)
+	nearby.forEach(enemy => {
+		// console.log(enemy)
+		if (!enemy.Enemy.ravage) {
+			enemy.stun = 2
+		}
+	})
+}
 
 // Each tick, check to see if the player is still pinned by anyone
 KDEventMapInventory["tickAfter"]["ravagerPinCheck"] = (e, item, data) => {
