@@ -66,6 +66,28 @@
 	* STRIP/PIN: If player and has clothing covering pelvis, or belted/vulva-plugged, remove. Lastly pins, preparing for the third phase.
 	* RAVAGE: If player and has exposed + unoccupied pelvis/vulva item groups, enter a sex state with increasing intensity
 */
+// Function to add callbacks
+/**********************************************
+ * Callback definition helper
+ * This function is a simple helper the I would recommend using if you're going to add callbacks for your ravager.
+ * Takes two parameters:
+ * 	- The key which will be used to reference your callback. This is the value to use when setting a callback value inside your ravager's definition.
+ * 	- The function to use as a callback. 
+ * Note: If you decide to not use this function, there are two things you need to know:
+ * 	- If RavagerFramework itself does not load before your enemy, KDEventMapEnemy['ravagerCallbacks'] will not exist yet. This will cause the game will show a crash if you try to add a callback entry into that map, and that will cause execution of your JS file to stop at that line, potentially causing your ravager to never be added to the game
+ * 	- Your function should be the value of KDEventMapEnemy['ravagerCallbacks'][<callback name>]
+*/
+window.RavagerAddCallback = (key, func) => {
+	if (!KDEventMapEnemy['ravagerCallbacks']) {
+		KDEventMapEnemy['ravagerCallbacks'] = {}
+		if (!KDEventMapEnemy['ravagerCallbacks']) {
+			throw new Error('[Ravager Framework] Failed to initialize the ravager callbacks key! Something seems to have gone very wrong. Please report this to the Ravager Framework with as much info as you can provide.')
+		}
+	}
+	console.log('[Ravager Framework] Adding callback function with key: ', key)
+	KDEventMapEnemy['ravagerCallbacks'][key] = func
+	return Boolean(KDEventMapEnemy['ravagerCallbacks'][key])
+}
 
 // Add our callbacks key
 if (! KDEventMapEnemy['ravagerCallbacks']) {
@@ -98,7 +120,8 @@ let debugCallbacks = {
 	}
 }
 for (var key in debugCallbacks) {
-	KDEventMapEnemy['ravagerCallbacks'][key] = debugCallbacks[key]
+	if (!RavagerAddCallback(key, debugCallbacks[key]))
+		console.error('[Ravager Framework] Failed to add debug callback: ', key)
 }
 
 // Base settings function, simplifying reloading settings

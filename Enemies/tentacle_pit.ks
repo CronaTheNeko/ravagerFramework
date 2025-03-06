@@ -1,23 +1,3 @@
-/**********************************************
- * Callback definition helper
- * This function is a simple helper the I would recommend using if you're going to add callbacks for your ravager.
- * Takes two parameters:
- * 	- The key which will be used to reference your callback. This is the value to use when setting a callback value inside your ravager's definition.
- * 	- The function to use as a callback. 
- * Note: If you decide to not use this function, there are two things you need to know:
- * 	- If RavagerFramework itself does not load before your enemy, KDEventMapEnemy['ravagerCallbacks'] will not exist yet. This will cause the game will show a crash if you try to add a callback entry into that map, and that will cause execution of your JS file to stop at that line, potentially causing your ravager to never be added to the game
- * 	- Your function should be the value of KDEventMapEnemy['ravagerCallbacks'][<callback name>]
-*/
-function AddCallback(key, func) {
-	if (! KDEventMapEnemy['ravagerCallbacks']) {
-		throw new Error('Ravager Framework has not been loaded yet! Please ensure that the Framework has been added and is listed alphabetically before your custom Ravager mod. If this is happening without any additional ravager mods (aka only Ravager Framework is adding ravagers), please post as much info as you can to the framework\'s thread on Discord so it can be investigated')
-	} else {
-		// When creating a custom ravager mod, I'd suggest changing this log call to have your mod's name inside the [ ] to help make it more clear what is loading when
-		console.log('[Ravager Framework] Adding callback function with key ', key)
-		KDEventMapEnemy['ravagerCallbacks'][key] = func
-	}
-}
-
 // BEGIN Tentacle Pit
 // Tentacle Pit definition
 let pit = {
@@ -209,12 +189,15 @@ addTextKey('KinkyDungeonSummonSingleRavagerTendril', 'An eager tentacle bursts o
 
 // BEGIN Ravaging Tendril
 // Completion callback to kill tendril upon ravaging completion
-AddCallback('pitTendrilCompletion', (enemy, target, passedOut) => {
+function pitTendrilCompletion(enemy, target, passedOut) {
 	console.log('[Ravager Framework] killing tendril')
 	enemy.hp = 0;
-})
+}
+if (!RavagerAddCallback('pitTendrilCompletion', pitTendrilCompletion)) {
+	console.error('[Ravager Framework][Tentacle Pit] Failed to add pitTendrilCompletion!')
+}
 // Effect callback for groping before ravaging
-AddCallback('pitTendrilEffectCallback', (enemy, target) => {
+function pitTendrilEffect(enemy, target) {
 	console.log('tendirl test')
 	// return false
 	if (enemy.ravage && enemy.ravage.progress == 1 && !enemy.ravage.finishedCarressing) {
@@ -248,7 +231,10 @@ AddCallback('pitTendrilEffectCallback', (enemy, target) => {
 		}
 	}
 	return false
-})
+}
+if (!RavagerAddCallback('pitTendrilEffectCallback', pitTendrilEffect)) {
+	console.error('[Ravager Framework][Tentacle Pit] Failed to add pitTendrilEffectCallback!')
+}
 // Tendril definition
 let tendril = {
 	addedByMod: 'RavagerFramework',
