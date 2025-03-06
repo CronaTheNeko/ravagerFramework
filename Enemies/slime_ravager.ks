@@ -262,4 +262,5 @@ addTextKey('KinkyDungeonRemindJailSlimeAdvMiss', 'Playing hard to get?~')
 addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandBlock', 'Get back here, sweetie~')
 // KinkyDungeonRemindJailChaseSlimeAdvCommandDefend
 addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandDefend', '') // Based on vanilla text entries, 'CommandDefend' seems to be shown when showing up to assist another npc. Might just leave this empty (as Fuuka does)
+addTextKey('KinkyDungeonRemindJailChaseSlimeAdvAlert', '') // Left empty because I'm not sure what to write here
 // Text keys still needed: 
