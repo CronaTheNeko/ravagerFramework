@@ -2,7 +2,7 @@
 name: Missing text
 about: Create a report for missing text
 title: "[TEXT KEY]"
-labels: ''
+labels: text keys
 assignees: ''
 
 ---
