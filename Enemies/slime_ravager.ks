@@ -117,7 +117,7 @@ let slimeRavager = {
 		targets: ["ItemVulva", "ItemMouth", "ItemButt"],
 		refractory: 50,
 		needsEyes: false,
-		bypassSpecial: ["Slime", "Rubber", "Liquid Metal"],
+		bypassSpecial: ["Slime", "Rubber", "LiquidMetal"],
 		
 		onomatopoeia: ["CLAP...", "PLAP..."], //floats overhead like stat changes (can be unspecified for none)
 		doneTaunts: ["That was good...", "Give me a minute and we'll go again, okay~?", "Such a good girl~!"],
