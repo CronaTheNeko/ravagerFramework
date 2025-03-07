@@ -1,4 +1,4 @@
-// Moved the All Range Callback so it'll actually work
+// Add a leash, shock module, or leash to the player during use -- Might make this chance based
 function wolfgirlRavagerAllRange(entity, target) {
 	let collared = KinkyDungeonPlayerTags.get("Collars");
 	let moduled = KinkyDungeonPlayerTags.get("Modules");
@@ -17,7 +17,7 @@ function wolfgirlRavagerAllRange(entity, target) {
 if (!RavagerAddCallback('wolfgirlRavagerAllRangeCallback', wolfgirlRavagerAllRange)) {
 	console.error('[Ravager Framework][Wolfgirl Ravager] Failed to add wolfgirlRavagerAllRangeCallback!')
 }
-// Moved the Submit Chance Modifier so it'll actually work
+// Increase submission chance if wearing shock module
 function wolfgirlSubmitChanceModifier(entity, target, baseSubmitChance) {
 	if(KinkyDungeonPlayerTags.get("Item_ShockModule")) {
 		KinkyDungeonSendTextMessage(5, "Your shock module gently insists you submit... (+20% Submit Chance)", "#ff44ff", 3);
@@ -28,12 +28,10 @@ function wolfgirlSubmitChanceModifier(entity, target, baseSubmitChance) {
 if (!RavagerAddCallback('wolfgirlSubmitChanceModifierCallback', wolfgirlSubmitChanceModifier)) {
 	console.error('[Ravager Framework][Wolfgirl Ravager] Failed to add wolfgirlSubmitChanceModifierCallback!')
 }
-// Hopefully we can get her spell functional here without screwing up the ravaging
+// Workaround for not being able to get the spell working well with ravaging
 function wolfgirlRavagerEffect(entity, target) {
-	// console.log('[Ravager Framework] [Wolfgirl Status Callback] ', entity, target)
 	if (!entity.hasThrownDevice) {
 		let res = KinkyDungeonCastSpell(target.x, target.y, KinkyDungeonSpellListEnemies.find((spell) => { if (spell.name == 'RestrainingDevice') return true}), entity)
-		// console.log(res)
 		entity.hasThrownDevice = true
 		return true
 	}
