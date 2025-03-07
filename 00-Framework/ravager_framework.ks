@@ -614,14 +614,14 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				let tmp_baseSubmitChance = KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.submitChanceModifierCallback](entity, target, baseSubmitChance)
 				switch (typeof tmp_baseSubmitChance) {
 				case 'undefined':
-					console.log('[Ravager Framework] WARNING: Ravager ', entity.Enemy.name, '(', TextGet('name' + entity.Enemy.name), ') used a submitChanceModifierCallback which returned no value! This result will be ignored. Please report this issue to the author of this ravager!')
+					console.warn('[Ravager Framework] WARNING: Ravager ', entity.Enemy.name, '(', TextGet('name' + entity.Enemy.name), ') used a submitChanceModifierCallback which returned no value! This result will be ignored. Please report this issue to the author of this ravager!')
 					break
 				case 'number':
 					baseSubmitChance = tmp_baseSubmitChance
 					dbg && console.log('[Ravager Framework] Base submit chance changed to ', baseSubmitChance)
 					break
 				default:
-					console.log('[Ravager Framework] WARNING: Ravager ', entity.Enemy.name, '(', TextGet('name' + entity.Enemy.name), ') used a submitChanceModifierCallback which returned a non-number value (', tmp_baseSubmitChance, ')! This result will be ignored. Please report this issue to the author of this ravager!')
+					console.warn('[Ravager Framework] WARNING: Ravager ', entity.Enemy.name, '(', TextGet('name' + entity.Enemy.name), ') used a submitChanceModifierCallback which returned a non-number value (', tmp_baseSubmitChance, ')! This result will be ignored. Please report this issue to the author of this ravager!')
 					break
 				}
 			}
@@ -819,9 +819,9 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 									didRestrain = true
 								}
 							} catch (e) {
-								console.log('[Ravager Framework] Caught error while adding a restraint as a fallback: ', e)
+								console.warn('[Ravager Framework] Caught error while adding a restraint as a fallback: ', e)
 							}
-						} else { console.log('[Ravager Framework] CANIDATE RESTRAINT INVALID! ', canidateRestraint) }
+						} else { console.error('[Ravager Framework] CANIDATE RESTRAINT INVALID! ', canidateRestraint) }
 					}
 				}
 				//
