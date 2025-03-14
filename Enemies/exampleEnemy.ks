@@ -163,7 +163,7 @@ let exampleEnemy = {
 
 		/*
 		 * Progression data
-		 * The first array item that has a number less than or equal to the ravager's current progress is the one used.
+		 * The first array item that has a number greater than or equal to the ravager's current progress is the one used.
 		 * You can use any ranges, greater than or equal to 1. Range 0 does technically exist, but these ranges are not checked until range 1.
 		 * The ravaging will end after the ravager's progress equals the last/largest item in your ranges array. The Bandit, Wolf, Slime, and Tentacle ravagers all end at range 20, but you can make yours longer or shorter
 		 * Range format: [ range, values ]
