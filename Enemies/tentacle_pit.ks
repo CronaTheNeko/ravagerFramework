@@ -163,13 +163,9 @@ let summonSpell = {
 let summonCondition = (enemy, target) => {
 	// Condition copied and modified from SarcoKraken's summon minion condition
 	let nearbyEnemies = KDNearbyEnemies(enemy.x, enemy.y, 10) // How many enemies are nearby
-	// console.log(nearbyEnemies)
 	let nearbyMinions = nearbyEnemies.filter(enemy => { return enemy.Enemy?.tags.pittendril }) // How many of the nearby enemies are minions
-	// console.log(nearbyMinions)
 	let maxByHP = Math.floor(enemy.hp / enemy.Enemy.maxhp / 0.2) // How many minions can it have depending on health
-	// console.log(maxByHP)
 	let minCount = Math.min(2, 1 + maxByHP) // How many minions can we summon, minimum of defined max (2 to get three minions out) or max based on health (+1 to ensure we always can summon at least one)
-	// console.log(minCount)
 	if (nearbyMinions.length > minCount)
 		return false
 	return true
@@ -190,23 +186,17 @@ addTextKey('KinkyDungeonSummonSingleRavagerTendril', 'An eager tentacle bursts o
 // BEGIN Ravaging Tendril
 // Completion callback to kill tendril upon ravaging completion
 function pitTendrilCompletion(enemy, target, passedOut) {
-	console.log('[Ravager Framework] killing tendril')
+	console.log('[Ravager Framework][Ravager Tendril] Killing tendril')
 	enemy.hp = 0;
 }
 if (!RavagerAddCallback('pitTendrilCompletion', pitTendrilCompletion)) {
-	console.error('[Ravager Framework][Tentacle Pit] Failed to add pitTendrilCompletion!')
+	console.error('[Ravager Framework][Ravager Tendril] Failed to add pitTendrilCompletion!')
 }
 // Effect callback for groping before ravaging
 function pitTendrilEffect(enemy, target) {
-	console.log('tendirl test')
-	// return false
 	if (enemy.ravage && enemy.ravage.progress == 1 && !enemy.ravage.finishedCarressing) {
-		// KinkyDungeonSendFloater(enemy, 'caress', '#ffffff', 2)
-		// return true
 		if (Math.random() < enemy.Enemy.ravage.caressChance) {
-			console.log('[Ravager Framework][RavagerTendril] Carressing player before ravaging')
-			// KinkyDungeonSendFloater(enemy, 'caress', '#ffffff', 2)
-			// KinkyDungeonSendActionMessage(20, 'caress', '#ff00ff', 1)
+			console.log('[Ravager Framework][Ravager Tendril] Carressing player before ravaging')
 			let msg = ''
 			switch (enemy.ravage.slot) {
 			case 'ItemVulva':
@@ -233,7 +223,7 @@ function pitTendrilEffect(enemy, target) {
 	return false
 }
 if (!RavagerAddCallback('pitTendrilEffectCallback', pitTendrilEffect)) {
-	console.error('[Ravager Framework][Tentacle Pit] Failed to add pitTendrilEffectCallback!')
+	console.error('[Ravager Framework][Ravager Tendril] Failed to add pitTendrilEffectCallback!')
 }
 // Tendril definition
 let tendril = {
@@ -297,7 +287,7 @@ let tendril = {
 		},
 		{
 			trigger: 'tickAfter',
-			type: 'ravagerRefactory'
+			type: 'ravagerRefractory'
 		}
 	],
 	nopickpocket: true,
@@ -341,7 +331,7 @@ let tendril = {
 	ravage: {
 		caressChance: 0.5,
 		targets: ['ItemVulva', 'ItemButt', 'ItemMouth'],
-		refactory: 5, // Planning to make the tendril despawn on completion, so this shouldn't matter
+		refactory: 5, // Tendril is killed on completion, so this really doesn't matter
 		needsEyes: false, // Could try to hypno player to 'addict' them by adding a debuff after a while of not being ravaged by plant; maybe a good use for the ravagerTendrilCum; maybe better done through an aphrodisiac for the plant
 		onomatopoeia: ['*Excited wriggling*', 'CLAP...', 'PLAP...'],
 		doneTaunts: ['*Happy caressing*'],
