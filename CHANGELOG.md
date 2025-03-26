@@ -63,6 +63,8 @@ v6.0.4
 	+ This is a dirty fix for that behavior and will hopefully be temporary
 - Increased evasion penalty while pinned
 - Fixed ravagers fallback narration never being used (the narration that is supposed to happen between ravaging sessions)
+- Reduced the toughness of struggling from a pin
+	+ For details, a struggle attempt requires about 30 usable stamina and struggling free should take about 5 struggle attempts
 - Ravager development:
 	+ Added `ravagerDevelopers.md` to document all framework-specific options available
 	+ Added globally accessible helper function to add callbacks for custom ravager development
