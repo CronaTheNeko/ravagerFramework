@@ -66,6 +66,28 @@
 	* STRIP/PIN: If player and has clothing covering pelvis, or belted/vulva-plugged, remove. Lastly pins, preparing for the third phase.
 	* RAVAGE: If player and has exposed + unoccupied pelvis/vulva item groups, enter a sex state with increasing intensity
 */
+// Function to add callbacks
+/**********************************************
+ * Callback definition helper
+ * This function is a simple helper the I would recommend using if you're going to add callbacks for your ravager.
+ * Takes two parameters:
+ * 	- The key which will be used to reference your callback. This is the value to use when setting a callback value inside your ravager's definition.
+ * 	- The function to use as a callback. 
+ * Note: If you decide to not use this function, there are two things you need to know:
+ * 	- If RavagerFramework itself does not load before your enemy, KDEventMapEnemy['ravagerCallbacks'] will not exist yet. This will cause the game will show a crash if you try to add a callback entry into that map, and that will cause execution of your JS file to stop at that line, potentially causing your ravager to never be added to the game
+ * 	- Your function should be the value of KDEventMapEnemy['ravagerCallbacks'][<callback name>]
+*/
+window.RavagerAddCallback = (key, func) => {
+	if (!KDEventMapEnemy['ravagerCallbacks']) {
+		KDEventMapEnemy['ravagerCallbacks'] = {}
+		if (!KDEventMapEnemy['ravagerCallbacks']) {
+			throw new Error('[Ravager Framework] Failed to initialize the ravager callbacks key! Something seems to have gone very wrong. Please report this to the Ravager Framework with as much info as you can provide.')
+		}
+	}
+	console.log('[Ravager Framework] Adding callback function with key: ', key)
+	KDEventMapEnemy['ravagerCallbacks'][key] = func
+	return Boolean(KDEventMapEnemy['ravagerCallbacks'][key])
+}
 
 // Add our callbacks key
 if (! KDEventMapEnemy['ravagerCallbacks']) {
@@ -98,7 +120,8 @@ let debugCallbacks = {
 	}
 }
 for (var key in debugCallbacks) {
-	KDEventMapEnemy['ravagerCallbacks'][key] = debugCallbacks[key]
+	if (!RavagerAddCallback(key, debugCallbacks[key]))
+		console.error('[Ravager Framework] Failed to add debug callback: ', key)
 }
 
 // Base settings function, simplifying reloading settings
@@ -591,14 +614,14 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				let tmp_baseSubmitChance = KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.submitChanceModifierCallback](entity, target, baseSubmitChance)
 				switch (typeof tmp_baseSubmitChance) {
 				case 'undefined':
-					console.log('[Ravager Framework] WARNING: Ravager ', entity.Enemy.name, '(', TextGet('name' + entity.Enemy.name), ') used a submitChanceModifierCallback which returned no value! This result will be ignored. Please report this issue to the author of this ravager!')
+					console.warn('[Ravager Framework] WARNING: Ravager ', entity.Enemy.name, '(', TextGet('name' + entity.Enemy.name), ') used a submitChanceModifierCallback which returned no value! This result will be ignored. Please report this issue to the author of this ravager!')
 					break
 				case 'number':
 					baseSubmitChance = tmp_baseSubmitChance
 					dbg && console.log('[Ravager Framework] Base submit chance changed to ', baseSubmitChance)
 					break
 				default:
-					console.log('[Ravager Framework] WARNING: Ravager ', entity.Enemy.name, '(', TextGet('name' + entity.Enemy.name), ') used a submitChanceModifierCallback which returned a non-number value (', tmp_baseSubmitChance, ')! This result will be ignored. Please report this issue to the author of this ravager!')
+					console.warn('[Ravager Framework] WARNING: Ravager ', entity.Enemy.name, '(', TextGet('name' + entity.Enemy.name), ') used a submitChanceModifierCallback which returned a non-number value (', tmp_baseSubmitChance, ')! This result will be ignored. Please report this issue to the author of this ravager!')
 					break
 				}
 			}
@@ -796,9 +819,9 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 									didRestrain = true
 								}
 							} catch (e) {
-								console.log('[Ravager Framework] Caught error while adding a restraint as a fallback: ', e)
+								console.warn('[Ravager Framework] Caught error while adding a restraint as a fallback: ', e)
 							}
-						} else { console.log('[Ravager Framework] CANIDATE RESTRAINT INVALID! ', canidateRestraint) }
+						} else { console.error('[Ravager Framework] CANIDATE RESTRAINT INVALID! ', canidateRestraint) }
 					}
 				}
 				//
@@ -806,7 +829,15 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				if (!didRestrain) {
 					dbg && console.log('[Ravager Framework] We DIDN\'T add a restraint, let\'s grope')
 					let dmg = KinkyDungeonDealDamage({damage: 1, type: "grope"});
-					if(enemy.fallbackNarration) KinkyDungeonSendTextMessage(10, ravRandom(enemy.fallbackNarration).replace("EnemyName", TextGet("Name" + entity.Enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff	", 4);
+					if (!enemy.ravage.noFallbackNarration) {
+						if(enemy.ravage.fallbackNarration) {
+							KinkyDungeonSendTextMessage( 10, ravRandom(enemy.ravage.fallbackNarration).replace("EnemyName", TextGet("Name" + enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff", 4);
+						} else {
+							KinkyDungeonSendTextMessage( 10, "The EnemyName roughly gropes you! (DamageTaken)".replace("EnemyName", TextGet("Name" + enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff", 4);
+						}
+					} else {
+						deb && console.log('[Ravager Framework] ', enemy.name, ' requests no fallback narration.')
+					}
 				}
 				//
 			}
@@ -835,12 +866,12 @@ KinkyDungeonRestraints.push(
 		bindarms: true,
 		bindhands: true,
 		blockfeet: true,
-		power: 20, 
+		power: 0.1,
 		weight: 20, 
 		alwaysStruggleable: true,
 		alwaysEscapable: ["Struggle"],
-		escapeChance: {"Struggle": 0.5, "Remove": 0.2, "Cut": 0.75},
-		struggleMinSpeed: {"Struggle": 0.1},
+		escapeChance: {"Struggle": -0.1, "Remove": 0.2, "Cut": 0.75},
+		struggleMinSpeed: {"Struggle": 0.2},
 		playerTags: {"ItemArmsFull":2},
 		enemyTags: {},
 		minLevel: 0, 
@@ -850,7 +881,7 @@ KinkyDungeonRestraints.push(
 		shrine: [],
 		events: [
 			{trigger: "tick", type: "sneakBuff", power: -1},
-			{trigger: "tick", type: "evasionBuff", power: -100},
+			{trigger: "tick", type: "evasionBuff", power: -1000},
 			{trigger: "tick", type: "blockBuff", power: -100},
 			{trigger: "tickAfter", type: "ravagerNarration", power: -100},
 			{trigger: "tickAfter", type: "ravagerPinCheck", power: -100},

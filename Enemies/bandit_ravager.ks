@@ -5,22 +5,6 @@
 	- Has a special attack that applies the ravage "effect"
 */
 
-/**********************************************
- * Callback definition helper
- * This function is a simple helper the I would recommend using if you're going to add callbacks for your ravager.
- * Takes two parameters:
- * 	- The key which will be used to reference your callback. This is the value to use when setting a callback value inside your ravager's definition.
- * 	- The function to use as a callback. 
-*/
-// function AddCallback(key, func) {
-// 	if (! KDEventMapEnemy['ravagerCallbacks']) {
-// 		throw new Error('Ravager Framework has not been loaded yet! Please ensure that the Framework has been added and is listed alphabetically before your custom Ravager mod.')
-// 	} else {
-// 		console.log('[Ravager Framework] Adding callback function with key ', key)
-// 		KDEventMapEnemy['ravagerCallbacks'][key] = func
-// 	}
-// }
-
 KDModelDresses['BanditRavager'] = [{"Item":"FashionBlindfoldTape","Group":"Blindfold","TopLevel":true,"Restraint":false,"Categories":["Restraints","Blindfolds","FashionRestraints"],"AddPose":["Blindfolds"],"Layers":{"Tape":{"Name":"Tape","Layer":"Blindfold","Pri":-1,"OffsetX":942,"OffsetY":200,"Invariant":true,"HideWhenOverridden":true,"InheritColor":"Tape"}},"Parent":"Fashionundefined","Filters":{"Tape":{"gamma":1,"saturation":0,"contrast":1.0999999999999999,"brightness":1,"red":0.43137254901960786,"green":0.21568627450980393,"blue":0,"alpha":1}},"Properties":{"Tape":{"Rotation":42,"XOffset":870,"YOffset":-470,"YScale":0.9,"XScale":0.8}}},{"Item":"Bandit","Group":"Bandit","TopLevel":true,"Categories":["Uniforms"],"Layers":{"Shorts":{"Name":"Shorts","Layer":"Shorts","Pri":7,"Poses":{"Spread":true,"Closed":true,"Kneel":true,"KneelClosed":true,"Hogtie":true},"HidePrefixPose":["Encase"],"HidePrefixPoseSuffix":["TorsoLower"]},"ShortsLeft":{"Name":"ShortsLeft","Layer":"ShortsLeft","Pri":7,"Poses":{"Spread":true,"Closed":true,"Kneel":true,"KneelClosed":true,"Hogtie":true},"HidePrefixPose":["Encase"],"HidePrefixPoseSuffix":["TorsoLower"]},"Breastplate":{"Name":"Breastplate","Layer":"Chestplate","Pri":24,"Poses":{"Free":true,"Boxtie":true,"Wristtie":true,"Yoked":true,"Front":true,"Up":true,"Crossed":true,"Hogtie":true},"HideWhenOverridden":true,"MorphPoses":{"Hogtie":"Hogtie"},"Invariant":true},"WristLeft":{"Name":"WristLeft","Layer":"WristLeft","Pri":7,"Poses":{"Free":true,"Yoked":true,"Front":true}},"WristRight":{"Name":"WristRight","Layer":"WristRight","Pri":7,"Poses":{"Free":true,"Yoked":true,"Front":true,"Crossed":true}},"Pouch":{"Name":"Pouch","Layer":"PantsAccRight","Pri":14,"Poses":{"Spread":true,"Closed":true,"Kneel":true,"KneelClosed":true,"Hogtie":true}},"Knee":{"Name":"Knee","Layer":"KneeAccLeft","Pri":15,"Poses":{"Spread":true,"Closed":true,"Kneel":true,"KneelClosed":true,"Hogtie":true},"HideWhenOverridden":true},"Choker":{"Name":"Choker","Layer":"Collar","Pri":3,"Invariant":true,"HideWhenOverridden":true},"ShoeLeft":{"Name":"ShoeLeft","Layer":"ShoeLeft","Pri":1,"Poses":{"Spread":true,"Closed":true,"Kneel":true,"KneelClosed":true},"GlobalDefaultOverride":{"KneelClosed":true},"NoDisplace":true,"HideWhenOverridden":true,"DisplacementSprite":"BootsShort","DisplaceAmount":30,"DisplaceLayers":{"Boots":true},"DisplaceZBonus":100},"ShoeRight":{"Name":"ShoeRight","Layer":"ShoeRight","Pri":1,"Poses":{"Spread":true,"Closed":true},"NoDisplace":true,"HideWhenOverridden":true},"ShoeRightKneel":{"Name":"ShoeRightKneel","Layer":"ShoeRightKneel","Pri":1,"Poses":{"Kneel":true},"Invariant":true,"NoDisplace":true,"InheritColor":"ShoeRight","HideWhenOverridden":true},"ShoeLeftHogtie":{"Name":"ShoeLeftHogtie","Layer":"ShoeLeftHogtie","Pri":1,"Poses":{"Hogtie":true},"Invariant":true,"NoDisplace":true,"InheritColor":"ShoeLeft","HideWhenOverridden":true}}}]
 
 KDModelHair['BanditRavager'] = [{"Item":"RavLargeHeartHairpin","Group":"Hair","Parent":"HeartHairPins","Protected":true,"Categories":["Hairstyles","Accessories"],"Layers":{"LargeHeartHairpin":{"Name":"LargeHeartHairpin","Layer":"HairFront","Pri":20}},"Filters":{"LargeHeartHairpin":{"gamma":1,"saturation":0,"contrast":1,"brightness":1,"red":0.9607843137254902,"green":0,"blue":2,"alpha":1}},"Properties":{"LargeHeartHairpin":{"XScale":1.8,"YScale":1.8,"YOffset":-300,"XOffset":-1000}}},	{"Item":"Curly","Group":"Hair","TopLevel":true,"Protected":true,"Categories":["Hairstyles","FrontHair"],"AddPose":["Hair"],"Layers":{"Curly":{"Name":"Curly","Layer":"Hair","Pri":0,"SwapLayerPose":{"HoodMask":"HairOver"}},"Curly_Overstrap":{"Name":"Curly_Overstrap","Layer":"HairFront","Pri":0,"InheritColor":"Curly"}},"Filters":{"Curly":{"gamma":1,"saturation":0,"contrast":1,"brightness":1,"red":1.1764705882352942,"green":0.3333333333333333,"blue":0,"alpha":1}}},{"Item":"ShortCurlyBack","Group":"Hair","Parent":"Curly","TopLevel":true,"Protected":true,"Categories":["Hairstyles","BackHair"],"Layers":{"BackShortCurly":{"Name":"BackShortCurly","Layer":"HairBack","Pri":0},"BackShortCurlyUnderlight":{"Name":"BackShortCurlyUnderlight","Layer":"HairBack","Pri":-0.1,"NoOverride":true,"TieToLayer":"BackShortCurly"}},"Filters":{"BackShortCurly":{"gamma":1,"saturation":0,"contrast":1,"brightness":1,"red":1.1764705882352942,"green":0.3333333333333333,"blue":0,"alpha":1},"BackShortCurlyUnderlight":{"gamma":1,"saturation":0,"contrast":1,"brightness":1,"red":1.1764705882352942,"green":0.3333333333333333,"blue":0,"alpha":1}}},{"Item":"FluffyPonytail","Group":"Hair","Parent":"Ponytail","TopLevel":true,"Protected":true,"Categories":["Hairstyles","BackHair"],"Layers":{"Ponytail2":{"Name":"Ponytail2","Layer":"HairBack","Pri":0}},"Filters":{"Ponytail2":{"gamma":1,"saturation":0,"contrast":1,"brightness":1,"red":0.7254901960784313,"green":0.19607843137254902,"blue":0,"alpha":1}},"Properties":{"Ponytail2":{"Rotation":-11,"YOffset":500,"XOffset":100,"LayerBonus":-1}}}]
@@ -65,9 +49,10 @@ let banditRavager = {
 		"clothRestraints", 
 		"chainweakness", 
 		"glueweakness", 
-		"jail", //ravagers in jails makes for a good time
-		"jailer", 
-		"hunter"
+		// "jail", // Needed to remove in order for ravager to stop pulling the player mid-ravage
+		// "jailer", // Needed to remove in order for ravager to stop pulling the player mid-ravage
+		"hunter",
+		// "human" // An attempt to fix the "Play with her" dialog, but still resulted in the ravager not acting after selecting the dialog
 	]),
 
 	// AI

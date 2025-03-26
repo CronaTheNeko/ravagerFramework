@@ -1,14 +1,5 @@
-function AddCallback(key, func) {
-	if (! KDEventMapEnemy['ravagerCallbacks']) {
-		throw new Error('Ravager Framework has not been loaded yet! Please ensure that the Framework has been added and is listed alphabetically before your custom Ravager mod. If this is happening without any additional ravager mods (aka only Ravager Framework is adding ravagers), please post as much info as you can to the framework\'s thread on Discord so it can be investigated')
-	} else {
-		// When creating a custom ravager mod, I'd suggest changing this log call to have your mod's name inside the [ ] to help make it more clear what is loading when
-		console.log('[Ravager Framework] Adding callback function with key ', key)
-		KDEventMapEnemy['ravagerCallbacks'][key] = func
-	}
-}
 // Moved the All Range Callback so it'll actually work
-AddCallback('slimegirlRavagerAllRangeCallback', (entity, target) => {
+function slimegirlRavagerAllRange(entity, target) {
 	console.log(entity)
 	console.log(entity.Enemy.ravage.addSlimeChance)
 	console.log(KDModSettings['RavagerFramework'].ravagerSlimeAddChance)
@@ -26,7 +17,10 @@ AddCallback('slimegirlRavagerAllRangeCallback', (entity, target) => {
 			KinkyDungeonSendTextMessage(5, TextGet("KinkyDungeonSlimeSpread"), "#ff44ff", 3);
 		}
 	}
-})
+}
+if (!RavagerAddCallback('slimegirlRavagerAllRangeCallback', slimegirlRavagerAllRange)) {
+	console.error('[Ravager Framework][Slimegirl Ravager] Failed to add slimegirlRavagerAllRangeCallback!')
+}
 
 KDModelDresses['SlimegirlRavager'] = [{"Item":"FashionLatexMittens","Group":"Mittens","Filters":{"LatexLeft":{"gamma":1,"saturation":0,"contrast":1,"brightness":1,"red":1.6666666666666667,"green":0.3333333333333333,"blue":0.6274509803921569,"alpha":1},"Mitten":{"gamma":1,"saturation":0,"contrast":0.81,"brightness":1,"red":4.176470588235294,"green":0.9215686274509803,"blue":1.6470588235294117,"alpha":1}},"Properties":{"LatexLeft":{},"Zipper":{"Protected":"0","ExtraHidePoses":["Xray"],"XOffset":57.62,"YOffset":-153.68,"ExtraRequirePoses":["Xray"]},"Mitten":{}}}]
 
@@ -123,7 +117,7 @@ let slimeRavager = {
 		targets: ["ItemVulva", "ItemMouth", "ItemButt"],
 		refractory: 50,
 		needsEyes: false,
-		bypassSpecial: ["Slime", "Rubber", "Liquid Metal"],
+		bypassSpecial: ["Slime", "Rubber", "LiquidMetal"],
 		
 		onomatopoeia: ["CLAP...", "PLAP..."], //floats overhead like stat changes (can be unspecified for none)
 		doneTaunts: ["That was good...", "Give me a minute and we'll go again, okay~?", "Such a good girl~!"],
@@ -262,4 +256,5 @@ addTextKey('KinkyDungeonRemindJailSlimeAdvMiss', 'Playing hard to get?~')
 addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandBlock', 'Get back here, sweetie~')
 // KinkyDungeonRemindJailChaseSlimeAdvCommandDefend
 addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandDefend', '') // Based on vanilla text entries, 'CommandDefend' seems to be shown when showing up to assist another npc. Might just leave this empty (as Fuuka does)
+addTextKey('KinkyDungeonRemindJailChaseSlimeAdvAlert', '') // Left empty because I'm not sure what to write here
 // Text keys still needed: 

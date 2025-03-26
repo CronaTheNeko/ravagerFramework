@@ -1,23 +1,3 @@
-/**********************************************
- * Callback definition helper
- * This function is a simple helper the I would recommend using if you're going to add callbacks for your ravager.
- * Takes two parameters:
- * 	- The key which will be used to reference your callback. This is the value to use when setting a callback value inside your ravager's definition.
- * 	- The function to use as a callback. 
- * Note: If you decide to not use this function, there are two things you need to know:
- * 	- If RavagerFramework itself does not load before your enemy, KDEventMapEnemy['ravagerCallbacks'] will not exist yet. This will cause the game will show a crash if you try to add a callback entry into that map, and that will cause execution of your JS file to stop at that line, potentially causing your ravager to never be added to the game
- * 	- Your function should be the value of KDEventMapEnemy['ravagerCallbacks'][<callback name>]
-*/
-function AddCallback(key, func) {
-	if (! KDEventMapEnemy['ravagerCallbacks']) {
-		throw new Error('Ravager Framework has not been loaded yet! Please ensure that the Framework has been added and is listed alphabetically before your custom Ravager mod. If this is happening without any additional ravager mods (aka only Ravager Framework is adding ravagers), please post as much info as you can to the framework\'s thread on Discord so it can be investigated')
-	} else {
-		// When creating a custom ravager mod, I'd suggest changing this log call to have your mod's name inside the [ ] to help make it more clear what is loading when
-		console.log('[Ravager Framework] Adding callback function with key ', key)
-		KDEventMapEnemy['ravagerCallbacks'][key] = func
-	}
-}
-
 // BEGIN Tentacle Pit
 // Tentacle Pit definition
 let pit = {
@@ -183,13 +163,9 @@ let summonSpell = {
 let summonCondition = (enemy, target) => {
 	// Condition copied and modified from SarcoKraken's summon minion condition
 	let nearbyEnemies = KDNearbyEnemies(enemy.x, enemy.y, 10) // How many enemies are nearby
-	// console.log(nearbyEnemies)
 	let nearbyMinions = nearbyEnemies.filter(enemy => { return enemy.Enemy?.tags.pittendril }) // How many of the nearby enemies are minions
-	// console.log(nearbyMinions)
 	let maxByHP = Math.floor(enemy.hp / enemy.Enemy.maxhp / 0.2) // How many minions can it have depending on health
-	// console.log(maxByHP)
 	let minCount = Math.min(2, 1 + maxByHP) // How many minions can we summon, minimum of defined max (2 to get three minions out) or max based on health (+1 to ensure we always can summon at least one)
-	// console.log(minCount)
 	if (nearbyMinions.length > minCount)
 		return false
 	return true
@@ -209,21 +185,18 @@ addTextKey('KinkyDungeonSummonSingleRavagerTendril', 'An eager tentacle bursts o
 
 // BEGIN Ravaging Tendril
 // Completion callback to kill tendril upon ravaging completion
-AddCallback('pitTendrilCompletion', (enemy, target, passedOut) => {
-	console.log('[Ravager Framework] killing tendril')
+function pitTendrilCompletion(enemy, target, passedOut) {
+	console.log('[Ravager Framework][Ravager Tendril] Killing tendril')
 	enemy.hp = 0;
-})
+}
+if (!RavagerAddCallback('pitTendrilCompletion', pitTendrilCompletion)) {
+	console.error('[Ravager Framework][Ravager Tendril] Failed to add pitTendrilCompletion!')
+}
 // Effect callback for groping before ravaging
-AddCallback('pitTendrilEffectCallback', (enemy, target) => {
-	console.log('tendirl test')
-	// return false
+function pitTendrilEffect(enemy, target) {
 	if (enemy.ravage && enemy.ravage.progress == 1 && !enemy.ravage.finishedCarressing) {
-		// KinkyDungeonSendFloater(enemy, 'caress', '#ffffff', 2)
-		// return true
 		if (Math.random() < enemy.Enemy.ravage.caressChance) {
-			console.log('[Ravager Framework][RavagerTendril] Carressing player before ravaging')
-			// KinkyDungeonSendFloater(enemy, 'caress', '#ffffff', 2)
-			// KinkyDungeonSendActionMessage(20, 'caress', '#ff00ff', 1)
+			console.log('[Ravager Framework][Ravager Tendril] Carressing player before ravaging')
 			let msg = ''
 			switch (enemy.ravage.slot) {
 			case 'ItemVulva':
@@ -248,7 +221,10 @@ AddCallback('pitTendrilEffectCallback', (enemy, target) => {
 		}
 	}
 	return false
-})
+}
+if (!RavagerAddCallback('pitTendrilEffectCallback', pitTendrilEffect)) {
+	console.error('[Ravager Framework][Ravager Tendril] Failed to add pitTendrilEffectCallback!')
+}
 // Tendril definition
 let tendril = {
 	addedByMod: 'RavagerFramework',
@@ -311,7 +287,7 @@ let tendril = {
 		},
 		{
 			trigger: 'tickAfter',
-			type: 'ravagerRefactory'
+			type: 'ravagerRefractory'
 		}
 	],
 	nopickpocket: true,
@@ -355,7 +331,7 @@ let tendril = {
 	ravage: {
 		caressChance: 0.5,
 		targets: ['ItemVulva', 'ItemButt', 'ItemMouth'],
-		refactory: 5, // Planning to make the tendril despawn on completion, so this shouldn't matter
+		refactory: 5, // Tendril is killed on completion, so this really doesn't matter
 		needsEyes: false, // Could try to hypno player to 'addict' them by adding a debuff after a while of not being ravaged by plant; maybe a good use for the ravagerTendrilCum; maybe better done through an aphrodisiac for the plant
 		onomatopoeia: ['*Excited wriggling*', 'CLAP...', 'PLAP...'],
 		doneTaunts: ['*Happy caressing*'],

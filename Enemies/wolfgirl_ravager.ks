@@ -1,14 +1,5 @@
-function AddCallback(key, func) {
-	if (! KDEventMapEnemy['ravagerCallbacks']) {
-		throw new Error('Ravager Framework has not been loaded yet! Please ensure that the Framework has been added and is listed alphabetically before your custom Ravager mod. If this is happening without any additional ravager mods (aka only Ravager Framework is adding ravagers), please post as much info as you can to the framework\'s thread on Discord so it can be investigated')
-	} else {
-		// When creating a custom ravager mod, I'd suggest changing this log call to have your mod's name inside the [ ] to help make it more clear what is loading when
-		console.log('[Ravager Framework] Adding callback function with key ', key)
-		KDEventMapEnemy['ravagerCallbacks'][key] = func
-	}
-}
-// Moved the All Range Callback so it'll actually work
-AddCallback('wolfgirlRavagerAllRangeCallback', (entity, target) => {
+// Add a leash, shock module, or leash to the player during use -- Might make this chance based
+function wolfgirlRavagerAllRange(entity, target) {
 	let collared = KinkyDungeonPlayerTags.get("Collars");
 	let moduled = KinkyDungeonPlayerTags.get("Modules");
 	let leashed = KinkyDungeonPlayerTags.get("Item_WolfLeash") || KinkyDungeonPlayerTags.get("Item_BasicLeash")
@@ -22,26 +13,33 @@ AddCallback('wolfgirlRavagerAllRangeCallback', (entity, target) => {
 		KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName("WolfCollar"), 1, false, "Red", undefined, undefined, undefined, "Nevermere", true);
 		KinkyDungeonSendTextMessage(5, "The Alpha fixes a collar around your neck...", "#ff44ff", 3);
 	}
-})
-// Moved the Submit Chance Modifier so it'll actually work
-AddCallback('wolfgirlSubmitChanceModifierCallback', (entity, target, baseSubmitChance) => {
+}
+if (!RavagerAddCallback('wolfgirlRavagerAllRangeCallback', wolfgirlRavagerAllRange)) {
+	console.error('[Ravager Framework][Wolfgirl Ravager] Failed to add wolfgirlRavagerAllRangeCallback!')
+}
+// Increase submission chance if wearing shock module
+function wolfgirlSubmitChanceModifier(entity, target, baseSubmitChance) {
 	if(KinkyDungeonPlayerTags.get("Item_ShockModule")) {
 		KinkyDungeonSendTextMessage(5, "Your shock module gently insists you submit... (+20% Submit Chance)", "#ff44ff", 3);
 		return baseSubmitChance + 20
 	}
 	return baseSubmitChance
-})
-// Hopefully we can get her spell functional here without screwing up the ravaging
-AddCallback('wolfgirlRavagerEffectCallback', (entity, target) => {
-	// console.log('[Ravager Framework] [Wolfgirl Status Callback] ', entity, target)
+}
+if (!RavagerAddCallback('wolfgirlSubmitChanceModifierCallback', wolfgirlSubmitChanceModifier)) {
+	console.error('[Ravager Framework][Wolfgirl Ravager] Failed to add wolfgirlSubmitChanceModifierCallback!')
+}
+// Workaround for not being able to get the spell working well with ravaging
+function wolfgirlRavagerEffect(entity, target) {
 	if (!entity.hasThrownDevice) {
 		let res = KinkyDungeonCastSpell(target.x, target.y, KinkyDungeonSpellListEnemies.find((spell) => { if (spell.name == 'RestrainingDevice') return true}), entity)
-		// console.log(res)
 		entity.hasThrownDevice = true
 		return true
 	}
 	return false
-})
+}
+if (!RavagerAddCallback('wolfgirlRavagerEffectCallback', wolfgirlRavagerEffect)) {
+	console.error('[Ravager Framework][Wolfgirl Ravager] Failed to add wolfgirlRavagerEffectCallback!')
+}
 
 // Outfit declaration
 KDModelDresses['WolfgirlRavager'] = [{"Item":"CyberPanties","Group":"Chastity","Filters":{"Lining":{"gamma":1.0166666666666666,"saturation":0,"contrast":0.88,"brightness":1,"red":0.11764705882352941,"green":0.11764705882352941,"blue":0.11764705882352941,"alpha":0.9833333333333333}}},{"Item":"VBikini","Group":"Swimsuit","Filters":{"VBikini":{"gamma":1,"saturation":0,"contrast":1,"brightness":1,"red":0.29411764705882354,"green":0.29411764705882354,"blue":0.27450980392156865,"alpha":1}},"Properties":{"VBikini":{"YScale":0.6,"YOffset":700,"XScale":1.11,"XOffset":-120,"LayerBonus":-100}}},{"Item":"ElfPanties","Group":"Elf","Properties":{"Panties":{"YOffset":25,"LayerBonus":-8000}}},{"Item":"LatexWhip","Group":"Weapon","Filters":{"LatexWhip":{"gamma":1,"saturation":0,"contrast":1.27,"brightness":1,"red":0,"green":0.5098039215686274,"blue":0.058823529411764705,"alpha":1}}},{"Item":"WolfgirlAlpha","Group":"WolfCatsuit",}]
@@ -96,8 +94,8 @@ let wolfRavager = {
 		"electricresist", 
 		"charmweakness", 
 		"stunweakness",
-		"jail",
-		"jailer",
+		// "jail", // Needed to remove in order for ravager to stop pulling the player mid-ravage
+		// "jailer", // Needed to remove in order for ravager to stop pulling the player mid-ravage
 		"unflinching", // makes enemy unable to be pulled/pushed. maybe don't remove this
 		"nosub", //probably don't want to remove this one
 		"hunter"

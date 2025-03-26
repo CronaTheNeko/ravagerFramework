@@ -53,3 +53,19 @@ v6.0.3
 - Modified 'RavagerOccupiedVulva' to use a blank model which lifts the skirt like crotch rope
 - Added debug logging option
 - Fixed RavagerTendril's crash from having no dialogue if the mod settings have never been loaded before
+
+v6.0.4
+- Added Mod Configuration option for the Slimegirl's chance to add a slime restraint to the player
+- Added more text keys to the Slimegirl
+- Fixed delayed appearance of Ravager's hairpin
+- Fixed Slimegirl's ability to bypass Liquid Metal restraints
+- Removed 'jail' and 'jailer' tags from Bandit Ravager and Wolfgirl Alpha to prevent them from dragging the player to jail mid-ravaging
+	+ This is a dirty fix for that behavior and will hopefully be temporary
+- Increased evasion penalty while pinned
+- Fixed ravagers fallback narration never being used (the narration that is supposed to happen between ravaging sessions)
+- Reduced the toughness of struggling from a pin
+	+ For details, a struggle attempt requires about 30 usable stamina and struggling free should take about 5 struggle attempts
+- Ravager development:
+	+ Added `ravagerDevelopers.md` to document all framework-specific options available
+	+ Added globally accessible helper function to add callbacks for custom ravager development
+	+ Added default fallback narration for ravagers, as well as a property that can be set if no narration is the desired behavior

@@ -1,10 +1,10 @@
-// This didn't fix the delayed loading of the hairpin on ravagers
-// console.log(KDModFiles)
-// for (var i = 0; i < 100000; i++) {
-// 	try {
-// 		PIXI.Texture.fromURL(KDModFiles['Models/Hair/LargeHeartHairpin.png'])
-// 	} catch {}
-// }
+// Pre-load ravager hairpin
+console.log('[Ravager Framework] Preloading assets...')
+try {
+  PIXI.Texture.fromURL(KDModFiles['Models/Hair/LargeHeartHairpin.png'])
+} catch (error) {
+  console.error('Caught error while loading LargeHeartHairpin: ', error.message)
+}
 
 // This hairpin model was snagged from Arconox's Asset Pack: https://discord.com/channels/938203644023685181/1247315650238746655/1253067649970343946
 AddModel({
