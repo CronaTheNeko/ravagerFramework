@@ -887,7 +887,7 @@ KinkyDungeonRestraints.push(
 			{trigger: "tickAfter", type: "ravagerPinCheck", power: -100},
 			{trigger: "passout", type: "ravagerRemove", power: -100},
 			{trigger: "remove", type: "ravagerRemove", power: -100},
-			{ trigger: "tickAfter", type: "sitDownAndShutUp" }
+			{ trigger: "tickAfter", type: "ravagerSitDownAndShutUp" }
 		],
 		failSuffix: {"Remove": "RavagerPinned", "Struggle": "RavagerPinned", "Cut": "RavagerPinned"},
 		customEquip: 'RavagerPinned',
@@ -1012,15 +1012,42 @@ KinkyDungeonRestraints.push(
 ////////////////
 // Events
 
-KDEventMapInventory["tickAfter"]["sitDownAndShutUp"] = (e, item, data) => {
-	console.log("[RavagerFramework] [sitDownAndShutUp]\ne: ", e, "\nitem: ", item, "\ndata: ", data)
+// Handles preventing enemies from interfering with ravaging, with some narration included
+KDEventMapInventory["tickAfter"]["ravagerSitDownAndShutUp"] = (e, item, data) => {
+	console.log("[RavagerFramework] [ravagerSitDownAndShutUp]\ne: ", e, "\nitem: ", item, "\ndata: ", data)
 	let nearby = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 5)
+	let stunnedCount = 0
+	let enemyName = ""
 	nearby.forEach(enemy => {
-		// console.log(enemy)
+		// Make sure we're only stunning non-ravagers
 		if (!enemy.Enemy.ravage) {
+			console.log("[RavagerFramework] [ravagerSitDownAndShutUp] Stunning ", enemy.Enemy.name)
+			// Stun 2 will stun an enemy for only the next turn
 			enemy.stun = 2
+			// We'll count an enemy for the witness narration if they're not a beast and haven't already been in a narration
+			if (!enemy.Enemy.tags.beast && !enemy.witnessedRavaging) {
+				// Hacky work around for resetting witness state causing an extra narration on the last turn of ravaging
+				if (enemy.witnessedRavagingJustDeleted) {
+					delete enemy.witnessedRavagingJustDeleted
+				} else {
+					// Count how many new witnesses there are, save their name incase there's only one, and label them as witnesses
+					stunnedCount++
+					enemyName = enemy.Enemy.name
+					enemy.witnessedRavaging = true
+				}
+			}
 		}
 	})
+	// If there's new witnesses, send narration depending on how many new witnesses there are
+	if (stunnedCount > 0) {
+		let msg = ""
+		if (stunnedCount === 1) {
+			msg = "The nearby " + TextGet("Name" + enemyName) + " notices your predicament and stays to watch"
+		} else {
+			msg = "Your situation attracts some attention nearby"
+		}
+		KinkyDungeonSendTextMessage(5, msg, "#ff5be9", 4);
+	}
 }
 
 // Each tick, check to see if the player is still pinned by anyone
@@ -1162,7 +1189,13 @@ function ravagerFreeAndClearAllDataIfNoRavagers(showMessage = true) {
 function ravagerFreeAndClearAllData() {
 	// Clear all enemies
 	for (const enemy of KDMapData.Entities) {
-		if(enemy.ravage) delete enemy.ravage	
+		if(enemy.ravage)
+			delete enemy.ravage
+		else {
+			// Clear the witness property from any enemies that witnessed this session
+			delete enemy.witnessedRavaging
+			enemy.witnessedRavagingJustDeleted = true
+		}
 	}
 	// Clear all "occupied" restraints
 	for (const slot in ravageEquipmentSlotTargets) {
