@@ -30,7 +30,7 @@ let banditRavager = {
 	faction: "Bandit", 
 	clusterWith: "bandit", 
 	playLine: "Bandit", 
-	bound: "BanditGrappler", 
+	bound: "BanditRavager", 
 	color: "#ddcaaa",
 	tags: KDMapInit([ 
 		//DO NOT add leashing or else they'll pull the player to jail and break everything

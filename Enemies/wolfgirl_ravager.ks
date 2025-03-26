@@ -78,7 +78,7 @@ let wolfRavager = {
 	faction: "Nevermere", 
 	clusterWith: "nevermere", 
 	playLine: "Wolfgirl", 
-	bound: "Wolfgirl", 
+	bound: "WolfgirlRavager", 
 	color: "#00EFAB",
 	tags: KDMapInit([ 
 		"opendoors", 
