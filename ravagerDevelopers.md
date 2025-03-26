@@ -183,6 +183,8 @@ Notes:
 ### Fallback narration
 An array of strings to be shown in the text log when a ravager attacks with the Ravage effect, but cannot take a ravaging action.
 
+Your narrations have a couple of options for dynamic strings. When displaying narration, the string "EnemyName" will be replaced with the attacking ravager's name and "DamageTaken" will be replaced with the amount of damage taken.
+
 Property path: `enemy.ravage.fallbackNarration`
 
 Required?: No
@@ -195,8 +197,21 @@ Notes:
 - There's two common reasons the fallback narration will be used:
   1) All the slots the ravager can use (defined in [Targets](#targets)) are currently occupied by other ravagers
   2) The ravager has recently finished a session with the player and is in their [refractory period](#refractory-period)
-- While this is optional, this narration is used so often that it should probably be considered required
-  + [Issue #6](https://github.com/CronaTheNeko/ravagerFramework/issues/6) is a plan to add a default fallback narration for any ravagers that don't declare their own
+- With this being optional, if you do not declare your own narration, the framework's default narration will be used.
+  + If your desired behvior is to not have fallback narration, see [No fallback narration](#no-fallback-narration).
+
+### No fallback narration
+Tell the framework not to use fallback narration. Useful if you don't want fallback narration, as the framework has a default narration
+
+Property path: `enemy.ravage.noFallbackNarration`
+
+Required?: No
+
+Type: Boolean
+
+Default value: False
+
+Note: As of fixing [Issue #6](https://github.com/CronaTheNeko/ravagerFramework/issues/6), the framework provides default fallback narration. When `enemy.ravage.fallbackNarration` is empty or not defined and this property is not set to true, the default narration will be used. This property provides a way to not use fallback narration, if that is the desired behvior.
 
 ### Restrain chance
 The chance that a ravager will add a restraint to the player when doing a fallback action. If this chance succeeds on a turn, a restraint will be added instead of dealing the normal grope damage.

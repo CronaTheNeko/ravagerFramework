@@ -829,7 +829,15 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				if (!didRestrain) {
 					dbg && console.log('[Ravager Framework] We DIDN\'T add a restraint, let\'s grope')
 					let dmg = KinkyDungeonDealDamage({damage: 1, type: "grope"});
-					if(enemy.fallbackNarration) KinkyDungeonSendTextMessage(10, ravRandom(enemy.fallbackNarration).replace("EnemyName", TextGet("Name" + entity.Enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff	", 4);
+					if (!enemy.ravage.noFallbackNarration) {
+						if(enemy.ravage.fallbackNarration) {
+							KinkyDungeonSendTextMessage( 10, ravRandom(enemy.ravage.fallbackNarration).replace("EnemyName", TextGet("Name" + enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff", 4);
+						} else {
+							KinkyDungeonSendTextMessage( 10, "The EnemyName roughly gropes you! (DamageTaken)".replace("EnemyName", TextGet("Name" + enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff", 4);
+						}
+					} else {
+						deb && console.log('[Ravager Framework] ', enemy.name, ' requests no fallback narration.')
+					}
 				}
 				//
 			}
