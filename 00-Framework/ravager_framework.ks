@@ -873,7 +873,7 @@ KinkyDungeonRestraints.push(
 		shrine: [],
 		events: [
 			{trigger: "tick", type: "sneakBuff", power: -1},
-			{trigger: "tick", type: "evasionBuff", power: -100},
+			{trigger: "tick", type: "evasionBuff", power: -1000},
 			{trigger: "tick", type: "blockBuff", power: -100},
 			{trigger: "tickAfter", type: "ravagerNarration", power: -100},
 			{trigger: "tickAfter", type: "ravagerPinCheck", power: -100},
