@@ -49,9 +49,10 @@ let banditRavager = {
 		"clothRestraints", 
 		"chainweakness", 
 		"glueweakness", 
-		"jail", //ravagers in jails makes for a good time
-		"jailer", 
-		"hunter"
+		// "jail", // Needed to remove in order for ravager to stop pulling the player mid-ravage
+		// "jailer", // Needed to remove in order for ravager to stop pulling the player mid-ravage
+		"hunter",
+		// "human" // An attempt to fix the "Play with her" dialog, but still resulted in the ravager not acting after selecting the dialog
 	]),
 
 	// AI

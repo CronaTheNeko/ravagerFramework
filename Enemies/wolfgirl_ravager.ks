@@ -94,8 +94,8 @@ let wolfRavager = {
 		"electricresist", 
 		"charmweakness", 
 		"stunweakness",
-		"jail",
-		"jailer",
+		// "jail", // Needed to remove in order for ravager to stop pulling the player mid-ravage
+		// "jailer", // Needed to remove in order for ravager to stop pulling the player mid-ravage
 		"unflinching", // makes enemy unable to be pulled/pushed. maybe don't remove this
 		"nosub", //probably don't want to remove this one
 		"hunter"
