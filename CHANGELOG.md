@@ -68,6 +68,7 @@ v6.0.4
 - Non-ravager enemies will now stop and watch you while ravagers have their way
 - Added custom bound sprite for Bandit and Wolfgirl ravagers
 - Added on-hit and orgasm sound effects with associated config options
+- Yet Another Text Key For The SlimeRavager™
 - Ravager development:
 	+ Added `ravagerDevelopers.md` to document all framework-specific options available
 	+ Added globally accessible helper function to add callbacks for custom ravager development

@@ -257,4 +257,5 @@ addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandBlock', 'Get back here, sw
 // KinkyDungeonRemindJailChaseSlimeAdvCommandDefend
 addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandDefend', '') // Based on vanilla text entries, 'CommandDefend' seems to be shown when showing up to assist another npc. Might just leave this empty (as Fuuka does)
 addTextKey('KinkyDungeonRemindJailChaseSlimeAdvAlert', '') // Left empty because I'm not sure what to write here
+addTextKey('KinkyDungeonRemindJailSlimeAdvBlockedMe', 'I\'m too slippery for that~') // Only saw this when trying to debug bind her
 // Text keys still needed: 
