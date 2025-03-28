@@ -67,6 +67,7 @@ v6.0.4
 	+ For details, a struggle attempt requires about 30 usable stamina and struggling free should take about 5 struggle attempts
 - Non-ravager enemies will now stop and watch you while ravagers have their way
 - Added custom bound sprite for Bandit and Wolfgirl ravagers
+- Added on-hit and orgasm sound effects with associated config options
 - Ravager development:
 	+ Added `ravagerDevelopers.md` to document all framework-specific options available
 	+ Added globally accessible helper function to add callbacks for custom ravager development
