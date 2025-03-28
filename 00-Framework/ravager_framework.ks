@@ -390,6 +390,7 @@ addTextKey('KDModButtonravagerDisableTentaclePit', 'Disable Tentacle Pit')
 addTextKey('KDModButtonravagerSpicyTendril', 'Spicy Ravager Tendril Dialogue')
 addTextKey('KDModButtonravagerSlimeAddChance', 'Slimegirl Restrict Chance')
 addTextKey('KDModButtonravagerEnableSound', 'Enable Sounds')
+addTextKey('KDModButtononHitChance', 'Moan Chance')
 addTextKey('KDModButtonravagerSoundVolume', 'Moan Volume')
 if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 	KDEventMapGeneric['afterModSettingsLoad']['RavagerFramework'] = (e, data) => {
