@@ -443,6 +443,7 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 				},
 				{
 					type: 'range',
+					name: 'Slimegirl Restrict Chance', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
 					refvar: 'ravagerSlimeAddChance',
 					default: 0.05,
 					rangelow: 0,
@@ -479,12 +480,14 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 			]
 		}
 		let settingsobject = (KDModSettings.hasOwnProperty('RavagerFramework') == false) ? {} : Object.assign({}, KDModSettings['RavagerFramework'])
+		// console.log('ModSettings state: ', KDModSettings['RavagerFramework'], settingsobject)
 		for (var i of KDModConfigs['RavagerFramework']) {
-			if (KDModSettings['RavagerFramework'][i.refvar] == undefined) {
-				dbg && console.log('Setting default value for ' + i.name + ' ...')
-				KDModSettings['RavagerFramework'][i.refvar] = i.default
+			if (settingsobject[i.refvar] == undefined) {
+				dbg && console.log('Setting default value for ' + i.refvar + ' ...')
+				settingsobject[i.refvar] = i.default
 			}
 		}
+		KDModSettings['RavagerFramework'] = settingsobject
 		// ravagerFrameworkRefreshEnemies('load')
 		// ravagerFrameworkApplySpicyTendril('load')
 		ravagerSettingsRefresh('load')
