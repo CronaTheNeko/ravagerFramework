@@ -54,7 +54,7 @@ v6.0.3
 - Added debug logging option
 - Fixed RavagerTendril's crash from having no dialogue if the mod settings have never been loaded before
 
-v6.0.4
+v6.1.0
 - Added Mod Configuration option for the Slimegirl's chance to add a slime restraint to the player
 - Added more text keys to the Slimegirl
 - Fixed delayed appearance of Ravager's hairpin
