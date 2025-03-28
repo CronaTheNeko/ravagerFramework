@@ -124,12 +124,89 @@ for (var key in debugCallbacks) {
 		console.error('[Ravager Framework] Failed to add debug callback: ', key)
 }
 
+//
+window.RavagerGetSettings = () => {
+	return KDModSettings['RavagerFramework']
+}
+window.RavagerGetBool = (refvar) => {
+	const settings = RavagerGetSettings()
+	return settings && settings[refvar]
+}
+window.RavagerGetNum = (refvar, default_val) => {
+	const settings = RavagerGetSettings()
+	return settings ? settings[refvar] : default_val
+}
+window.RavagerData = {
+	KDEventMapGeneric: {
+		beforeDamage: {
+			RavagerSoundHit: (e, item, data) => { RavagerSoundGotHit = true }
+		},
+		tick: {
+			RavagerSoundTick: (e, item, data) => { RavagerSoundGotHit = false }
+		}
+	},
+	KDExpressions: {
+		RavagerSoundHit: {
+			stackable: true,
+			priority: 108,
+			criteria: (C) => {
+				if (C == KinkyDungeonPlayer && (RavagerSoundGotHit || KDUniqueBulletHits.has('undefined[object Object]_player'))) {
+					RavagerSoundGotHit = false
+					KinkyDungeonInterruptSleep()
+					console.log('enableSound: ', RavagerGetBool('ravagerEnableSound'), '\nvolume: ', RavagerGetNum('ravagerSoundVolume', 1) / 2, '\nonHitChance: ', RavagerGetNum('onHitChance', 0.3))
+					if (KDToggles.Sound && RavagerGetBool('ravagerEnableSound') && Math.random() < RavagerGetNum('onHitChance', 0.3)) {
+						AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio/" + (KinkyDungeonGagTotal() > 0 ? "Angry21 liliana.ogg" : "Ah1 liliana.ogg"), RavagerGetNum('ravagerSoundVolume', 1) / 2)
+					}
+					return true
+				}
+				return false
+			},
+			expression: (C) => {
+				return {
+					EyesPose: "EyesAngry",
+					Eyes2Pose: "Eyes2Closed",
+					BrowsPose: "BrowsAnnoyed",
+					Brows2Pose: "Brows2Angry",
+					BlushPose: "",
+					MouthPose: "MouthSurprised"
+				}
+			}
+		},
+		RavagerSoundOrgasm: {
+			stackable: true,
+			priority: 90,
+			criteria: (C) => {
+				if (C == KinkyDungeonPlayer && KinkyDungeonFlags.get("OrgSuccess") == 7) {
+					if (KDToggles.Sound && RavagerGetBool('ravagerEnableSound')) {
+						AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio" + (KinkyDungeonGagTotal > 0 ? "GagOrgasm.ogg" : "Ah1 liliana.ogg"), RavagerGetNum('ravagerSoundVolume', 1) / 2)
+					}
+					KinkyDungeonSendTextMessage(8, "You make a loud moaning noise", "#1fffc7", 1);
+					KinkyDungeonMakeNoise(9, KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y)
+					return true
+				}
+				return false
+			},
+			expression: (C) => {
+				return {
+					EyesPose: "EyesClosed",
+					Eyes2Pose: "Eyes2Closed",
+					BrowsPose: "BrowsAnnoyed",
+					Brows2Pose: "Brows2Annoyed",
+					BlushPose: "",
+					MouthPose: "MouthSurprised"
+				}
+			}
+		}
+	}
+}
+
 // Base settings function, simplifying reloading settings
 function ravagerSettingsRefresh(reason) {
 	console.log('[Ravager Framework] Running settings functions for reason: ' + reason)
 	ravagerFrameworkRefreshEnemies(reason)
 	ravagerFrameworkApplySpicyTendril(reason)
 	ravagerFrameworkApplySlimeRestrictChance(reason)
+	ravagerFrameworkSetupSound(reason)
 	console.log('[Ravager Framework] Finished running settings functions')
 }
 // Change slime girl's chance to add slime to the player
@@ -282,6 +359,28 @@ function ravagerFrameworkRefreshEnemies(reason) {
 	KinkyDungeonRefreshEnemiesCache()
 }
 
+function ravagerFrameworkSetupSound(reason) {
+	console.log('[Ravager Framework] ravagerFrameworkSetupSound(' + reason + ')')
+	var settings = KDModSettings['RavagerFramework'];
+	var dbg = settings.ravagerDebug;
+	var otherSoundFound = KDAllModFiles.filter((val) => { if (val.filename.toLowerCase().includes('girlsound.ks')) return true; }).length > 0
+	if (settings.ravagerEnableSound && !otherSoundFound) {
+		dbg && console.log('[Ravager Framework] Enabling sound effects ...')
+		window.RavagerSoundGotHit = false
+		KDEventMapGeneric.beforeDamage.RavagerSoundHit = RavagerData.KDEventMapGeneric.beforeDamage.RavagerSoundHit
+		KDEventMapGeneric.tick.RavagerSoundTick = RavagerData.KDEventMapGeneric.tick.RavagerSoundTick
+		KDExpressions.RavagerSoundHit = RavagerData.KDExpressions.RavagerSoundHit
+		KDExpressions.RavagerSoundOrgasm = RavagerData.KDExpressions.RavagerSoundOrgasm
+	} else {
+		dbg && console.log('[Ravager Framework] Disabling sound effects ...')
+		delete window.RavagerSoundGotHit
+		delete KDEventMapGeneric.beforeDamage.RavagerSoundHit
+		delete KDEventMapGeneric.tick.RavagerSoundTick
+		delete KDExpressions.RavagerSoundHit
+		delete KDExpressions.RavagerSoundOrgasm
+	}
+}
+
 addTextKey('KDModButtonRavagerFramework', 'Ravager Framework')
 addTextKey('KDModButtonravagerDebug', 'Enable Debug Messages')
 addTextKey('KDModButtonravagerDisableBandit', 'Disable Bandit Ravager')
@@ -290,6 +389,8 @@ addTextKey('KDModButtonravagerDisableSlimegirl', 'Disable Slimegirl Ravager')
 addTextKey('KDModButtonravagerDisableTentaclePit', 'Disable Tentacle Pit')
 addTextKey('KDModButtonravagerSpicyTendril', 'Spicy Ravager Tendril Dialogue')
 addTextKey('KDModButtonravagerSlimeAddChance', 'Slimegirl Restrict Chance')
+addTextKey('KDModButtonravagerEnableSound', 'Enable Sounds')
+addTextKey('KDModButtonravagerSoundVolume', 'Moan Volume')
 if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 	KDEventMapGeneric['afterModSettingsLoad']['RavagerFramework'] = (e, data) => {
 		let dbg = KDModSettings['RavagerFramework'] && KDModSettings['RavagerFramework'].ravagerDebug;
@@ -348,7 +449,33 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 					rangehigh: 1,
 					stepcount: 0.01,
 					block: undefined
-				}
+				},
+				{
+					type: 'boolean',
+					refvar: 'ravagerEnableSound',
+					default: true,
+					block: undefined
+				},
+				{
+					type: 'range',
+					name: 'Hit Sound Chance', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
+					refvar: 'onHitChance',
+					default: 0.3,
+					rangelow: 0,
+					rangehigh: 1,
+					stepcount: 0.05,
+					block: undefined
+				},
+				{
+					type: 'range',
+					name: 'Sound Effect Volume', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
+					refvar: 'ravagerSoundVolume',
+					default: 1,
+					rangelow: 0,
+					rangehigh: 2,
+					stepcount: 0.05,
+					block: undefined
+				},
 			]
 		}
 		let settingsobject = (KDModSettings.hasOwnProperty('RavagerFramework') == false) ? {} : Object.assign({}, KDModSettings['RavagerFramework'])
