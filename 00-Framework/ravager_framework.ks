@@ -563,6 +563,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 	if (!skipEverything) {
 		//clothing targts
 		let clothingTargetsPelvis = KDGetDressList()[KinkyDungeonCurrentDress].filter(article=> {
+				if (["InnocentDesireSuit", "NightCatSuit", "MikosSuitLV1", "MikosSuitLV2", "MikosSuitLV3", "Nake", "EtherMageSuit"].some(str => KinkyDungeonCurrentDress == str)) return false // Working around a function override for PureWind'sTools outfits
 				if (enemy.ravage.bypassAll) return false // Seems to not be called before stripping; but it's working as it is now, so I'll come back to this later
 				if(article.Lost) return false
 				//if(article.Skirt) return true // Disabled because trying to remove the skirt would always fail, resulting in ravagers being unable to progress
@@ -574,6 +575,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 		_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect clothingTargetsPelvis: ', clothingTargetsPelvis)
 
 		let clothingTargetsMouth = KDGetDressList()[KinkyDungeonCurrentDress].filter(article=> {
+				if (["InnocentDesireSuit", "NightCatSuit", "MikosSuitLV1", "MikosSuitLV2", "MikosSuitLV3", "Nake", "EtherMageSuit"].some(str => KinkyDungeonCurrentDress == str)) return false // Working around a function override for PureWind'sTools outfits
 				if (enemy.ravage.bypassAll) return false // Seems to not be called before stripping; but it's working as it is now, so I'll come back to this later
 				if(article.Lost) return false
 				if(["Mask", "Visor", "Gag"].some(str => article.Item.includes(str))) {
@@ -582,6 +584,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 		})
 
 		let clothingTargetsHead = KDGetDressList()[KinkyDungeonCurrentDress].filter(article=> {
+				if (["InnocentDesireSuit", "NightCatSuit", "MikosSuitLV1", "MikosSuitLV2", "MikosSuitLV3", "Nake", "EtherMageSuit"].some(str => KinkyDungeonCurrentDress == str)) return false // Working around a function override for PureWind'sTools outfits
 				if (enemy.ravage.bypassAll) return false // Seems to not be called before stripping; but it's working as it is now, so I'll come back to this later
 				if(article.Lost) return false
 				if(["Hat"].some(str => article.Item.includes(str))) {
