@@ -76,3 +76,4 @@ v6.1.0
 
 v6.1.1
 - Initial addition of extreme debugging logs
+- Bypass stripping PureWind outfits (from PureWind'sTools) to avoid infinite loop of stripping clothes
