@@ -73,3 +73,6 @@ v6.1.0
 	+ Added `ravagerDevelopers.md` to document all framework-specific options available
 	+ Added globally accessible helper function to add callbacks for custom ravager development
 	+ Added default fallback narration for ravagers, as well as a property that can be set if no narration is the desired behavior
+
+v6.1.1
+- Initial addition of extreme debugging logs

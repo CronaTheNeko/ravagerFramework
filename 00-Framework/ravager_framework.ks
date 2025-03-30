@@ -124,6 +124,17 @@ for (var key in debugCallbacks) {
 		console.error('[Ravager Framework] Failed to add debug callback: ', key)
 }
 
+// Hidden option to enable way too many console messages
+window._RavagerFrameworkDebugEnabled = false;
+window.RavagerFrameworkDebug = function() {
+	if (_RavagerFrameworkDebugEnabled) {
+		console.log('[Ravager Framework] Serious debug mode disabled.')
+		_RavagerFrameworkDebugEnabled = false
+	} else {
+		console.log('[Ravager Framework] Serious debug mode enabled. Hope you like lots of text and variables!')
+		_RavagerFrameworkDebugEnabled = true
+	}
+}
 //
 window.RavagerGetSettings = () => {
 	return KDModSettings['RavagerFramework']
@@ -528,6 +539,7 @@ let ravageEquipmentSlotTargets = {
 KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bullet, entity) => {
 	let dbg = KDModSettings['RavagerFramework'] && KDModSettings['RavagerFramework'].ravagerDebug;
 	dbg && console.log('[Ravager Framework]: Effect: Ravage; Ravaging entity is', entity, 'target is', target)
+	_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: Ravager PlayerEffect; target: ', target, '; damage: ', damage, '; playerEffect: ', playerEffect, '; spell: ', spell, '; faction: ', faction, '; bullet: ', bullet, '; entity: ', entity)
 	let enemy = entity.Enemy
 	if(!enemy.ravage) throw 'Ravaging enemies need to have ravage settings!'
 
@@ -559,6 +571,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					return true
 			}
 		})
+		_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect clothingTargetsPelvis: ', clothingTargetsPelvis)
 
 		let clothingTargetsMouth = KDGetDressList()[KinkyDungeonCurrentDress].filter(article=> {
 				if (enemy.ravage.bypassAll) return false // Seems to not be called before stripping; but it's working as it is now, so I'll come back to this later
@@ -616,6 +629,8 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 		for (const slot in stripOptions.equipment) {
 			ravageEquipmentSlotTargets[slot].forEach(groupName => {
 				let restraintInSlot = KinkyDungeonGetRestraintItem(groupName)
+				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect creating array of worn equipment; groupName: ', groupName, '; restraintInSlot: ', restraintInSlot)
+				_RavagerFrameworkDebugEnabled && restraintInSlot && console.log('	; if eval: restraintInSlot: ', Boolean(restraintInSlot), '; InSlot name: ', restraintInSlot.name, '; InSlot name != Stripped: ', restraintInSlot.name != "Stripped", '; InSlot name not includes RavagerOccupied: ', !restraintInSlot.name.includes("RavagerOccupied"), '; not bypassed: ', !bypassed(restraintInSlot), '; not bypassAll: ', !enemy.ravage.bypassAll, '; Total: ', restraintInSlot && restraintInSlot.name != "Stripped" && !restraintInSlot.name.includes("RavagerOccupied") && !bypassed(restraintInSlot) && !enemy.ravage.bypassAll)
 				if(
 					restraintInSlot && 
 					restraintInSlot.name != "Stripped" && 
@@ -689,14 +704,18 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 		// If all slots are taken, gotta fallback
 		// TODO!!! prioritize oral if target is belted
 		let canRavage = true
+		_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect validSlots; needs to choose slot: ', !entity.ravage.slot, 'slot ocuppier type = object: ', typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object", '; entity not in desired slot: ', (typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object" && KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity), '; Total: ', !entity.ravage.slot || (typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object" && KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity))
+		_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect validSlots; validSlots.length: ', validSlots.length)
 		if(!entity.ravage.slot || (typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object" && KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity)) {
 			dbg && console.log('[Ravager Framework]: validSlots: ', validSlots, '; entity.ravage.slot: ', entity.ravage.slot, '; entity not in desired player slot: ', KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity, '; desired player slot: ', KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot])
 			if(validSlots.length) entity.ravage.slot = ravRandom(validSlots)
 			else canRavage = false
 		}
+		_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect validSlots; entity slot: ', entity.ravage.slot, '; canRavage: ', canRavage)
 
 		////////////////////////////////////////////////////////////////////////
 		/* RAVAGE SECTION - If target is player, lower body is nude, and is pinned */
+		_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: playerEffect section determination; target is player: ', target == KinkyDungeonPlayerEntity, '; canRavage: ', canRavage, '; uncovered[' + entity.ravage.slot + ']: ', uncovered[entity.ravage.slot], '; Pinned tag: ', Boolean(KinkyDungeonPlayerTags.get("Item_Pinned")), '; refractory: ', Boolean(entity.ravageRefractory))
 		if(
 			target == KinkyDungeonPlayerEntity &&
 			canRavage &&
@@ -899,12 +918,17 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				}
 				KinkyDungeonSendTextMessage(10, `EnemyName tears your ${TextGet("Restraint" + targetRestraint.name)} away!`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff0000", 4);	
 			} else if(stripOptions.clothing[entity.ravage.slot].length) {
+				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; clothing strip options: ', stripOptions.clothing[entity.ravage.slot])
 				let stripped = stripOptions.clothing[entity.ravage.slot][0]
+				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped: ', stripped)
+				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; slot check; slot not = ItemMouth: ', entity.ravage.slot != "ItemMouth", '; !getRestraintItem ItemPelvis: ', !KinkyDungeonGetRestraintItem("ItemPelvis"), '; clothing includes shorts, bikini, or panties: ', ["Shorts", "Bikini", "Panties"].some(str => stripped.Item.includes(str)), '; Total: ', entity.ravage.slot != "ItemMouth" && !KinkyDungeonGetRestraintItem("ItemPelvis") && ["Shorts", "Bikini", "Panties"].some(str => stripped.Item.includes(str)))
 				if(entity.ravage.slot != "ItemMouth" && !KinkyDungeonGetRestraintItem("ItemPelvis") && ["Shorts", "Bikini", "Panties"].some(str => stripped.Item.includes(str))) {
 					if (!entity.Enemy.ravage.bypassAll) KinkyDungeonAddRestraintIfWeaker("Stripped") // Since panties are sacred normally
 				}
 				KinkyDungeonSendTextMessage(10, `EnemyName tears your ${stripped.Item} away!`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff0000", 4);
+				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped.Lost = ', stripped.Lost)
 				stripped.Lost = true
+				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped.Lost = ', stripped.Lost)
 			} else {
 				KinkyDungeonAddRestraintIfWeaker("Pinned")
 				KinkyDungeonSendTextMessage(10, `EnemyName gets a good grip on you...`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff00ff	", 4);
