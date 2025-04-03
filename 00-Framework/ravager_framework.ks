@@ -208,7 +208,15 @@ window.RavagerData = {
 				}
 			}
 		}
+	},
+	functions: {
+		DrawButtonKDEx: DrawButtonKDEx
 	}
+}
+DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options) {
+	if (name == "Ravager Framework")
+		Color = "#ff00ff"
+	return RavagerData.functions.DrawButtonKDEx(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options)
 }
 
 // Base settings function, simplifying reloading settings
