@@ -826,6 +826,72 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				if(range[0] > entity.ravage.progress) return true
 			})
 
+			// Helper to get what the previous range was for the sake of increase player ravaged counts 
+			function getPreviousRange(currRange, enemy) {
+				return currRange ? enemy.ravage.ranges[enemy.ravage.ranges.findIndex((v) => { if (v == currRange) return true; }) - 1] : enemy.ravage.ranges.at(-1)
+			}
+			// Helper to increase player ravaged counts
+			function increasePlayerRavagedCount(range, slot, target, enemy, assumeIncrement) {
+				const dbg = RavagerGetSetting('ravagerDebug')
+				dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: range: ', range, '; slot: ', slot, '; target: ', target, '; enemy: ', enemy, '; assumeIncrement: ', assumeIncrement)
+				// Check that player.ravagedCount exists
+				if (target.ravagedCounts == undefined) {
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Creating player\'s ravagedCounts')
+					target.ravagedCounts = {}
+				}
+				// Check for last incremented, so we don't repeatedly increment the same slot
+				if (target.ravagedCounts.lastIncremented == undefined) {
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Creating player\'s ravagedCounts.lastIncremented')
+					target.ravagedCounts.lastIncremented = {}
+				}
+				if (range == undefined) {
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Invalid range')
+					return false
+				} else if (target.ravagedCounts.lastIncremented[slot] == range[0]) {
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Matched range against previous incremented range')
+					return false
+				} else {
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Last incremented range not matching; deleting')
+					delete target.ravagedCounts.lastIncremented[slot]
+				}
+				// Check the range's increment setting for all/specified slot
+				let incCount = range[1].useCount
+				if (incCount == undefined && assumeIncrement) { // Failed to think through the fact that we want to increment slots by default at the end. So if rangeData.useCount is missing, we default to incrementing by one for all slots. This should still respect being able to not increment on specific slots via making an object without that slot, or setting the slot to false, and disabling entirely by setting rangeData.useCount to false
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Assuming increment by default; we\'re hopefully at the end of a session')
+					incCount = 1
+				}
+				dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: incCount: ', incCount)
+				if (incCount) {
+					// Normalize incCount
+					if ((typeof incCount).toLowerCase() == "object") {
+						if (!incCount[slot])
+							return false
+						incCount = Number(incCount[slot])
+					} else if (Number.isNaN(Number(incCount))) {
+						incCount = 0
+					} else {
+						incCount = Number(incCount)
+					}
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Normalized incCount: ', incCount)
+					// Check if specified slot's use count is undefined
+					if (target.ravagedCounts[slot] == undefined || target.ravagedCounts[slot] < 0) {
+						// Set use count to range's increment count (Cast to Number to handle Boolean meaning increment by one)
+						target.ravagedCounts[slot] = incCount
+						dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Set slot\'s count to ', incCount)
+					} else {
+						// Increment use count by range's increment count (cast to Number to handle Boolean meaning increment)
+						target.ravagedCounts[slot] += incCount
+						dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Incremented slot\'s count by ', incCount)
+					}
+					target.ravagedCounts.lastIncremented[slot] = range[0]
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Set slot\'s last incremented to ', range[0])
+					return true
+				} else {
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: incCount invalid')
+					return false
+				}
+			}
+
 			// If rangeData is null, the encounter is over, and doneDialogue should be used.
 			if(range) {
 				let rangeData = range[1]
@@ -879,6 +945,8 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					dbg && console.log('[Ravager Framework] Calling all range callback ', enemy.ravage.allRangeCallback, ' ...')
 					KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.allRangeCallback](entity, target, entity.ravage.slot)
 				}
+				dbg && console.log('[Ravager Framework]: Attempting to increment slot use count...')
+				increasePlayerRavagedCount(getPreviousRange(range, enemy), slotOfChoice, target, enemy)
 			} else {			
 				// Done playing, if they were
 				if(entity.playWithPlayer) entity.playWithPlayer = 0
@@ -898,6 +966,10 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					KinkyDungeonPassOut()
 					passedOut = true
 				}
+
+				// Check for increasing ravaged count
+				dbg && console.log('[Ravager Framework]: Attempting to increment slot use count at end of session...')
+				increasePlayerRavagedCount(getPreviousRange(range, enemy), slotOfChoice, target, enemy, !(enemy.ravage.ranges.filter(v => v[1].useCount).length > 0))
 
 				if(enemy.ravage.doneTaunts) KinkyDungeonSendDialogue(entity, ravRandom(enemy.ravage.doneTaunts).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6);
 				if (
