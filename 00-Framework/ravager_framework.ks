@@ -136,16 +136,26 @@ window.RavagerFrameworkDebug = function() {
 	}
 }
 //
-window.RavagerGetSettings = () => {
-	return KDModSettings['RavagerFramework']
-}
-window.RavagerGetBool = (refvar) => {
-	const settings = RavagerGetSettings()
-	return settings && settings[refvar]
-}
-window.RavagerGetNum = (refvar, default_val) => {
-	const settings = RavagerGetSettings()
-	return settings ? settings[refvar] : default_val
+// Function to get a mod setting value. If settings are undefined, it'll return the default value given to KDModConfigs. If there is not matching value given to KDModConfigs, 
+window.RavagerGetSetting = function(refvar) {
+	const settings = KDModSettings.RavagerFramework
+	var config = RavagerData.ModConfig.find((val) => { if (val.refvar == refvar) return true; })
+	function RFConfigDefault(refvar, config) {
+		if (config == undefined) {
+			console.error('[Ravager Framework]: RavagerGetSetting couldn\'t find ModConfig values for ' + refvar + ' !')
+			return undefined
+		}
+		return config.default
+	}
+	if (!settings) {
+		console.warn('[Ravager Framework]: RavagerGetSetting couldn\'t get current settings for the framework!')
+		return RFConfigDefault(refvar, config)
+	}
+	if (settings[refvar] == undefined) {
+		console.warn('[Ravager Framework]: RavagerGetSetting couldn\'t get the current setting for ' + refvar)
+		return RFConfigDefault(refvar, config)
+	}
+	return settings[refvar]
 }
 window.RavagerData = {
 	KDEventMapGeneric: {
@@ -164,9 +174,9 @@ window.RavagerData = {
 				if (C == KinkyDungeonPlayer && (RavagerSoundGotHit || KDUniqueBulletHits.has('undefined[object Object]_player'))) {
 					RavagerSoundGotHit = false
 					KinkyDungeonInterruptSleep()
-					console.log('enableSound: ', RavagerGetBool('ravagerEnableSound'), '\nvolume: ', RavagerGetNum('ravagerSoundVolume', 1) / 2, '\nonHitChance: ', RavagerGetNum('onHitChance', 0.3))
-					if (KDToggles.Sound && RavagerGetBool('ravagerEnableSound') && Math.random() < RavagerGetNum('onHitChance', 0.3)) {
-						AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio/" + (KinkyDungeonGagTotal() > 0 ? "Angry21 liliana.ogg" : "Ah1 liliana.ogg"), RavagerGetNum('ravagerSoundVolume', 1) / 2)
+					console.log('enableSound: ', RavagerGetSetting('ravagerEnableSound'), '\nvolume: ', RavagerGetSetting('ravagerSoundVolume') / 2, '\nonHitChance: ', RavagerGetSetting('onHitChance'))
+					if (KDToggles.Sound && RavagerGetSetting('ravagerEnableSound') && Math.random() < RavagerGetSetting('onHitChance')) {
+						AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio/" + (KinkyDungeonGagTotal() > 0 ? "Angry21 liliana.ogg" : "Ah1 liliana.ogg"), RavagerGetSetting('ravagerSoundVolume') / 2)
 					}
 					return true
 				}
@@ -188,8 +198,8 @@ window.RavagerData = {
 			priority: 90,
 			criteria: (C) => {
 				if (C == KinkyDungeonPlayer && KinkyDungeonFlags.get("OrgSuccess") == 7) {
-					if (KDToggles.Sound && RavagerGetBool('ravagerEnableSound')) {
-						AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio" + (KinkyDungeonGagTotal > 0 ? "GagOrgasm.ogg" : "Ah1 liliana.ogg"), RavagerGetNum('ravagerSoundVolume', 1) / 2)
+					if (KDToggles.Sound && RavagerGetSetting('ravagerEnableSound')) {
+						AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio" + (KinkyDungeonGagTotal > 0 ? "GagOrgasm.ogg" : "Ah1 liliana.ogg"), RavagerGetSetting('ravagerSoundVolume') / 2)
 					}
 					KinkyDungeonSendTextMessage(8, "You make a loud moaning noise", "#1fffc7", 1);
 					KinkyDungeonMakeNoise(9, KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y)
@@ -211,11 +221,93 @@ window.RavagerData = {
 	},
 	functions: {
 		DrawButtonKDEx: DrawButtonKDEx
-	}
+	},
+	ModConfig: [
+		{
+			type: 'boolean',
+			refvar: 'ravagerDebug',
+			default: false,
+			block: undefined
+		},
+		{
+			// name: 'Disable Bandit Ravager',
+			type: 'boolean',
+			refvar: 'ravagerDisableBandit',
+			default: false,
+			block: undefined
+		},
+		{
+			// name: 'Disable Wolfgirl Ravager',
+			type: 'boolean',
+			refvar: 'ravagerDisableWolfgirl',
+			default: false,
+			block: undefined
+		},
+		{
+			// name: 'Disable Slimegirl Ravager',
+			type: 'boolean',
+			refvar: 'ravagerDisableSlimegirl',
+			default: false,
+			block: undefined
+		},
+		{
+			// name: 'Disable Tentacle Pit',
+			type: 'boolean',
+			refvar: 'ravagerDisableTentaclePit',
+			default: false,
+			block: undefined
+		},
+		{
+			// name: 'Spicy Ravager Tendril Dialogue',
+			type: 'boolean',
+			refvar: 'ravagerSpicyTendril',
+			default: false,
+			block: undefined
+		},
+		{
+			type: 'range',
+			name: 'Slimegirl Restrict Chance', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
+			refvar: 'ravagerSlimeAddChance',
+			default: 0.05,
+			rangelow: 0,
+			rangehigh: 1,
+			stepcount: 0.01,
+			block: undefined
+		},
+		{
+			type: 'boolean',
+			refvar: 'ravagerEnableSound',
+			default: true,
+			block: undefined
+		},
+		{
+			type: 'range',
+			name: 'Hit Sound Chance', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
+			refvar: 'onHitChance',
+			default: 0.3,
+			rangelow: 0,
+			rangehigh: 1,
+			stepcount: 0.05,
+			block: undefined
+		},
+		{
+			type: 'range',
+			name: 'Sound Effect Volume', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
+			refvar: 'ravagerSoundVolume',
+			default: 1,
+			rangelow: 0,
+			rangehigh: 2,
+			stepcount: 0.05,
+			block: undefined
+		},
+	]
 }
 DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options) {
-	if (name == "Ravager Framework")
-		Color = "#ff00ff"
+	if (name == "Ravager Framework") {
+		Color = "#ff66ff"
+		FillColor = "#330033"
+		// NoBorder = true
+	}
 	return RavagerData.functions.DrawButtonKDEx(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options)
 }
 
@@ -419,85 +511,7 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 			dbg && console.log('[Ravager Framework] KDModSettings was null.')
 		}
 		if (KDModConfigs != undefined) {
-			KDModConfigs['RavagerFramework'] = [
-				{
-					type: 'boolean',
-					refvar: 'ravagerDebug',
-					default: false,
-					block: undefined
-				},
-				{
-					// name: 'Disable Bandit Ravager',
-					type: 'boolean',
-					refvar: 'ravagerDisableBandit',
-					default: false,
-					block: undefined
-				},
-				{
-					// name: 'Disable Wolfgirl Ravager',
-					type: 'boolean',
-					refvar: 'ravagerDisableWolfgirl',
-					default: false,
-					block: undefined
-				},
-				{
-					// name: 'Disable Slimegirl Ravager',
-					type: 'boolean',
-					refvar: 'ravagerDisableSlimegirl',
-					default: false,
-					block: undefined
-				},
-				{
-					// name: 'Disable Tentacle Pit',
-					type: 'boolean',
-					refvar: 'ravagerDisableTentaclePit',
-					default: false,
-					block: undefined
-				},
-				{
-					// name: 'Spicy Ravager Tendril Dialogue',
-					type: 'boolean',
-					refvar: 'ravagerSpicyTendril',
-					default: false,
-					block: undefined
-				},
-				{
-					type: 'range',
-					name: 'Slimegirl Restrict Chance', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
-					refvar: 'ravagerSlimeAddChance',
-					default: 0.05,
-					rangelow: 0,
-					rangehigh: 1,
-					stepcount: 0.01,
-					block: undefined
-				},
-				{
-					type: 'boolean',
-					refvar: 'ravagerEnableSound',
-					default: true,
-					block: undefined
-				},
-				{
-					type: 'range',
-					name: 'Hit Sound Chance', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
-					refvar: 'onHitChance',
-					default: 0.3,
-					rangelow: 0,
-					rangehigh: 1,
-					stepcount: 0.05,
-					block: undefined
-				},
-				{
-					type: 'range',
-					name: 'Sound Effect Volume', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
-					refvar: 'ravagerSoundVolume',
-					default: 1,
-					rangelow: 0,
-					rangehigh: 2,
-					stepcount: 0.05,
-					block: undefined
-				},
-			]
+			KDModConfigs['RavagerFramework'] = RavagerData.ModConfig
 		}
 		let settingsobject = (KDModSettings.hasOwnProperty('RavagerFramework') == false) ? {} : Object.assign({}, KDModSettings['RavagerFramework'])
 		// console.log('ModSettings state: ', KDModSettings['RavagerFramework'], settingsobject)
