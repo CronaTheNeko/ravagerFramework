@@ -300,6 +300,36 @@ window.RavagerData = {
 			stepcount: 0.05,
 			block: undefined
 		},
+		{
+			type: 'boolean',
+			refvar: 'ravEnableUseCount',
+			default: true,
+			block: undefined
+		},
+		{
+			type: 'list',
+			name: 'ravUseCountMode', // Needed for proper declaration of the left and right selection buttons
+			refvar: 'ravUseCountMode',
+			options: [ 'Any', 'Sometimes', 'Always' ],
+			default: 'Any',
+			block: undefined
+		},
+		{
+			type: 'range',
+			name: 'ravUseCountModeChance',
+			refvar: 'ravUseCountModeChance',
+			default: 0.75,
+			rangelow: 0,
+			rangehigh: 1,
+			stepcount: 0.05,
+			block: undefined
+		},
+		{
+			type: 'boolean',
+			refvar: 'ravUseCountOverride',
+			default: false,
+			block: undefined
+		}
 	]
 }
 DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options) {
@@ -503,6 +533,10 @@ addTextKey('KDModButtonravagerSlimeAddChance', 'Slimegirl Restrict Chance')
 addTextKey('KDModButtonravagerEnableSound', 'Enable Sounds')
 addTextKey('KDModButtononHitChance', 'Moan Chance')
 addTextKey('KDModButtonravagerSoundVolume', 'Moan Volume')
+addTextKey('KDModButtonravEnableUseCount', 'Enable Experience Aware Mode')
+addTextKey('KDModButtonravUseCountMode', 'Exp Aware Mode')
+addTextKey('KDModButtonravUseCountModeChance', 'Exp Aware Chance')
+addTextKey('KDModButtonravUseCountOverride', 'Override Exp Aware Mode')
 if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 	KDEventMapGeneric['afterModSettingsLoad']['RavagerFramework'] = (e, data) => {
 		let dbg = KDModSettings['RavagerFramework'] && KDModSettings['RavagerFramework'].ravagerDebug;
@@ -834,6 +868,11 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 			function increasePlayerRavagedCount(range, slot, target, enemy, assumeIncrement) {
 				const dbg = RavagerGetSetting('ravagerDebug')
 				dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: range: ', range, '; slot: ', slot, '; target: ', target, '; enemy: ', enemy, '; assumeIncrement: ', assumeIncrement)
+				// Bail if use-count-aware mode is disabled
+				if (!RavagerGetSetting('ravEnableUseCount')) {
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: EA mode disabled. Bailing.')
+					return
+				}
 				// Check that player.ravagedCount exists
 				if (target.ravagedCounts == undefined) {
 					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Creating player\'s ravagedCounts')
@@ -906,9 +945,80 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					KinkyDungeonDoTryOrgasm((rangeData.orgasmBonus || 0) + slotsOccupied, 1)
 				}
 
+				// Helpers for use count based text
+				function checkPreviousUseCount(slot) {
+					return target.ravagedCounts && typeof target.ravagedCounts[slotOfChoice] == "number" && target.ravagedCounts[slot] > 0
+				}
+				function decideToDoExperiencedText(obj, slot, rangeData) {
+					// Check that use-count-aware mode is enabled before continuing
+					if (!RavagerGetSetting('ravEnableUseCount')) {
+						dbg && console.log('[Ravager Framework][decideToDoExperiencedText]: EA mode disabled. Bailing.')
+						return false
+					}
+					// Initial value, just checks that there is narration
+					let result = Boolean(obj[1] && obj[1][slot])
+					// Helper functions
+					function experiencedTextDecideDefault() {
+						return Math.random() < RavagerGetSetting('ravUseCountModeChance')
+					}
+					function experiencedTextDecideUser() {
+						const pref = RavagerGetSetting('ravUseCountMode').toLowerCase()
+						if (pref == 'sometimes') {
+							return experiencedTextDecideDefault()
+						} else if (pref == 'always') {
+							return true
+						} else {
+							console.error('[Ravager Framework][decideToDoExperiencedText][experiencedTextDecideUser]: Invalid preference: ', pref)
+							return false
+						}
+					}
+					function experiencedTextDecideRavager() {
+						return rangeData.experiencedAlways || (rangeData.hasOwnProperty('experiencedChance') ? (Math.random() < rangeData.experiencedChance) : experiencedTextDecideDefault())
+					}
+					const tryUser = RavagerGetSetting('ravUseCountMode').toLowerCase() != 'any'
+					const tryRav = rangeData.hasOwnProperty('experiencedChance') || rangeData.experiencedAlways
+					if (RavagerGetSetting('ravUseCountOverride')) {
+						if (tryUser) {
+							result = result && experiencedTextDecideUser()
+						} else if (tryRav) {
+							result = result && experiencedTextDecideRavager()
+						} else {
+							result = result && experiencedTextDecideDefault()
+						}
+					} else {
+						if (tryRav) {
+							result = result && experiencedTextDecideRavager()
+						} else if (tryUser) {
+							result = result && experiencedTextDecideUser()
+						} else {
+							result = result && experiencedTextDecideDefault()
+						}
+					}
+					// Return
+					return result
+				}
+
 				// Next, handle dialogue/narration
-				if(rangeData.narration) pRav.narrationBuffer.push(ravRandom(rangeData.narration[slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)));
-				if(rangeData.taunts) KinkyDungeonSendDialogue(entity, ravRandom(rangeData.taunts).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6);
+				// Use count based narration
+				let didExperiencedNarration = false
+				if (checkPreviousUseCount(slotOfChoice) && rangeData.experiencedNarration) {
+					let eNarr = rangeData.experiencedNarration.findLast((range) => { if (range[0] <= target.ravagedCounts[slotOfChoice]) return true; })
+					if (decideToDoExperiencedText(eNarr, slotOfChoice, rangeData)) {
+						pRav.narrationBuffer.push(ravRandom(eNarr[1][slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)));
+						didExperiencedNarration = true
+					}
+				}
+				if(rangeData.narration && !didExperiencedNarration) pRav.narrationBuffer.push(ravRandom(rangeData.narration[slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)));
+				// Use count based taunts
+				let didExperiencedTaunt = false
+				if (checkPreviousUseCount(slotOfChoice) && rangeData.experiencedTaunts) {
+					let eTaunt = rangeData.experiencedTaunts.findLast((range) => { if (range[0] <= target.ravagedCounts[slotOfChoice]) return true; })
+					if (decideToDoExperiencedText(eTaunt, slotOfChoice, rangeData)) {
+						KinkyDungeonSendDialogue(entity, ravRandom(eTaunt[1][slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6)
+						didExperiencedTaunt = true
+					}
+				}
+				if(rangeData.taunts && !didExperiencedTaunt) KinkyDungeonSendDialogue(entity, ravRandom(rangeData.taunts).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6);
 				if(rangeData.dp) { // Only do floaty sound effects if DP is being applied, since that means action is happening
 					if(enemy.ravage.onomatopoeia) KinkyDungeonSendFloater(entity, ravRandom(enemy.ravage.onomatopoeia), "#ff00ff", 2);
 				}
