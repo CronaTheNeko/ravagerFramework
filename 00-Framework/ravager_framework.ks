@@ -135,7 +135,203 @@ window.RavagerFrameworkDebug = function() {
 		_RavagerFrameworkDebugEnabled = true
 	}
 }
-//
+// Developer helper function to verify a ravager's EAM values
+window.RavagerFrameworkVerifyEAM = function(ravagerName) {
+	const ravager = KDEnemiesCache.get(ravagerName)
+	// Check that enemy exists
+	if (!ravager) {
+		console.error('[RavagerFrameworkVerifyEAM] Could not find an enemy by the name of ', ravagerName)
+		return false
+	}
+	// Check for ravager.ravage to make sure this is a ravager
+	if (!ravager.ravage) {
+		console.error('[RavagerFrameworkVerifyEAM] Enemy does not have a "ravage" property. Either you\'re checking the wrong enemy, or you\'ve defined your ravager wrong.')
+		return false
+	}
+	// Check that ravager has ranges
+	if (!ravager.ravage.ranges || ravager.ravage.ranges.length < 1) {
+		console.error('[RavagerFrameworkVerifyEAM] Ravager has no ranges. This ravager will be unable to ravage the player.')
+		return false
+	}
+	// Track failed ranges
+	let failedRanges = []
+	// Track ranges with invalid EAM properties
+	let eamFailedRanges = []
+	//
+	let hasEAMRanges = false
+	// Loop each range
+	for (var range of ravager.ravage.ranges) {
+		// Check for rangeData
+		if (range.length < 2 || !range[1]) {
+			console.error('[RavagerFrameworkVerifyEAM] Invalid range: ', range)
+			// return false
+			failedRanges.push(range)
+			continue
+		}
+		const rangeData = range[1]
+		// Log about use count
+		if (rangeData.hasOwnProperty('useCount')) {
+			let useCount = rangeData.useCount
+			if (typeof useCount == undefined) {
+				console.warn('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount defined, but it is set to undefined. Doing so is not well tested. If this is not your last range, the expected behavior is to block incrementing use count, but that is unnecessary, as that is the default bahvior. If this is in your last range, this will result in incrementing the use count by 1 regardless of slot. It is recommended you either remove this setting if it is not in your last range, or set useCount to 0 if this is in your last range and you wish to block incrementing use counts.')
+			} else if (typeof useCount == 'number') {
+				if (useCount == 0)
+					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to zero. If this is the last range, this will prevent incrementing use counts. If this is not the last range, this setting is unnecessary.')
+				else if (useCount < 0)
+					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to a negative value. This will result in DECREMENTING use counts instead of incrementing them.')
+				else if (useCount > 0)
+					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use counts by ', useCount, ' for every slot')
+				else
+					console.error('[RavagerFrameworkVerifyEAM] wtf just happened? (useCount = number)')
+			} else if (typeof useCount == 'object') {
+				let hasSlots = false
+				if (useCount.hasOwnProperty('ItemVulva')) {
+					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemVulva by ', useCount.ItemVulva)
+					hasSlots = true
+				}
+				if (useCount.hasOwnProperty('ItemMouth')) {
+					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemMouth by ', useCount.ItemMouth)
+					hasSlots = true
+				}
+				if (useCount.hasOwnProperty('ItemButt')) {
+					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemButt by ', useCount.ItemButt)
+					hasSlots = true
+				}
+				if (useCount.hasOwnProperty('ItemHead')) {
+					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemHead by ', useCount.ItemHead)
+					hasSlots = true
+				}
+				if (!hasSlots) {
+					console.warn('[RavagerFrameworkVerifyEAM] Range ', range, ' defines useCount as a dictionary, but has no slots. This will result in never incrementing use counts.')
+				}
+			} else {
+				console.error('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to an unknown type. This scenario is untested. If you beleive this is a mistake, please report the issue. Otherwise, it is recommended to fix your definition of useCount.')
+			}
+		}
+		// Track if this range has any EAM settings
+		let hasEAMProps = false
+		// Check for taunts
+		if (rangeData.hasOwnProperty('experiencedTaunts')) {
+			let tauntsValid = true
+			// Loop each taunt range
+			for (var count of rangeData.experiencedTaunts) {
+				// Check structure of taunt range
+				if (count.length < 2 || !count[1]) {
+					console.warn('[RavagerFrameworkVerifyEAM] This range has an invalid EAM taunt definition: ', count)
+					if (!eamFailedRanges.includes(count))
+						eamFailedRanges.push(count)
+					continue
+				}
+				let countData = count[1]
+				// Track if this taunt range has any slots
+				let hasSlots = false
+				// Check for each slot
+				// const hasSlots = countData.hasOwnProperty('ItemVulva') || countData.hasOwnProperty('ItemButt') || countData.hasOwnProperty('ItemMouth') || countData.hasOwnProperty('ItemHead')
+				for (var slot of [ 'ItemVulva', 'ItemMouth', 'ItemButt', 'ItemHead' ]) {
+					// let slotValid = countData.hasOwnProperty(slot)
+					// let slotWasValid = slotValid
+					if (!countData.hasOwnProperty(slot))
+						continue
+					let stringsValid = Array.isArray(countData[slot])
+					if (!stringsValid) {
+						console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
+						continue
+					}
+					for (var string of countData[slot]) {
+						stringsValid = stringsValid && typeof string == 'string'
+					}
+					if (!stringsValid) {
+						console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains taunts which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
+					}
+					// hasSlots = hasSlots || stringsValid
+					hasSlots = true
+				}
+				// Warn if there's no slots
+				if (!hasSlots)
+					console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
+				tauntsValid = tauntsValid && hasSlots
+			}
+			if (!tauntsValid)
+				console.warn('[RavagerFrameworkVerifyEAM] experiencedTaunts is defined for range ' + range[0] + '. Either experiencedTaunts is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
+			hasEAMProps = hasEAMProps || tauntsValid
+		}
+		// Check for narration
+		if (rangeData.hasOwnProperty('experiencedNarration')) {
+			let narrationValid = true
+			for (var count of rangeData.experiencedTaunts) {
+				if (count.length < 2 || !count[1]) {
+					console.warn('[RavagerFrameworkVerifyEAM] This range has an invalid EAM narration definition: ', count)
+					if (!eamFailedRanges.includes(count))
+						eamFailedRanges.push(count)
+					continue
+				}
+				let countData = count[1]
+				let hasSlots = false
+				for (var slot of [ 'ItemVulva', 'ItemMouth', 'ItemButt', 'ItemHead' ]) {
+					if (!countData.hasOwnProperty(slot))
+						continue
+					let stringsValid = Array.isArray(countData[slot])
+					if (!stringsValid) {
+						console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
+						continue
+					}
+					for (var string of countData[slot]) {
+						stringsValid = stringsValid && typeof string == 'string'
+					}
+					if (!stringsValid) {
+						console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains narrations which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
+					}
+					hasSlots = true
+				}
+				if (!hasSlots)
+					console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
+				narrationValid = narrationValid && hasSlots
+			}
+			if (!narrationValid)
+				console.warn('[RavagerFrameworkVerifyEAM] experiencedNarration is defined for range ' + range[0] + '. Either experiencedNarration is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
+			hasEAMProps = hasEAMProps || narrationValid
+		}
+		//
+		let hasChance = rangeData.hasOwnProperty('experiencedChance')
+		let hasAlways = rangeData.hasOwnProperty('experiencedAlways')
+		//
+		if (!hasEAMProps && (hasChance || hasAlways)) {
+			console.warn('[RavagerFrameworkVerifyEAM] Range ', range, 'defines EAM chance or always, but does not appear to have any valid taunts or narrations. Without taunts or narrations to use, EAM text will not be used, and the chance and always settings are pointless')
+		}
+		//
+		hasEAMProps = hasEAMProps || hasChance || hasAlways
+		//
+		if (hasChance && hasAlways && rangeData.experiencedAlways) {
+			console.warn('[RavagerFrameworkVerifyEAM] Range ', range, ' defines both experiencedChance and experiencedAlways. experiencedAlways overrides experiencedChance, so it\'s pointless to have them both declared at the same time.')
+			continue
+		}
+		// Check for chance
+		if (hasChance && rangeData.experiencedChance <= 0) {
+			console.warn('[RavagerFrameworkVerifyEAM] Range ', range, ' has experiencedChance set to or below 0. This setting will result in EAM text never being used unless the user overrides your ravager\'s preference.')
+		}
+		// Check for always
+		if (hasAlways && !rangeData.experiencedAlways) {
+			console.warn('[RavagerFrameworkVerifyEAM] Range ', range, ' has experiencedAlways set to false. Doing so is entirely unneeded, as this setting only has any effect when true.')
+		}
+		hasEAMRanges = hasEAMRanges || hasEAMProps
+	}
+	// Bail on failed ranges
+	if (failedRanges.length > 0) {
+		console.error('[RavagerFrameworkVerifyEAM] The following ranges are invalid and may cause crashes: ', failedRanges)
+		return false
+	}
+	// Bail of EAM failures in ranges
+	if (eamFailedRanges.length > 0) {
+		console.error('[RavagerFrameworkVerifyEAM] The following ranges have invalid EAM properties and may cause crashes: ', eamFailedRanges)
+		return false
+	}
+	//
+	if (!hasEAMRanges) {
+		console.error('[RavagerFrameworkVerifyEAM] Ravager doesn\'t appear to have any ranges with valid EAM properties.')
+		return false
+	}
+	return true
+}
 // Function to get a mod setting value. If settings are undefined, it'll return the default value given to KDModConfigs. If there is not matching value given to KDModConfigs, 
 window.RavagerGetSetting = function(refvar) {
 	const settings = KDModSettings.RavagerFramework
