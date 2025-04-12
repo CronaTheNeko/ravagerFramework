@@ -324,6 +324,136 @@ Notes:
 - The orgasm chance is decided by KD's `KinkyDungeonDoTryOrgasm`. The modifiers given to it are the number of slots occupied plus `rangeData.orgasmBonus`
 - Giving this bonus as a negative number would likely work, but is currently untested
 
+#### Use Count Influence
+Defines if/how the player's slot use counts will be changed during a range, for use by Experience Aware text. Doing so inside a range definition allows for plenty of flexibility as to when and how many times you want to count the player as having been used.
+
+Property path: `rangeData.useCount`
+
+Required?: No
+
+Type: Number, or dictionary
+
+Default value: 1
+
+Valid values: Any number, or a dictionary with key/value pairs being the slot and the number to increment the player's use count by.
+
+Notes:
+- If you simply want to increment the player's use count by one at the end of a session, regardless of slot, this value is unnecessary since that is the framework's default behavior.
+- If you'd like to increment the player's use count for some slots and not others, set this value to a dictionary which has the slots you want to increment, while omitting the slots you don't want to increment
+- If you'd like to not increment the player's use count at all, set this value to 0
+- To validate you ravager's EAM settings, use the browser console and call `RavagerFrameworkVerifyEAM(ravagerName)` with your ravager's name
+
+Examples:
+- Incrementing use count by two for all slots: `useCount: 2`
+- Not incrementing use count for any slots: `useCount: 0`
+- Incrementing for ItemVulva and ItemButt, but not ItemMouth:
+```
+useCount: {
+  ItemVulva: 1,
+  ItemButt: 1
+}
+```
+
+#### Experience Aware Taunts
+Defines the text above the ravager's head for Experience Aware Mode. The structure of this data mimics [ranges](#ranges) and [rangeData](#range-data).
+
+Property path: `rangeData.experiencedTaunts`
+
+Required?: No
+
+Type: Array of arrays, each of those being `[ slotUseCount, tauntDictionary ]`
+
+Valid values: Each element in this array must be an array of two elements; the first element being the number of times a ravager has used a given slot; the second element is a dictionary containing the taunts for each slot. See below for an example.
+
+Notes:
+- Just like [Ranges](#ranges), the values defined here are not sorted. The last element in the array that has a `slotUseCount` less than or equal to the player's use count in the slot the ravager chooses will be used, even if there's a higher `slotUseCount` earlier in the array.
+- Each slot is optional, and there shouldn't be any issue in omitting any slots from these taunt lists.
+- Just like [Taunts](#taunts), the taunt that will be used is chosen randomly from the given array of taunts.
+- Just like [Taunts](#taunts), the string "EnemyName" in your taunts will be replaced by the ravager's name.
+- To validate you ravager's EAM settings, use the browser console and call `RavagerFrameworkVerifyEAM(ravagerName)` with your ravager's name
+
+Example:
+```
+experiencedTaunts: [
+  [ 1, { // Defines taunts to be used after the player has been used once in the slot your ravager chooses
+    ItemVulva: [ "Example EAM Vulva Taunt 1", "Example EAM Vulva Taunt 2" ],
+    ItemButt: [ "Example EAM Butt Taunt 1", "Example EAM Butt Taunt 2" ],
+    ItemMouth: [ "Example EAM Mouth Taunt 1", "Example EAM Mouth Taunt 2" ]
+  }],
+  [ 2, { // Defines taunts to be used after the player has been used two or more times in the slot your ravager chooses
+    ItemVulva: [ "Example EAM Vulva Taunt 1", "Example EAM Vulva Taunt 2" ],
+    ItemButt: [ "Example EAM Butt Taunt 1", "Example EAM Butt Taunt 2" ],
+    ItemMouth: [ "Example EAM Mouth Taunt 1", "Example EAM Mouth Taunt 2" ]
+  }]
+]
+```
+
+#### Experience Aware Narration
+Defines the narration to be used for Experience Aware Mode. The structure of this data mimics [ranges](#ranges) and [rangeData](#range-data).
+
+Property path: `rangeData.experiencedNarration`
+
+Required?: No
+
+Type: Array of arrays, each of those being `[ slotUseCount, narrationDictionary ]`
+
+Valid values: Each element in this array must be an array of two elements; the first element being the number of times a ravager has used a given slot; the second element is a dictionary containing the narration for each slot. See below for an example.
+
+Notes:
+- Just like [Ranges](#ranges), the values defined here are not sorted. The last element in the array that has a `slotUseCount` less than or equal to the player's use count in the slot the ravager chooses will be used, even if there's a higher `slotUseCount` earlier in the array.
+- Each slot is optional, and there shouldn't be any issue in omitting any slots from these narration lists.
+- Just like [Narration](#narration), the narration that will be used is chosen randomly from the given array of narrations.
+- Just like [Narration](#narration), the string "EnemyName" in your narrations will be replaced by the ravager's name.
+- To validate you ravager's EAM settings, use the browser console and call `RavagerFrameworkVerifyEAM(ravagerName)` with your ravager's name
+
+Example:
+```
+experiencedNarration: [
+  [ 1, { // Defines narration to be used after the player has been used once in the slot your ravager chooses
+    ItemVulva: [ "Example EAM Vulva Narration 1", "Example EAM Vulva Narration 2" ],
+    ItemButt: [ "Example EAM Butt Narration 1", "Example EAM Butt Narration 2" ],
+    ItemMouth: [ "Example EAM Mouth Narration 1", "Example EAM Mouth Narration 2" ]
+  }],
+  [ 2, { // Defines narration to be used after the player has been used two or more times in the slot your ravager chooses
+    ItemVulva: [ "Example EAM Vulva Narration 1", "Example EAM Vulva Narration 2" ],
+    ItemButt: [ "Example EAM Butt Narration 1", "Example EAM Butt Narration 2" ],
+    ItemMouth: [ "Example EAM Mouth Narration 1", "Example EAM Mouth Narration 2" ]
+  }]
+]
+```
+
+#### Experience Aware Mode Chance
+Defines the chance that a ravager will use Experience Aware Mode taunts and narration
+
+Property path: `rangeData.experiencedChance`
+
+Required?: No
+
+Type: Number
+
+Valid values: Decimals between `0.0` and `1.0`, representing a `0%` to `100%` chance
+
+Notes:
+- This value overrides the mod config preference for chance-based/guaranteed use of Experience Aware text, but can also be overridden by the mod config if the user desires.
+- When neither this property nor `rangeData.experiencedAlways` are set, the use of Experience Aware text is left up to the relevant mod configs and controlled by the user. This means that Experience Aware text being used is determined by either the user-controlled chance or always, based on which the user prefers.
+- To validate you ravager's EAM settings, use the browser console and call `RavagerFrameworkVerifyEAM(ravagerName)` with your ravager's name
+
+#### Experience Aware Mode Always
+Makes a ravager prefer to always use Experience Aware Mode taunts and narration.
+
+Property path: `rangeData.experiencedAlways`
+
+Required?: No
+
+Type: Boolean
+
+Default value: false
+
+Notes:
+- This value overrides the mod config preference for chance-based/guaranteed use of Experience Aware text, but can also be overridden by the mod config if the user desires.
+- When neither this property nor `rangeData.experiencedChance` are set, the use of Experience Aware text is left up to the relevant mod configs and controlled by the user. This means that Experience Aware text being used is determined by either the user-controlled chance or always, based on which the user prefers.
+- To validate you ravager's EAM settings, use the browser console and call `RavagerFrameworkVerifyEAM(ravagerName)` with your ravager's name
+
 ##### Callback
 A reference to a callback function to be called during a specific range. Allows you to do extra stuff after all the normal ravaging actions for a specific range.
 
