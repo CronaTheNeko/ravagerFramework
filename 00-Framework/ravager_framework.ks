@@ -220,7 +220,12 @@ window.RavagerData = {
 		}
 	},
 	functions: {
-		DrawButtonKDEx: DrawButtonKDEx
+		DrawButtonKDEx: DrawButtonKDEx,
+		KinkyDungeonDrawEnemiesHP: KinkyDungeonDrawEnemiesHP
+	},
+	conditions: {
+		// Checked to make the MimicRavager spoiler only show when the mimic has not ambushed the player
+		mimicRavSpoiler: enemy => !enemy.ambushtrigger
 	},
 	ModConfig: [
 		{
@@ -309,6 +314,119 @@ DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, 
 		// NoBorder = true
 	}
 	return RavagerData.functions.DrawButtonKDEx(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options)
+}
+// Checks if the player can see an enemy; just a shortcut for a call to KDCanSeeEnemy, which I anticipate being useful in the future
+window.RFPlayerCanSeeEnemy = function(entity) {
+	const xDist = Math.abs(entity.x - KinkyDungeonPlayerEntity.x)
+	const yDist = Math.abs(entity.y - KinkyDungeonPlayerEntity.y)
+	const largestDist = Math.max(xDist, yDist)
+	return KDCanSeeEnemy(entity, largestDist)
+}
+// Shortcut to getting ravager debug
+window.RFDebug = function() {
+	return RavagerGetSetting('ravagerDebug')
+}
+// Currently just used for the mimic spoiler, but there's other ideas of how this can be used, so I've attempted to generalize it
+KinkyDungeonDrawEnemiesHP = function(delta, canvasOffsetX, canvasOffsetY, CamX, CamY, _CamXoffset, _CamYoffset) {
+	// Firstly, call the original function; we'll probably have some bailing happening later
+	RavagerData.functions.KinkyDungeonDrawEnemiesHP(delta, canvasOffsetX, canvasOffsetY, CamX, CamY, _CamXoffset, _CamYoffset)
+	// Get all enemies
+	const nearby = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, KDGameData.MaxVisionDist + 1, undefined, true)
+	// Loop enemies
+	for (var entity of nearby) {
+		// Convinience reference to entity.Enemy
+		const enemy = entity.Enemy
+		// If there's one of our bubbles, check what to do about it
+		if (entity.ravBubble) {
+			// Expired
+			if (KinkyDungeonCurrentTick > entity.ravBubble.index + entity.ravBubble.duration) {
+				RFDebug() && console.log('[Ravager Framework][KinkyDungeonDrawEnemiesHP]: Bubble expired for enemy' + entity.Enemy.name + '(' + entity.id + ')')
+				delete entity.ravBubble
+			} else {
+				// If the player can't see the enemy, there's no need to draw a bubble; bail
+				if (!RFPlayerCanSeeEnemy(entity))
+					continue
+				// Does the enemy define a condition?
+				const hasCond = enemy.ravage.hasOwnProperty('bubbleCondition')
+				// Does said condition correspond to a function to call?
+				const execCond = hasCond && typeof enemy.ravage.bubbleCondition == 'string' && typeof RavagerData.conditions[enemy.ravage.bubbleCondition] == 'function'
+				// If there's no condition, continue to drawing
+				if (hasCond) {
+					// If the condition is a function and that function returns false, bail
+					if (execCond && !RavagerData.conditions[enemy.ravage.bubbleCondition](entity))
+						continue
+					// If the condition isn't a function and that value evaluates to false, bail
+					else if (!execCond && !enemy.ravage.bubbleCondition)
+						continue
+				}
+				// If we make it here, we should be drawing the bubble
+				KDDraw(
+					kdenemystatusboard,
+					kdpixisprites,
+					entity.id + "ravBubble",
+					KinkyDungeonRootDirectory + `Conditions/RavBubble/${entity.ravBubble.name}.png`,
+					canvasOffsetX + ((entity.visual_x ? entity.visual_x : entity.x) - CamX) * KinkyDungeonGridSizeDisplay,
+					canvasOffsetY + ((entity.visual_y ? entity.visual_y : entity.y) - CamY) * KinkyDungeonGridSizeDisplay - KinkyDungeonGridSizeDisplay / 2,
+					KinkyDungeonGridSizeDisplay,
+					KinkyDungeonGridSizeDisplay,
+					undefined,
+					{ zIndex: 25 }
+				)
+			}
+		}
+	}
+}
+// Conditions helper
+window.RavagerFrameworkAddCondition = function(key, func) {
+	if (!RavagerData.conditions) {
+		RavagerData.conditions = {}
+		if (!RavagerData.conditions) {
+			throw new Error('[Ravager Framework] Failed to initialize Ravager Conditions! Something seems to have gone very wrong. Please report this to the Ravager Framework with as much info as you can provide.')
+		}
+	}
+	RFDebug() && console.log('[Ravager Framework] Adding condition function with key:', key)
+	RavagerData.conditions[key] = func
+	return Boolean(RavagerData.conditions[key])
+}
+// Game tick side of ravager bubbles
+KDEventMapEnemy['tick']['ravagerBubble'] = (e, entity, data) => {
+	const enemy = entity.Enemy
+	// Setup defaults
+	if (!e.hasOwnProperty('chance'))
+		e.chance = 0.3
+	if (!e.hasOwnProperty('duration'))
+		e.duration = 3
+	if (!e.hasOwnProperty('image'))
+		e.image = 'Hearts'
+	// Debugging
+	const dbg = RFDebug()
+	dbg && console.log('[Ravager Framework][ravagerBubble] Starting event with e:', e)
+	// Does the enemy define a condition?
+	const hasCond = enemy.ravage.hasOwnProperty('bubbleCondition')
+	// Does said condition correspond to a function to call?
+	const execCond = hasCond && typeof enemy.ravage.bubbleCondition == 'string' && typeof RavagerData.conditions[enemy.ravage.bubbleCondition] == 'function'
+	// If there's no condition, don't bail
+	if (hasCond)
+		// If the condition is a function and that function returns false, bail
+		if (execCond && !RavagerData.conditions[enemy.ravage.bubbleCondition](entity))
+			return
+		// If the condition isn't a function and the condition evaluates to false, bail
+		else if (!execCond && !enemy.ravage.bubbleCondition)
+			return
+	// If we've gotten this far, we're supposed to be drawing the bubble; setup an empty object to avoid crashing
+	if (!entity.ravBubble)
+		entity.ravBubble = {}
+	// Check that there's not a bubble already, then roll the dice
+	if (!entity.ravBubble.name && Math.random() < e.chance) {
+		// Setup bubble to be drawn
+		entity.ravBubble = {
+			name: e.image,
+			duration: e.duration,
+			index: KinkyDungeonCurrentTick
+		}
+		// Debugging
+		dbg && console.log('[Ravager Framework][ravagerBubble] Set Rav Bubble properties for ' + entity.Enemy.name + '(' + entity.id + ')')
+	}
 }
 
 // Base settings function, simplifying reloading settings
