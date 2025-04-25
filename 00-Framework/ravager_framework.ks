@@ -220,7 +220,44 @@ window.RavagerData = {
 		}
 	},
 	functions: {
-		DrawButtonKDEx: DrawButtonKDEx
+		DrawButtonKDEx: DrawButtonKDEx,
+		NameFormat: function(string, entity, restraint, clothing, damage) {
+			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Initial string "' + string + '"; entity: ', entity)
+			// Player name
+			string = string.replace("PlayerName", KDGameData.PlayerName)
+			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+			// Enemy name
+			if (entity) {
+			string = string.replace("EnemyName", TextGet('Name' + entity.Enemy.name))
+			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+			}
+			// Restraint name
+			if (restraint) {
+				string = string.replace("RestraintName", TextGet('Restraint' + restraint.name))
+			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+			}
+			// Clothing name
+			if (clothing) {
+				string = string.replace("ClothingName", TextGet("m_" + clothing.Item).includes("[NotFound]") ? clothing.Item : TextGet("m_" + clothing.Item))
+			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+			}
+			// Damage string
+			if (damage) {
+				string = string.replace("DamageTaken", damage.string)
+			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+			}
+			return string
+		},
+	},
+	defaults: {
+		releaseMessage: "You feel weak as the EnemyName releases you...",
+		passoutMessage: "Your body is broken and exhausted...",
+		restraintTearMessage: "EnemyName tears your RestraintName away!",
+		clothingTearMessage: "EnemyName tears your ClothingName away!",
+		pinMessage: 'EnemyName gets a good grip on you...',
+		addRestraintMessage: 'The EnemyName forces you to wear a RestraintName',
+		fallbackNarration: "The EnemyName roughly gropes you! (DamageTaken)",
+
 	},
 	ModConfig: [
 		{
@@ -841,8 +878,12 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				}
 
 				// Next, handle dialogue/narration
-				if(rangeData.narration) pRav.narrationBuffer.push(ravRandom(rangeData.narration[slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)));
-				if(rangeData.taunts) KinkyDungeonSendDialogue(entity, ravRandom(rangeData.taunts).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6);
+				// if(rangeData.narration) pRav.narrationBuffer.push(ravRandom(rangeData.narration[slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)).replace("PlayerName", loadedsaveNames[KDSaveSlot - 1]));
+				if (rangeData.narration)
+					pRav.narrationBuffer.push(RavagerData.functions.NameFormat(ravRandom(rangeData.narration[slotOfChoice]), entity))
+				// if(rangeData.taunts) KinkyDungeonSendDialogue(entity, ravRandom(rangeData.taunts).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6);
+				if (rangeData.taunts)
+					KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(ravRandom(rangeData.taunts), entity), KDGetColor(entity), 6, 6)
 				if(rangeData.dp) { // Only do floaty sound effects if DP is being applied, since that means action is happening
 					if(enemy.ravage.onomatopoeia) KinkyDungeonSendFloater(entity, ravRandom(enemy.ravage.onomatopoeia), "#ff00ff", 2);
 				}
@@ -892,14 +933,17 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					entity.ravageRefractory = enemy.ravage.refractory
 					KDBreakTether(KinkyDungeonPlayerEntity) // Chances are, this enemy was holding the tether
 					delete entity.ravage
-					KinkyDungeonSendActionMessage(45, "You feel weak as the EnemyName releases you...".replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ee00ee", 4);
+					// KinkyDungeonSendActionMessage(45, "You feel weak as the EnemyName releases you...".replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ee00ee", 4);
+					KinkyDungeonSendActionMessage(45, RavagerData.functions.NameFormat(RavagerData.defaults.releaseMessage, entity), "#e0e", 4) // Maybe make this controllable by a rav dev?
 				} else { // Pass out!
-					KinkyDungeonSendActionMessage(45, "You're body is broken and exhausted...", "#ee00ee", 4);
+					KinkyDungeonSendActionMessage(45, RavagerData.defaults.passoutMessage, "#ee00ee", 4);
 					KinkyDungeonPassOut()
 					passedOut = true
 				}
 
-				if(enemy.ravage.doneTaunts) KinkyDungeonSendDialogue(entity, ravRandom(enemy.ravage.doneTaunts).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6);
+				// if(enemy.ravage.doneTaunts) KinkyDungeonSendDialogue(entity, ravRandom(enemy.ravage.doneTaunts).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6);
+				if (enemy.ravage.doneTaunts)
+					KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(ravRandom(enemy.ravage.doneTaunts), entity), KDGetColor(entity), 6, 6)
 				if (
 					typeof enemy.ravage.completionCallback == 'string' &&
 					KDEventMapEnemy['ravagerCallbacks'] &&
@@ -941,7 +985,8 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				} else {
 					KinkyDungeonRemoveRestraint(input, true, false, false, false, false, entity)
 				}
-				KinkyDungeonSendTextMessage(10, `EnemyName tears your ${TextGet("Restraint" + targetRestraint.name)} away!`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff0000", 4);	
+				// KinkyDungeonSendTextMessage(10, `EnemyName tears your ${TextGet("Restraint" + targetRestraint.name)} away!`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff0000", 4);	
+				KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.restraintTearMessage, entity, targetRestraint), "#f00", 4) // Maybe make this controllable for a rav dev?
 			} else if(stripOptions.clothing[entity.ravage.slot].length) {
 				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; clothing strip options: ', stripOptions.clothing[entity.ravage.slot])
 				let stripped = stripOptions.clothing[entity.ravage.slot][0]
@@ -950,13 +995,15 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				if(entity.ravage.slot != "ItemMouth" && !KinkyDungeonGetRestraintItem("ItemPelvis") && ["Shorts", "Bikini", "Panties"].some(str => stripped.Item.includes(str))) {
 					if (!entity.Enemy.ravage.bypassAll) KinkyDungeonAddRestraintIfWeaker("Stripped") // Since panties are sacred normally
 				}
-				KinkyDungeonSendTextMessage(10, `EnemyName tears your ${stripped.Item} away!`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff0000", 4);
+				// KinkyDungeonSendTextMessage(10, `EnemyName tears your ${stripped.Item} away!`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff0000", 4);
+				KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.clothingTearMessage, entity, undefined, stripped), "#f00", 4) // Maybe make this controllable for a rav dev?
 				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped.Lost = ', stripped.Lost)
 				stripped.Lost = true
 				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped.Lost = ', stripped.Lost)
 			} else {
 				KinkyDungeonAddRestraintIfWeaker("Pinned")
-				KinkyDungeonSendTextMessage(10, `EnemyName gets a good grip on you...`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff00ff	", 4);
+				// KinkyDungeonSendTextMessage(10, `EnemyName gets a good grip on you...`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff00ff	", 4);
+				KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.pinMessage, entity), "#f0f", 4)
 			}
 			KinkyDungeonDressPlayer()
 			return {sfx: "Miss", effect: true};
@@ -995,7 +1042,8 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 								let ret = KinkyDungeonAddRestraintIfWeaker(canidateRestraint)
 								// If we succeeded, print a message about that and set didRestrain to true
 								if (ret) {
-									KinkyDungeonSendTextMessage(10, 'The EnemyName forces you to wear a RestraintName'.replace('EnemyName', TextGet('Name' + entity.Enemy.name)).replace('RestraintName', TextGet('Restraint' + canidateRestraint.name)), '#FF00FF', 4)
+									// KinkyDungeonSendTextMessage(10, 'The EnemyName forces you to wear a RestraintName'.replace('EnemyName', TextGet('Name' + entity.Enemy.name)).replace('RestraintName', TextGet('Restraint' + canidateRestraint.name)), '#FF00FF', 4)
+									KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.addRestraintMessage, entity, canidateRestraint), "#f0f", 4)
 									didRestrain = true
 								}
 							} catch (e) {
@@ -1011,9 +1059,11 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					let dmg = KinkyDungeonDealDamage({damage: 1, type: "grope"});
 					if (!enemy.ravage.noFallbackNarration) {
 						if(enemy.ravage.fallbackNarration) {
-							KinkyDungeonSendTextMessage( 10, ravRandom(enemy.ravage.fallbackNarration).replace("EnemyName", TextGet("Name" + enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff", 4);
+							// KinkyDungeonSendTextMessage( 10, ravRandom(enemy.ravage.fallbackNarration).replace("EnemyName", TextGet("Name" + enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff", 4);
+							KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(ravRandom(enemy.ravage.fallbackNarration), entity, undefined, undefined, dmg), "#f0f", 4)
 						} else {
-							KinkyDungeonSendTextMessage( 10, "The EnemyName roughly gropes you! (DamageTaken)".replace("EnemyName", TextGet("Name" + enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff", 4);
+							// KinkyDungeonSendTextMessage( 10, "The EnemyName roughly gropes you! (DamageTaken)".replace("EnemyName", TextGet("Name" + enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff", 4);
+							KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.fallbackNarration, entity, undefined, undefined, dmg), "#f0f", 4)
 						}
 					} else {
 						deb && console.log('[Ravager Framework] ', enemy.name, ' requests no fallback narration.')
