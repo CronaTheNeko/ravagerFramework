@@ -120,12 +120,12 @@ let pit = {
 			amountMax: 5,
 			weight: 12
 		},
-		{ // --- Haven't implemented yet, but my idea is to make a consumable that can repel humanoid ravagers (some kind of dialog like 'an abomination already used you')
-			name: 'ravagerTendrilCum',
-			amountMin: 1,
-			amountMax: 5,
-			weight: 1
-		}
+		// { // --- Haven't implemented yet, but my idea is to make a consumable that can repel humanoid ravagers (some kind of dialog like 'an abomination already used you')
+		// 	name: 'ravagerTendrilCum',
+		// 	amountMin: 1,
+		// 	amountMax: 5,
+		// 	weight: 1
+		// }
 	]
 }
 // Summon spell definition
@@ -321,12 +321,12 @@ let tendril = {
 			amountMax: 1,
 			weight: 1
 		},
-		{ // --- Haven't implemented yet, but my idea is to make a consumable that can repel humanoid ravagers (some kind of dialog like 'an abomination already used you')
-			name: 'ravagerTendrilCum',
-			amountMin: 1,
-			amountMax: 5,
-			weight: 1
-		}
+		// { // --- Haven't implemented yet, but my idea is to make a consumable that can repel humanoid ravagers (some kind of dialog like 'an abomination already used you')
+		// 	name: 'ravagerTendrilCum',
+		// 	amountMin: 1,
+		// 	amountMax: 5,
+		// 	weight: 1
+		// }
 	],
 	ravage: {
 		caressChance: 0.5,
