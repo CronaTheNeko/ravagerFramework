@@ -417,14 +417,19 @@ window.RavagerData = {
 	},
 	functions: {
 		DrawButtonKDEx: DrawButtonKDEx,
-		NameFormat: function(string, entity, restraint, clothing, damage) {
+		NameFormat: function(string, entity, restraint, clothing, damage, skipCapitalize) {
 			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Initial string "' + string + '"; entity: ', entity)
 			// Player name
 			string = string.replace("PlayerName", KDGameData.PlayerName)
 			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
 			// Enemy name
 			if (entity) {
-			string = string.replace("EnemyName", TextGet('Name' + entity.Enemy.name))
+				// Definition name
+				string = string.replace("EnemyName", TextGet('Name' + entity.Enemy.name))
+				// Possible custom entity name (no formatting)
+				string = string.replace("EnemyCNameBare", KDEnemyName(entity))
+				// Possible custom entity name (w/ formatting)
+				string = string.replace("EnemyCName", entity.CustomName || KDGetName(entity.id) || "the " + TextGet("Name" + entity.Enemy.name))
 			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
 			}
 			// Restraint name
@@ -442,6 +447,9 @@ window.RavagerData = {
 				string = string.replace("DamageTaken", damage.string)
 			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
 			}
+			// Capitalize
+			if (!skipCapitalize)
+				string = string.replaceAt(0, string[0].toUpperCase())
 			return string
 		},
 	},
