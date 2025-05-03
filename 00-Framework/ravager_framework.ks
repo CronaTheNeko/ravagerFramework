@@ -454,13 +454,13 @@ window.RavagerData = {
 		},
 	},
 	defaults: {
-		releaseMessage: "You feel weak as the EnemyName releases you...",
+		releaseMessage: "You feel weak as EnemyCName releases you...",
 		passoutMessage: "Your body is broken and exhausted...",
-		restraintTearMessage: "EnemyName tears your RestraintName away!",
-		clothingTearMessage: "EnemyName tears your ClothingName away!",
-		pinMessage: 'EnemyName gets a good grip on you...',
-		addRestraintMessage: 'The EnemyName forces you to wear a RestraintName',
-		fallbackNarration: "The EnemyName roughly gropes you! (DamageTaken)",
+		restraintTearMessage: "EnemyCName tears your RestraintName away!",
+		clothingTearMessage: "EnemyCName tears your ClothingName away!",
+		pinMessage: "EnemyCName gets a good grip on you...",
+		addRestraintMessage: "EnemyCName forces you to wear a RestraintName",
+		fallbackNarration: "EnemyCName roughly gropes you! (DamageTaken)",
 
 	},
 	ModConfig: [
@@ -1245,7 +1245,8 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				if (checkPreviousUseCount(slotOfChoice) && rangeData.experiencedNarration) {
 					let eNarr = rangeData.experiencedNarration.findLast((range) => { if (range[0] <= target.ravagedCounts[slotOfChoice]) return true; })
 					if (decideToDoExperiencedText(eNarr, slotOfChoice, rangeData)) {
-						pRav.narrationBuffer.push(ravRandom(eNarr[1][slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)));
+						// pRav.narrationBuffer.push(ravRandom(eNarr[1][slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)));
+						pRav.narrationBuffer.push(RavagerData.functions.NameFormat(ravRandom(eNarr[1][slotOfChoice]), entity)
 						didExperiencedNarration = true
 					}
 				}
@@ -1257,7 +1258,8 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				if (checkPreviousUseCount(slotOfChoice) && rangeData.experiencedTaunts) {
 					let eTaunt = rangeData.experiencedTaunts.findLast((range) => { if (range[0] <= target.ravagedCounts[slotOfChoice]) return true; })
 					if (decideToDoExperiencedText(eTaunt, slotOfChoice, rangeData)) {
-						KinkyDungeonSendDialogue(entity, ravRandom(eTaunt[1][slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6)
+						// KinkyDungeonSendDialogue(entity, ravRandom(eTaunt[1][slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6)
+						KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(ravRandom(eTaunt[1][slotOfChoice]), entity), KDGetColor(entity), 6, 6)
 						didExperiencedTaunt = true
 					}
 				}

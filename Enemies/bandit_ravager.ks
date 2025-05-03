@@ -111,7 +111,7 @@ let banditRavager = {
 		onomatopoeia: ["CLAP...", "PLAP..."], //floats overhead like stat changes (can be unspecified for none)
 		doneTaunts: ["That was good...", "Give me a minute and we'll go again, okay~?", "Such a good girl~!"],
 
-		fallbackNarration: ["The ravager roughly gropes you! (DamageTaken)"],
+		// fallbackNarration: ["The ravager roughly gropes you! (DamageTaken)"], // Going to rework this, but let it be default for now
 		restrainChance: 0.05, // Chance, decimal between 0 and 1
 
 		// progression data - first group that's got a number your count is less than is the one used
@@ -120,9 +120,9 @@ let banditRavager = {
 			[1, { // starting - no stat damage yet
 				taunts: ["Relax, girlie...", "Hehe, ready~?"],
 				narration: {
-					ItemVulva: ["EnemyName lines her intimidating cock up with your pussy..."],
-					ItemButt: ["EnemyName lines her intimidating cock up with your ass..."],
-					ItemMouth: ["EnemyName presses her cockhead against your lips..."],
+					ItemVulva: ["EnemyCName lines her intimidating cock up with your pussy..."],
+					ItemButt: ["EnemyCName lines her intimidating cock up with your ass..."],
+					ItemMouth: ["EnemyCName presses her cockhead against your lips..."],
 					ItemHead: ["head range 1"] //
 				}
 			}],
