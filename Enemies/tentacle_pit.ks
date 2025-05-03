@@ -335,7 +335,7 @@ let tendril = {
 		needsEyes: false, // Could try to hypno player to 'addict' them by adding a debuff after a while of not being ravaged by plant; maybe a good use for the ravagerTendrilCum; maybe better done through an aphrodisiac for the plant
 		onomatopoeia: ['*Excited wriggling*', 'CLAP...', 'PLAP...'],
 		doneTaunts: ['*Happy caressing*'],
-		fallbackNarration: ['The tendril caresses your curves (damage taken)'],
+		fallbackNarration: ['The tendril caresses your curves (DamageTaken)'],
 		completionCallback: 'pitTendrilCompletion', // Callback to despawn tendril after ravaging, maybe after ravaging twice
 		effectCallback: 'pitTendrilEffectCallback', // Callback to allow the tendril to caress the player (fallback style) for a bit before using her
 		ranges: [
@@ -343,19 +343,19 @@ let tendril = {
 				taunts: [ '*Preemtive dripping*', '*Wriggling and pulsing*' ],
 				narration: {
 					// 'Wild' version
-					SpicyItemVulva: [ 'The EnemyName rubs its\' wet tip against your pussy...' ],
-					SpicyItemButt: [ 'The EnemyName rubs its\' wet tip against your ass...' ],
-					SpicyItemMouth: [ 'The EnemyName presses its\' tip against your lips...' ],
+					SpicyItemVulva: [ 'EnemyCName rubs its\' wet tip against your pussy...' ],
+					SpicyItemButt: [ 'EnemyCName rubs its\' wet tip against your ass...' ],
+					SpicyItemMouth: [ 'EnemyCName presses its\' tip against your lips...' ],
 					//
 					// 'Tame' version
-					TameItemVulva: [ 'The EnemyName rubs its\' wet tip against your pussy...' ],
-					TameItemButt: [ 'The EnemyName rubs its\' wet tip against your ass...' ],
-					TameItemMouth: [ 'The EnemyName presses its\' tip against your lips...' ],
+					TameItemVulva: [ 'EnemyCName rubs its\' wet tip against your pussy...' ],
+					TameItemButt: [ 'EnemyCName rubs its\' wet tip against your ass...' ],
+					TameItemMouth: [ 'EnemyCName presses its\' tip against your lips...' ],
 					//
 					// Active narration
-					ItemVulva: [ 'The EnemyName rubs its\' wet tip against your pussy...' ],
-					ItemButt: [ 'The EnemyName rubs its\' wet tip against your ass...' ],
-					ItemMouth: [ 'The EnemyName presses its\' tip against your lips...' ],
+					ItemVulva: [ 'EnemyCName rubs its\' wet tip against your pussy...' ],
+					ItemButt: [ 'EnemyCName rubs its\' wet tip against your ass...' ],
+					ItemMouth: [ 'EnemyCName presses its\' tip against your lips...' ],
 					//
 				}
 			}],
