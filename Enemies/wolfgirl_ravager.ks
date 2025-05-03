@@ -1,17 +1,19 @@
 // Add a leash, shock module, or leash to the player during use -- Might make this chance based
 function wolfgirlRavagerAllRange(entity, target) {
+	if (KDIsInParty(entity))
+		return
 	let collared = KinkyDungeonPlayerTags.get("Collars");
 	let moduled = KinkyDungeonPlayerTags.get("Modules");
 	let leashed = KinkyDungeonPlayerTags.get("Item_WolfLeash") || KinkyDungeonPlayerTags.get("Item_BasicLeash")
 	if(collared && moduled && !leashed){
 		KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName("WolfLeash"), 1, false, "Red", undefined, undefined, undefined, "Nevermere", true);
-		KinkyDungeonSendTextMessage(5, "The Alpha clicks a leash onto your collar, pulling you close...", "#ff44ff", 3);
+		KinkyDungeonSendTextMessage(5, RavagerData.functions.NameFormat("EnemyCName clicks a leash onto your collar, pulling you close...", entity), "#ff44ff", 3);
 	} else if(collared && !moduled) {
 		KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName("ShockModule"), 1, false, "Red", undefined, undefined, undefined, "Nevermere", true);
-		KinkyDungeonSendTextMessage(5, "The Alpha activates your collar's training module...", "#ff44ff", 3);
+		KinkyDungeonSendTextMessage(5, RavagerData.functions.NameFormat("EnemyCName activates your collar's training module...", entity), "#ff44ff", 3);
 	} else if(!collared) {
 		KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName("WolfCollar"), 1, false, "Red", undefined, undefined, undefined, "Nevermere", true);
-		KinkyDungeonSendTextMessage(5, "The Alpha fixes a collar around your neck...", "#ff44ff", 3);
+		KinkyDungeonSendTextMessage(5, RavagerData.functions.NameFormat("EnemyCName fixes a collar around your neck...", entity), "#ff44ff", 3);
 	}
 }
 if (!RavagerAddCallback('wolfgirlRavagerAllRangeCallback', wolfgirlRavagerAllRange)) {
@@ -75,6 +77,7 @@ let wolfRavager = {
 	addedByMod: 'RavagerFramework',
 	// id data
 	name: "WolfgirlRavager", 
+	nameList: "nevermere",
 	faction: "Nevermere", 
 	clusterWith: "nevermere", 
 	playLine: "Wolfgirl", 
@@ -174,7 +177,7 @@ let wolfRavager = {
 		// this can be a function ( (enemy, target) => {whatever} ) if you don't want it to do generic grope damage. anything you specify is used instead
 		// you only need to specify narration if no callback is defined - otherwise you bring your own narration
 		fallbackCallback: false, 
-		fallbackNarration: ["The ravager roughly gropes you! (DamageTaken)"],
+		// fallbackNarration: ["The ravager roughly gropes you! (DamageTaken)"], // Going to rework, but leaving at default for now
 		restrainChance: 0.05, // Chance, decimal between 0 and 1
 
 		// another optional function callback - will be called when an enemy is done
@@ -191,9 +194,9 @@ let wolfRavager = {
 			[1, { // starting - no stat damage yet
 				taunts: ["Relax, girlie...", "Hehe, ready~?"],
 				narration: {
-					ItemVulva: ["EnemyName lines her intimidating cock up with your pussy..."],
-					ItemButt: ["EnemyName lines her intimidating cock up with your ass..."],
-					ItemMouth: ["EnemyName presses her cockhead against your lips..."],
+					ItemVulva: ["EnemyCName lines her intimidating cock up with your pussy..."],
+					ItemButt: ["EnemyCName lines her intimidating cock up with your ass..."],
+					ItemMouth: ["EnemyCName presses her cockhead against your lips..."],
 				}
 			}],
 

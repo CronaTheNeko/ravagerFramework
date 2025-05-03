@@ -135,7 +135,203 @@ window.RavagerFrameworkDebug = function() {
 		_RavagerFrameworkDebugEnabled = true
 	}
 }
-//
+// Developer helper function to verify a ravager's EAM values
+window.RavagerFrameworkVerifyEAM = function(ravagerName) {
+	const ravager = KDEnemiesCache.get(ravagerName)
+	// Check that enemy exists
+	if (!ravager) {
+		console.error('[RavagerFrameworkVerifyEAM] Could not find an enemy by the name of ', ravagerName)
+		return false
+	}
+	// Check for ravager.ravage to make sure this is a ravager
+	if (!ravager.ravage) {
+		console.error('[RavagerFrameworkVerifyEAM] Enemy does not have a "ravage" property. Either you\'re checking the wrong enemy, or you\'ve defined your ravager wrong.')
+		return false
+	}
+	// Check that ravager has ranges
+	if (!ravager.ravage.ranges || ravager.ravage.ranges.length < 1) {
+		console.error('[RavagerFrameworkVerifyEAM] Ravager has no ranges. This ravager will be unable to ravage the player.')
+		return false
+	}
+	// Track failed ranges
+	let failedRanges = []
+	// Track ranges with invalid EAM properties
+	let eamFailedRanges = []
+	//
+	let hasEAMRanges = false
+	// Loop each range
+	for (var range of ravager.ravage.ranges) {
+		// Check for rangeData
+		if (range.length < 2 || !range[1]) {
+			console.error('[RavagerFrameworkVerifyEAM] Invalid range: ', range)
+			// return false
+			failedRanges.push(range)
+			continue
+		}
+		const rangeData = range[1]
+		// Log about use count
+		if (rangeData.hasOwnProperty('useCount')) {
+			let useCount = rangeData.useCount
+			if (typeof useCount == undefined) {
+				console.warn('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount defined, but it is set to undefined. Doing so is not well tested. If this is not your last range, the expected behavior is to block incrementing use count, but that is unnecessary, as that is the default bahvior. If this is in your last range, this will result in incrementing the use count by 1 regardless of slot. It is recommended you either remove this setting if it is not in your last range, or set useCount to 0 if this is in your last range and you wish to block incrementing use counts.')
+			} else if (typeof useCount == 'number') {
+				if (useCount == 0)
+					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to zero. If this is the last range, this will prevent incrementing use counts. If this is not the last range, this setting is unnecessary.')
+				else if (useCount < 0)
+					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to a negative value. This will result in DECREMENTING use counts instead of incrementing them.')
+				else if (useCount > 0)
+					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use counts by ', useCount, ' for every slot')
+				else
+					console.error('[RavagerFrameworkVerifyEAM] wtf just happened? (useCount = number)')
+			} else if (typeof useCount == 'object') {
+				let hasSlots = false
+				if (useCount.hasOwnProperty('ItemVulva')) {
+					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemVulva by ', useCount.ItemVulva)
+					hasSlots = true
+				}
+				if (useCount.hasOwnProperty('ItemMouth')) {
+					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemMouth by ', useCount.ItemMouth)
+					hasSlots = true
+				}
+				if (useCount.hasOwnProperty('ItemButt')) {
+					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemButt by ', useCount.ItemButt)
+					hasSlots = true
+				}
+				if (useCount.hasOwnProperty('ItemHead')) {
+					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemHead by ', useCount.ItemHead)
+					hasSlots = true
+				}
+				if (!hasSlots) {
+					console.warn('[RavagerFrameworkVerifyEAM] Range ', range, ' defines useCount as a dictionary, but has no slots. This will result in never incrementing use counts.')
+				}
+			} else {
+				console.error('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to an unknown type. This scenario is untested. If you beleive this is a mistake, please report the issue. Otherwise, it is recommended to fix your definition of useCount.')
+			}
+		}
+		// Track if this range has any EAM settings
+		let hasEAMProps = false
+		// Check for taunts
+		if (rangeData.hasOwnProperty('experiencedTaunts')) {
+			let tauntsValid = true
+			// Loop each taunt range
+			for (var count of rangeData.experiencedTaunts) {
+				// Check structure of taunt range
+				if (count.length < 2 || !count[1]) {
+					console.warn('[RavagerFrameworkVerifyEAM] This range has an invalid EAM taunt definition: ', count)
+					if (!eamFailedRanges.includes(count))
+						eamFailedRanges.push(count)
+					continue
+				}
+				let countData = count[1]
+				// Track if this taunt range has any slots
+				let hasSlots = false
+				// Check for each slot
+				// const hasSlots = countData.hasOwnProperty('ItemVulva') || countData.hasOwnProperty('ItemButt') || countData.hasOwnProperty('ItemMouth') || countData.hasOwnProperty('ItemHead')
+				for (var slot of [ 'ItemVulva', 'ItemMouth', 'ItemButt', 'ItemHead' ]) {
+					// let slotValid = countData.hasOwnProperty(slot)
+					// let slotWasValid = slotValid
+					if (!countData.hasOwnProperty(slot))
+						continue
+					let stringsValid = Array.isArray(countData[slot])
+					if (!stringsValid) {
+						console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
+						continue
+					}
+					for (var string of countData[slot]) {
+						stringsValid = stringsValid && typeof string == 'string'
+					}
+					if (!stringsValid) {
+						console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains taunts which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
+					}
+					// hasSlots = hasSlots || stringsValid
+					hasSlots = true
+				}
+				// Warn if there's no slots
+				if (!hasSlots)
+					console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
+				tauntsValid = tauntsValid && hasSlots
+			}
+			if (!tauntsValid)
+				console.warn('[RavagerFrameworkVerifyEAM] experiencedTaunts is defined for range ' + range[0] + '. Either experiencedTaunts is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
+			hasEAMProps = hasEAMProps || tauntsValid
+		}
+		// Check for narration
+		if (rangeData.hasOwnProperty('experiencedNarration')) {
+			let narrationValid = true
+			for (var count of rangeData.experiencedTaunts) {
+				if (count.length < 2 || !count[1]) {
+					console.warn('[RavagerFrameworkVerifyEAM] This range has an invalid EAM narration definition: ', count)
+					if (!eamFailedRanges.includes(count))
+						eamFailedRanges.push(count)
+					continue
+				}
+				let countData = count[1]
+				let hasSlots = false
+				for (var slot of [ 'ItemVulva', 'ItemMouth', 'ItemButt', 'ItemHead' ]) {
+					if (!countData.hasOwnProperty(slot))
+						continue
+					let stringsValid = Array.isArray(countData[slot])
+					if (!stringsValid) {
+						console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
+						continue
+					}
+					for (var string of countData[slot]) {
+						stringsValid = stringsValid && typeof string == 'string'
+					}
+					if (!stringsValid) {
+						console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains narrations which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
+					}
+					hasSlots = true
+				}
+				if (!hasSlots)
+					console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
+				narrationValid = narrationValid && hasSlots
+			}
+			if (!narrationValid)
+				console.warn('[RavagerFrameworkVerifyEAM] experiencedNarration is defined for range ' + range[0] + '. Either experiencedNarration is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
+			hasEAMProps = hasEAMProps || narrationValid
+		}
+		//
+		let hasChance = rangeData.hasOwnProperty('experiencedChance')
+		let hasAlways = rangeData.hasOwnProperty('experiencedAlways')
+		//
+		if (!hasEAMProps && (hasChance || hasAlways)) {
+			console.warn('[RavagerFrameworkVerifyEAM] Range ', range, 'defines EAM chance or always, but does not appear to have any valid taunts or narrations. Without taunts or narrations to use, EAM text will not be used, and the chance and always settings are pointless')
+		}
+		//
+		hasEAMProps = hasEAMProps || hasChance || hasAlways
+		//
+		if (hasChance && hasAlways && rangeData.experiencedAlways) {
+			console.warn('[RavagerFrameworkVerifyEAM] Range ', range, ' defines both experiencedChance and experiencedAlways. experiencedAlways overrides experiencedChance, so it\'s pointless to have them both declared at the same time.')
+			continue
+		}
+		// Check for chance
+		if (hasChance && rangeData.experiencedChance <= 0) {
+			console.warn('[RavagerFrameworkVerifyEAM] Range ', range, ' has experiencedChance set to or below 0. This setting will result in EAM text never being used unless the user overrides your ravager\'s preference.')
+		}
+		// Check for always
+		if (hasAlways && !rangeData.experiencedAlways) {
+			console.warn('[RavagerFrameworkVerifyEAM] Range ', range, ' has experiencedAlways set to false. Doing so is entirely unneeded, as this setting only has any effect when true.')
+		}
+		hasEAMRanges = hasEAMRanges || hasEAMProps
+	}
+	// Bail on failed ranges
+	if (failedRanges.length > 0) {
+		console.error('[RavagerFrameworkVerifyEAM] The following ranges are invalid and may cause crashes: ', failedRanges)
+		return false
+	}
+	// Bail of EAM failures in ranges
+	if (eamFailedRanges.length > 0) {
+		console.error('[RavagerFrameworkVerifyEAM] The following ranges have invalid EAM properties and may cause crashes: ', eamFailedRanges)
+		return false
+	}
+	//
+	if (!hasEAMRanges) {
+		console.error('[RavagerFrameworkVerifyEAM] Ravager doesn\'t appear to have any ranges with valid EAM properties.')
+		return false
+	}
+	return true
+}
 // Function to get a mod setting value. If settings are undefined, it'll return the default value given to KDModConfigs. If there is not matching value given to KDModConfigs, 
 window.RavagerGetSetting = function(refvar) {
 	const settings = KDModSettings.RavagerFramework
@@ -221,11 +417,55 @@ window.RavagerData = {
 	},
 	functions: {
 		DrawButtonKDEx: DrawButtonKDEx,
-		KinkyDungeonDrawEnemiesHP: KinkyDungeonDrawEnemiesHP
+		KinkyDungeonDrawEnemiesHP: KinkyDungeonDrawEnemiesHP,
+		NameFormat: function(string, entity, restraint, clothing, damage, skipCapitalize) {
+			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Initial string "' + string + '"; entity: ', entity)
+			// Player name
+			string = string.replace("PlayerName", KDGameData.PlayerName)
+			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+			// Enemy name
+			if (entity) {
+				// Definition name
+				string = string.replace("EnemyName", TextGet('Name' + entity.Enemy.name))
+				// Possible custom entity name (no formatting)
+				string = string.replace("EnemyCNameBare", KDEnemyName(entity))
+				// Possible custom entity name (w/ formatting)
+				string = string.replace("EnemyCName", entity.CustomName || KDGetName(entity.id) || "the " + TextGet("Name" + entity.Enemy.name))
+			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+			}
+			// Restraint name
+			if (restraint) {
+				string = string.replace("RestraintName", TextGet('Restraint' + restraint.name))
+			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+			}
+			// Clothing name
+			if (clothing) {
+				string = string.replace("ClothingName", TextGet("m_" + clothing.Item).includes("[NotFound]") ? clothing.Item : TextGet("m_" + clothing.Item))
+			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+			}
+			// Damage string
+			if (damage) {
+				string = string.replace("DamageTaken", damage.string)
+			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+			}
+			// Capitalize
+			if (!skipCapitalize)
+				string = string.replaceAt(0, string[0].toUpperCase())
+			return string
+		},
 	},
 	conditions: {
 		// Checked to make the MimicRavager spoiler only show when the mimic has not ambushed the player
 		mimicRavSpoiler: enemy => !enemy.ambushtrigger
+	},
+	defaults: {
+		releaseMessage: "You feel weak as EnemyCName releases you...",
+		passoutMessage: "Your body is broken and exhausted...",
+		restraintTearMessage: "EnemyCName tears your RestraintName away!",
+		clothingTearMessage: "EnemyCName tears your ClothingName away!",
+		pinMessage: "EnemyCName gets a good grip on you...",
+		addRestraintMessage: "EnemyCName forces you to wear a RestraintName",
+		fallbackNarration: "EnemyCName roughly gropes you! (DamageTaken)",
 	},
 	ModConfig: [
 		{
@@ -305,6 +545,36 @@ window.RavagerData = {
 			stepcount: 0.05,
 			block: undefined
 		},
+		{
+			type: 'boolean',
+			refvar: 'ravEnableUseCount',
+			default: true,
+			block: undefined
+		},
+		{
+			type: 'list',
+			name: 'ravUseCountMode', // Needed for proper declaration of the left and right selection buttons
+			refvar: 'ravUseCountMode',
+			options: [ 'Any', 'Sometimes', 'Always' ],
+			default: 'Any',
+			block: undefined
+		},
+		{
+			type: 'range',
+			name: 'ravUseCountModeChance',
+			refvar: 'ravUseCountModeChance',
+			default: 0.75,
+			rangelow: 0,
+			rangehigh: 1,
+			stepcount: 0.05,
+			block: undefined
+		},
+		{
+			type: 'boolean',
+			refvar: 'ravUseCountOverride',
+			default: false,
+			block: undefined
+		}
 	]
 }
 DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options) {
@@ -621,6 +891,10 @@ addTextKey('KDModButtonravagerSlimeAddChance', 'Slimegirl Restrict Chance')
 addTextKey('KDModButtonravagerEnableSound', 'Enable Sounds')
 addTextKey('KDModButtononHitChance', 'Moan Chance')
 addTextKey('KDModButtonravagerSoundVolume', 'Moan Volume')
+addTextKey('KDModButtonravEnableUseCount', 'Enable Experience Aware Mode')
+addTextKey('KDModButtonravUseCountMode', 'Exp Aware Mode')
+addTextKey('KDModButtonravUseCountModeChance', 'Exp Aware Chance')
+addTextKey('KDModButtonravUseCountOverride', 'Override Exp Aware Mode')
 if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 	KDEventMapGeneric['afterModSettingsLoad']['RavagerFramework'] = (e, data) => {
 		let dbg = KDModSettings['RavagerFramework'] && KDModSettings['RavagerFramework'].ravagerDebug;
@@ -944,6 +1218,77 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				if(range[0] > entity.ravage.progress) return true
 			})
 
+			// Helper to get what the previous range was for the sake of increase player ravaged counts 
+			function getPreviousRange(currRange, enemy) {
+				return currRange ? enemy.ravage.ranges[enemy.ravage.ranges.findIndex((v) => { if (v == currRange) return true; }) - 1] : enemy.ravage.ranges.at(-1)
+			}
+			// Helper to increase player ravaged counts
+			function increasePlayerRavagedCount(range, slot, target, enemy, assumeIncrement) {
+				const dbg = RavagerGetSetting('ravagerDebug')
+				dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: range: ', range, '; slot: ', slot, '; target: ', target, '; enemy: ', enemy, '; assumeIncrement: ', assumeIncrement)
+				// Bail if use-count-aware mode is disabled
+				if (!RavagerGetSetting('ravEnableUseCount')) {
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: EA mode disabled. Bailing.')
+					return
+				}
+				// Check that player.ravagedCount exists
+				if (target.ravagedCounts == undefined) {
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Creating player\'s ravagedCounts')
+					target.ravagedCounts = {}
+				}
+				// Check for last incremented, so we don't repeatedly increment the same slot
+				if (target.ravagedCounts.lastIncremented == undefined) {
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Creating player\'s ravagedCounts.lastIncremented')
+					target.ravagedCounts.lastIncremented = {}
+				}
+				if (range == undefined) {
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Invalid range')
+					return false
+				} else if (target.ravagedCounts.lastIncremented[slot] == range[0]) {
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Matched range against previous incremented range')
+					return false
+				} else {
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Last incremented range not matching; deleting')
+					delete target.ravagedCounts.lastIncremented[slot]
+				}
+				// Check the range's increment setting for all/specified slot
+				let incCount = range[1].useCount
+				if (incCount == undefined && assumeIncrement) { // Failed to think through the fact that we want to increment slots by default at the end. So if rangeData.useCount is missing, we default to incrementing by one for all slots. This should still respect being able to not increment on specific slots via making an object without that slot, or setting the slot to false, and disabling entirely by setting rangeData.useCount to false
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Assuming increment by default; we\'re hopefully at the end of a session')
+					incCount = 1
+				}
+				dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: incCount: ', incCount)
+				if (incCount) {
+					// Normalize incCount
+					if ((typeof incCount).toLowerCase() == "object") {
+						if (!incCount[slot])
+							return false
+						incCount = Number(incCount[slot])
+					} else if (Number.isNaN(Number(incCount))) {
+						incCount = 0
+					} else {
+						incCount = Number(incCount)
+					}
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Normalized incCount: ', incCount)
+					// Check if specified slot's use count is undefined
+					if (target.ravagedCounts[slot] == undefined || target.ravagedCounts[slot] < 0) {
+						// Set use count to range's increment count (Cast to Number to handle Boolean meaning increment by one)
+						target.ravagedCounts[slot] = incCount
+						dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Set slot\'s count to ', incCount)
+					} else {
+						// Increment use count by range's increment count (cast to Number to handle Boolean meaning increment)
+						target.ravagedCounts[slot] += incCount
+						dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Incremented slot\'s count by ', incCount)
+					}
+					target.ravagedCounts.lastIncremented[slot] = range[0]
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Set slot\'s last incremented to ', range[0])
+					return true
+				} else {
+					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: incCount invalid')
+					return false
+				}
+			}
+
 			// If rangeData is null, the encounter is over, and doneDialogue should be used.
 			if(range) {
 				let rangeData = range[1]
@@ -958,9 +1303,86 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					KinkyDungeonDoTryOrgasm((rangeData.orgasmBonus || 0) + slotsOccupied, 1)
 				}
 
+				// Helpers for use count based text
+				function checkPreviousUseCount(slot) {
+					return target.ravagedCounts && typeof target.ravagedCounts[slotOfChoice] == "number" && target.ravagedCounts[slot] > 0
+				}
+				function decideToDoExperiencedText(obj, slot, rangeData) {
+					// Check that use-count-aware mode is enabled before continuing
+					if (!RavagerGetSetting('ravEnableUseCount')) {
+						dbg && console.log('[Ravager Framework][decideToDoExperiencedText]: EA mode disabled. Bailing.')
+						return false
+					}
+					// Initial value, just checks that there is narration
+					let result = Boolean(obj[1] && obj[1][slot])
+					// Helper functions
+					function experiencedTextDecideDefault() {
+						return Math.random() < RavagerGetSetting('ravUseCountModeChance')
+					}
+					function experiencedTextDecideUser() {
+						const pref = RavagerGetSetting('ravUseCountMode').toLowerCase()
+						if (pref == 'sometimes') {
+							return experiencedTextDecideDefault()
+						} else if (pref == 'always') {
+							return true
+						} else {
+							console.error('[Ravager Framework][decideToDoExperiencedText][experiencedTextDecideUser]: Invalid preference: ', pref)
+							return false
+						}
+					}
+					function experiencedTextDecideRavager() {
+						return rangeData.experiencedAlways || (rangeData.hasOwnProperty('experiencedChance') ? (Math.random() < rangeData.experiencedChance) : experiencedTextDecideDefault())
+					}
+					const tryUser = RavagerGetSetting('ravUseCountMode').toLowerCase() != 'any'
+					const tryRav = rangeData.hasOwnProperty('experiencedChance') || rangeData.experiencedAlways
+					if (RavagerGetSetting('ravUseCountOverride')) {
+						if (tryUser) {
+							result = result && experiencedTextDecideUser()
+						} else if (tryRav) {
+							result = result && experiencedTextDecideRavager()
+						} else {
+							result = result && experiencedTextDecideDefault()
+						}
+					} else {
+						if (tryRav) {
+							result = result && experiencedTextDecideRavager()
+						} else if (tryUser) {
+							result = result && experiencedTextDecideUser()
+						} else {
+							result = result && experiencedTextDecideDefault()
+						}
+					}
+					// Return
+					return result
+				}
+
 				// Next, handle dialogue/narration
-				if(rangeData.narration) pRav.narrationBuffer.push(ravRandom(rangeData.narration[slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)));
-				if(rangeData.taunts) KinkyDungeonSendDialogue(entity, ravRandom(rangeData.taunts).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6);
+				// Use count based narration
+				let didExperiencedNarration = false
+				if (checkPreviousUseCount(slotOfChoice) && rangeData.experiencedNarration) {
+					let eNarr = rangeData.experiencedNarration.findLast((range) => { if (range[0] <= target.ravagedCounts[slotOfChoice]) return true; })
+					if (decideToDoExperiencedText(eNarr, slotOfChoice, rangeData)) {
+						// pRav.narrationBuffer.push(ravRandom(eNarr[1][slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)));
+						pRav.narrationBuffer.push(RavagerData.functions.NameFormat(ravRandom(eNarr[1][slotOfChoice]), entity)
+						didExperiencedNarration = true
+					}
+				}
+				// if(rangeData.narration && !didExperiencedNarration) pRav.narrationBuffer.push(ravRandom(rangeData.narration[slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)));
+				if (rangeData.narration && !didExperiencedNarration)
+					pRav.narrationBuffer.push(RavagerData.functions.NameFormat(ravRandom(rangeData.narration[slotOfChoice]), entity))
+				// Use count based taunts
+				let didExperiencedTaunt = false
+				if (checkPreviousUseCount(slotOfChoice) && rangeData.experiencedTaunts) {
+					let eTaunt = rangeData.experiencedTaunts.findLast((range) => { if (range[0] <= target.ravagedCounts[slotOfChoice]) return true; })
+					if (decideToDoExperiencedText(eTaunt, slotOfChoice, rangeData)) {
+						// KinkyDungeonSendDialogue(entity, ravRandom(eTaunt[1][slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6)
+						KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(ravRandom(eTaunt[1][slotOfChoice]), entity), KDGetColor(entity), 6, 6)
+						didExperiencedTaunt = true
+					}
+				}
+				// if(rangeData.taunts && !didExperiencedTaunt) KinkyDungeonSendDialogue(entity, ravRandom(rangeData.taunts).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6);
+				if (rangeData.taunts && !didExperiencedNarration)
+					KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(ravRandom(rangeData.taunts), entity), KDGetColor(entity), 6, 6)
 				if(rangeData.dp) { // Only do floaty sound effects if DP is being applied, since that means action is happening
 					if(enemy.ravage.onomatopoeia) KinkyDungeonSendFloater(entity, ravRandom(enemy.ravage.onomatopoeia), "#ff00ff", 2);
 				}
@@ -997,6 +1419,8 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					dbg && console.log('[Ravager Framework] Calling all range callback ', enemy.ravage.allRangeCallback, ' ...')
 					KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.allRangeCallback](entity, target, entity.ravage.slot)
 				}
+				dbg && console.log('[Ravager Framework]: Attempting to increment slot use count...')
+				increasePlayerRavagedCount(getPreviousRange(range, enemy), slotOfChoice, target, enemy)
 			} else {			
 				// Done playing, if they were
 				if(entity.playWithPlayer) entity.playWithPlayer = 0
@@ -1010,14 +1434,21 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					entity.ravageRefractory = enemy.ravage.refractory
 					KDBreakTether(KinkyDungeonPlayerEntity) // Chances are, this enemy was holding the tether
 					delete entity.ravage
-					KinkyDungeonSendActionMessage(45, "You feel weak as the EnemyName releases you...".replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ee00ee", 4);
+					// KinkyDungeonSendActionMessage(45, "You feel weak as the EnemyName releases you...".replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ee00ee", 4);
+					KinkyDungeonSendActionMessage(45, RavagerData.functions.NameFormat(RavagerData.defaults.releaseMessage, entity), "#e0e", 4) // Maybe make this controllable by a rav dev?
 				} else { // Pass out!
-					KinkyDungeonSendActionMessage(45, "You're body is broken and exhausted...", "#ee00ee", 4);
+					KinkyDungeonSendActionMessage(45, RavagerData.defaults.passoutMessage, "#ee00ee", 4);
 					KinkyDungeonPassOut()
 					passedOut = true
 				}
 
-				if(enemy.ravage.doneTaunts) KinkyDungeonSendDialogue(entity, ravRandom(enemy.ravage.doneTaunts).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6);
+				// Check for increasing ravaged count
+				dbg && console.log('[Ravager Framework]: Attempting to increment slot use count at end of session...')
+				increasePlayerRavagedCount(getPreviousRange(range, enemy), slotOfChoice, target, enemy, !(enemy.ravage.ranges.filter(v => v[1].useCount).length > 0))
+
+				// if(enemy.ravage.doneTaunts) KinkyDungeonSendDialogue(entity, ravRandom(enemy.ravage.doneTaunts).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6);
+				if (enemy.ravage.doneTaunts)
+					KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(ravRandom(enemy.ravage.doneTaunts), entity), KDGetColor(entity), 6, 6)
 				if (
 					typeof enemy.ravage.completionCallback == 'string' &&
 					KDEventMapEnemy['ravagerCallbacks'] &&
@@ -1059,7 +1490,8 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				} else {
 					KinkyDungeonRemoveRestraint(input, true, false, false, false, false, entity)
 				}
-				KinkyDungeonSendTextMessage(10, `EnemyName tears your ${TextGet("Restraint" + targetRestraint.name)} away!`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff0000", 4);	
+				// KinkyDungeonSendTextMessage(10, `EnemyName tears your ${TextGet("Restraint" + targetRestraint.name)} away!`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff0000", 4);	
+				KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.restraintTearMessage, entity, targetRestraint), "#f00", 4) // Maybe make this controllable for a rav dev?
 			} else if(stripOptions.clothing[entity.ravage.slot].length) {
 				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; clothing strip options: ', stripOptions.clothing[entity.ravage.slot])
 				let stripped = stripOptions.clothing[entity.ravage.slot][0]
@@ -1068,13 +1500,15 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				if(entity.ravage.slot != "ItemMouth" && !KinkyDungeonGetRestraintItem("ItemPelvis") && ["Shorts", "Bikini", "Panties"].some(str => stripped.Item.includes(str))) {
 					if (!entity.Enemy.ravage.bypassAll) KinkyDungeonAddRestraintIfWeaker("Stripped") // Since panties are sacred normally
 				}
-				KinkyDungeonSendTextMessage(10, `EnemyName tears your ${stripped.Item} away!`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff0000", 4);
+				// KinkyDungeonSendTextMessage(10, `EnemyName tears your ${stripped.Item} away!`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff0000", 4);
+				KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.clothingTearMessage, entity, undefined, stripped), "#f00", 4) // Maybe make this controllable for a rav dev?
 				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped.Lost = ', stripped.Lost)
 				stripped.Lost = true
 				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped.Lost = ', stripped.Lost)
 			} else {
 				KinkyDungeonAddRestraintIfWeaker("Pinned")
-				KinkyDungeonSendTextMessage(10, `EnemyName gets a good grip on you...`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff00ff	", 4);
+				// KinkyDungeonSendTextMessage(10, `EnemyName gets a good grip on you...`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff00ff	", 4);
+				KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.pinMessage, entity), "#f0f", 4)
 			}
 			KinkyDungeonDressPlayer()
 			return {sfx: "Miss", effect: true};
@@ -1113,7 +1547,8 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 								let ret = KinkyDungeonAddRestraintIfWeaker(canidateRestraint)
 								// If we succeeded, print a message about that and set didRestrain to true
 								if (ret) {
-									KinkyDungeonSendTextMessage(10, 'The EnemyName forces you to wear a RestraintName'.replace('EnemyName', TextGet('Name' + entity.Enemy.name)).replace('RestraintName', TextGet('Restraint' + canidateRestraint.name)), '#FF00FF', 4)
+									// KinkyDungeonSendTextMessage(10, 'The EnemyName forces you to wear a RestraintName'.replace('EnemyName', TextGet('Name' + entity.Enemy.name)).replace('RestraintName', TextGet('Restraint' + canidateRestraint.name)), '#FF00FF', 4)
+									KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.addRestraintMessage, entity, canidateRestraint), "#f0f", 4)
 									didRestrain = true
 								}
 							} catch (e) {
@@ -1129,9 +1564,11 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					let dmg = KinkyDungeonDealDamage({damage: 1, type: "grope"});
 					if (!enemy.ravage.noFallbackNarration) {
 						if(enemy.ravage.fallbackNarration) {
-							KinkyDungeonSendTextMessage( 10, ravRandom(enemy.ravage.fallbackNarration).replace("EnemyName", TextGet("Name" + enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff", 4);
+							// KinkyDungeonSendTextMessage( 10, ravRandom(enemy.ravage.fallbackNarration).replace("EnemyName", TextGet("Name" + enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff", 4);
+							KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(ravRandom(enemy.ravage.fallbackNarration), entity, undefined, undefined, dmg), "#f0f", 4)
 						} else {
-							KinkyDungeonSendTextMessage( 10, "The EnemyName roughly gropes you! (DamageTaken)".replace("EnemyName", TextGet("Name" + enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff", 4);
+							// KinkyDungeonSendTextMessage( 10, "The EnemyName roughly gropes you! (DamageTaken)".replace("EnemyName", TextGet("Name" + enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff", 4);
+							KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.fallbackNarration, entity, undefined, undefined, dmg), "#f0f", 4)
 						}
 					} else {
 						deb && console.log('[Ravager Framework] ', enemy.name, ' requests no fallback narration.')

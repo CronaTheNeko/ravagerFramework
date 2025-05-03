@@ -122,7 +122,7 @@ let slimeRavager = {
 		onomatopoeia: ["CLAP...", "PLAP..."], //floats overhead like stat changes (can be unspecified for none)
 		doneTaunts: ["That was good...", "Give me a minute and we'll go again, okay~?", "Such a good girl~!"],
 
-		fallbackNarration: ["The ravager roughly gropes you! (DamageTaken)"],
+		// fallbackNarration: ["The ravager roughly gropes you! (DamageTaken)"], // Going to rework, leaving at default for now
 		// restrainChance: 0.05, // Chance, decimal between 0 and 1 // Disabled for slime girl, she adds slime now
 
 		// A callback for the slime girl to add slime to the player
@@ -134,9 +134,9 @@ let slimeRavager = {
 			[1, { // starting - no stat damage yet
 				taunts: ["Relax, girlie...", "Hehe, ready~?"],
 				narration: {
-					ItemVulva: ["EnemyName lines her intimidating cock up with your pussy..."],
-					ItemButt: ["EnemyName lines her intimidating cock up with your ass..."],
-					ItemMouth: ["EnemyName presses her cockhead against your lips..."],
+					ItemVulva: ["EnemyCName lines her intimidating cock up with your pussy..."],
+					ItemButt: ["EnemyCName lines her intimidating cock up with your ass..."],
+					ItemMouth: ["EnemyCName presses her cockhead against your lips..."],
 				}
 			}],
 
