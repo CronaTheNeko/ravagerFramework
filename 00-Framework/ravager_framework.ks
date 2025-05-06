@@ -1246,7 +1246,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					let eNarr = rangeData.experiencedNarration.findLast((range) => { if (range[0] <= target.ravagedCounts[slotOfChoice]) return true; })
 					if (decideToDoExperiencedText(eNarr, slotOfChoice, rangeData)) {
 						// pRav.narrationBuffer.push(ravRandom(eNarr[1][slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)));
-						pRav.narrationBuffer.push(RavagerData.functions.NameFormat(ravRandom(eNarr[1][slotOfChoice]), entity)
+						pRav.narrationBuffer.push(RavagerData.functions.NameFormat(ravRandom(eNarr[1][slotOfChoice]), entity))
 						didExperiencedNarration = true
 					}
 				}
