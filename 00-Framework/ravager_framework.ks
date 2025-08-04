@@ -1045,10 +1045,14 @@ KDDropItems = function(enemy, mapData) {
 }
 // Just here so I can have a cool custom colored button in mod config
 DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options) {
-	if (name == "Ravager Framework") {
-		Color = "#ff66ff"
-		FillColor = "#330033"
-		// NoBorder = true
+	// Change the color of my mod config button
+	if (KinkyDungeonState == "ModConfig") {
+		if (name == "Ravager Framework") {
+			Color = "#ff66ff"
+			FillColor = "#330033"
+		// } else if (["ravEnableUseCount", "ravUseCountOverride", "ravagerCustomDrop", "ravagerDebug", "ravagerDisableBandit", "ravagerDisableMimic", "ravagerDisableSlimegirl", "ravagerDisableTentaclePit", "ravagerDisableWolfgirl", "ravagerEnableSound", "ravagerSpicyTendril"].includes(name)) {
+
+		}
 	}
 	// Run and return the original DrawButtonKDEx
 	return RavagerData.functions.DrawButtonKDEx(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options)
