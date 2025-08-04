@@ -126,7 +126,7 @@ for (var key in debugCallbacks) {
 
 // Hidden option to enable way too many console messages
 window._RavagerFrameworkDebugEnabled = false;
-window.RavagerFrameworkDebug = function() {
+window.RavagerFrameworkToggleDebug = function() {
 	if (_RavagerFrameworkDebugEnabled) {
 		console.log('[Ravager Framework] Serious debug mode disabled.')
 		_RavagerFrameworkDebugEnabled = false
@@ -370,7 +370,8 @@ window.RavagerData = {
 				if (C == KinkyDungeonPlayer && (RavagerSoundGotHit || KDUniqueBulletHits.has('undefined[object Object]_player'))) {
 					RavagerSoundGotHit = false
 					KinkyDungeonInterruptSleep()
-					console.log('enableSound: ', RavagerGetSetting('ravagerEnableSound'), '\nvolume: ', RavagerGetSetting('ravagerSoundVolume') / 2, '\nonHitChance: ', RavagerGetSetting('onHitChance'))
+					// Debug message
+					_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][RavagerSoundHit]: enableSound: ', RavagerGetSetting('ravagerEnableSound'), '\nvolume: ', RavagerGetSetting('ravagerSoundVolume') / 2, '\nonHitChance: ', RavagerGetSetting('onHitChance'))
 					if (KDToggles.Sound && RavagerGetSetting('ravagerEnableSound') && Math.random() < RavagerGetSetting('onHitChance')) {
 						AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio/" + (KinkyDungeonGagTotal() > 0 ? "Angry21 liliana.ogg" : "Ah1 liliana.ogg"), RavagerGetSetting('ravagerSoundVolume') / 2)
 					}
@@ -593,7 +594,7 @@ window.RFPlayerCanSeeEnemy = function(entity) {
 	return KDCanSeeEnemy(entity, largestDist)
 }
 // Shortcut to getting ravager debug
-window.RFDebug = function() {
+window.RFDebugEnabled = function() {
 	return RavagerGetSetting('ravagerDebug')
 }
 // Currently just used for the mimic spoiler, but there's other ideas of how this can be used, so I've attempted to generalize it
@@ -610,7 +611,7 @@ KinkyDungeonDrawEnemiesHP = function(delta, canvasOffsetX, canvasOffsetY, CamX, 
 		if (entity.ravBubble) {
 			// Expired
 			if (KinkyDungeonCurrentTick > entity.ravBubble.index + entity.ravBubble.duration) {
-				RFDebug() && console.log('[Ravager Framework][KinkyDungeonDrawEnemiesHP]: Bubble expired for enemy' + entity.Enemy.name + '(' + entity.id + ')')
+				RFDebug('[Ravager Framework][KinkyDungeonDrawEnemiesHP]: Bubble expired for enemy' + entity.Enemy.name + '(' + entity.id + ')')
 				delete entity.ravBubble
 			} else {
 				// If the player can't see the enemy, there's no need to draw a bubble; bail
@@ -654,7 +655,7 @@ window.RavagerFrameworkAddCondition = function(key, func) {
 			throw new Error('[Ravager Framework] Failed to initialize Ravager Conditions! Something seems to have gone very wrong. Please report this to the Ravager Framework with as much info as you can provide.')
 		}
 	}
-	RFDebug() && console.log('[Ravager Framework] Adding condition function with key:', key)
+	RFDebug('[Ravager Framework] Adding condition function with key:', key)
 	RavagerData.conditions[key] = func
 	return Boolean(RavagerData.conditions[key])
 }
@@ -669,8 +670,7 @@ KDEventMapEnemy['tick']['ravagerBubble'] = (e, entity, data) => {
 	if (!e.hasOwnProperty('image'))
 		e.image = 'Hearts'
 	// Debugging
-	const dbg = RFDebug()
-	dbg && console.log('[Ravager Framework][ravagerBubble] Starting event with e:', e)
+	RFDebug('[Ravager Framework][ravagerBubble] Starting event with e:', e)
 	// Does the enemy define a condition?
 	const hasCond = enemy.ravage.hasOwnProperty('bubbleCondition')
 	// Does said condition correspond to a function to call?
@@ -695,7 +695,7 @@ KDEventMapEnemy['tick']['ravagerBubble'] = (e, entity, data) => {
 			index: KinkyDungeonCurrentTick
 		}
 		// Debugging
-		dbg && console.log('[Ravager Framework][ravagerBubble] Set Rav Bubble properties for ' + entity.Enemy.name + '(' + entity.id + ')')
+		RFDebug('[Ravager Framework][ravagerBubble] Set Rav Bubble properties for ' + entity.Enemy.name + '(' + entity.id + ')')
 	}
 }
 
@@ -710,9 +710,9 @@ function ravagerSettingsRefresh(reason) {
 }
 // Change slime girl's chance to add slime to the player
 function ravagerFrameworkApplySlimeRestrictChance(reason) {
-	console.log('[Ravager Framework] ravagerFrameworkApplySlimeRestrictChance(' + reason + ')')
 	var settings = KDModSettings['RavagerFramework'];
 	var dbg = settings && settings.ravagerDebug;
+	dbg && console.log('[Ravager Framework] ravagerFrameworkApplySlimeRestrictChance(' + reason + ')')
 	dbg && console.log('[Ravager Framework] Setting Slime Girl\'s restrict chance to ' + settings.ravagerSlimeAddChance)
 	var slimeIndex = KinkyDungeonEnemies.findIndex(val => { if (val.name == 'SlimeRavager' && val.addedByMod == 'RavagerFramework') return true });
 	if (!settings.ravagerDisableSlimegirl && slimeIndex >= 0) {
@@ -759,10 +759,10 @@ function ravagerFrameworkApplySpicyTendril(reason) {
 }
 // Mod Settings for disabling ravagers
 function ravagerFrameworkRefreshEnemies(reason) {
-	console.log('[Ravager Framework] ravagerFrameworkRefreshEnemies(' + reason + ')')
 	// Shortcut for settings
 	var settings = KDModSettings['RavagerFramework']
 	let dbg = settings && settings.ravagerDebug;
+	dbg && console.log('[Ravager Framework] ravagerFrameworkRefreshEnemies(' + reason + ')')
 	// Checking for bandit
 	var banditFoundIndex = KinkyDungeonEnemies.findIndex((val) => { if (val.name == 'BanditRavager' && val.addedByMod == 'RavagerFramework') return true })
 	// Check if we're supposed to be removing or adding the ravager
@@ -859,9 +859,9 @@ function ravagerFrameworkRefreshEnemies(reason) {
 }
 
 function ravagerFrameworkSetupSound(reason) {
-	console.log('[Ravager Framework] ravagerFrameworkSetupSound(' + reason + ')')
 	var settings = KDModSettings['RavagerFramework'];
 	var dbg = settings.ravagerDebug;
+	dbg && console.log('[Ravager Framework] ravagerFrameworkSetupSound(' + reason + ')')
 	var otherSoundFound = KDAllModFiles.filter((val) => { if (val.filename.toLowerCase().includes('girlsound.ks')) return true; }).length > 0
 	if (settings.ravagerEnableSound && !otherSoundFound) {
 		dbg && console.log('[Ravager Framework] Enabling sound effects ...')
@@ -930,17 +930,14 @@ if (KDEventMapGeneric['afterModConfig'] != undefined) {
 //
 
 
-// Verbosity function, courtesy of CTN
-// Need to figure out a way to deal with arbitrary number of arguments while keeping the nice way console.log will print an object
-// Seems I prob can't make this work. Seems like JS is in strict mode, so I can't manually construct the arguments object given to console.log
-// I'm giving up on this as of now.
-// function RavagerFrameworkVMSG() {
-// 	console.log('[RavagerFramework] :  ')//, msg)
-// 	// console.log(arguments)
-// 	console.log(arguments[Symbol.iterator]())
-// }
-// -- Method found for doing this, `KDModSettings['RavagerFramework'].ravagerDebug && console.log(...)`
-// -- Or (as I've done around the file) define the setting to a variable and && against that for less typing
+// Verbosity function for normal level debugging
+window.RFDebug = (...args) => {
+	RFDebugEnabled() && console.log(...args)
+}
+// Verbosity function for extreme level debugging
+window.RFTrace = (...args) => {
+	_RavagerFrameworkDebugEnabled && console.log(...args)
+}
 
 //things, in order, to remove for a given slot goal
 let ravageEquipmentSlotTargets = {
