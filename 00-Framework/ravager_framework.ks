@@ -135,7 +135,7 @@ window.RavagerFrameworkToggleDebug = function() {
 		_RavagerFrameworkDebugEnabled = true
 	}
 }
-// Developer helper function to verify a ravager's EAM values
+// Developer helper function to verify a ravager's EAM values - please don't have a bug ;-;
 window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 	const ravager = KDEnemiesCache.get(ravagerName)
 	// Check that enemy exists
@@ -332,46 +332,62 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 	}
 	return true
 }
-// Function to get a mod setting value. If settings are undefined, it'll return the default value given to KDModConfigs. If there is not matching value given to KDModConfigs, 
+// Function to get a mod setting value
+// If settings are undefined, it'll return the default value given to KDModConfigs
+// If there is not matching value given to KDModConfigs, it'll return undefined
 window.RavagerGetSetting = function(refvar) {
+	// Mod settings and default config objects
 	const settings = KDModSettings.RavagerFramework
 	var config = RavagerData.ModConfig.find((val) => { if (val.refvar == refvar) return true; })
+	// Helper for getting default value
 	function RFConfigDefault(refvar, config) {
+		// Check for missing default values; signals either a data structure change or (dev) failure to declare default values
 		if (config == undefined) {
 			console.error('[Ravager Framework]: RavagerGetSetting couldn\'t find ModConfig values for ' + refvar + ' !')
 			return undefined
 		}
 		return config.default
 	}
+	// No settings, return default; probably should never happen, but I believe I've seen it in the past when there's no localData
 	if (!settings) {
 		console.warn('[Ravager Framework]: RavagerGetSetting couldn\'t get current settings for the framework!')
 		return RFConfigDefault(refvar, config)
 	}
+	// Requested setting isn't set, return default
 	if (settings[refvar] == undefined) {
 		console.warn('[Ravager Framework]: RavagerGetSetting couldn\'t get the current setting for ' + refvar)
 		return RFConfigDefault(refvar, config)
 	}
+	// Return setting
 	return settings[refvar]
 }
 window.RavagerData = {
+	// To be (maybe) added at KDEventMapGeneric
 	KDEventMapGeneric: {
+		// Sets flag for playing a sound
 		beforeDamage: {
 			RavagerSoundHit: (e, item, data) => { RavagerSoundGotHit = true }
 		},
+		// Sets flag for playing a sound
 		tick: {
 			RavagerSoundTick: (e, item, data) => { RavagerSoundGotHit = false }
 		}
 	},
+	// To be (maybe) added at KDExpressions
 	KDExpressions: {
+		// Plays sound on getting hit
 		RavagerSoundHit: {
 			stackable: true,
 			priority: 108,
 			criteria: (C) => {
 				if (C == KinkyDungeonPlayer && (RavagerSoundGotHit || KDUniqueBulletHits.has('undefined[object Object]_player'))) {
+					// Unset hit flag
 					RavagerSoundGotHit = false
+					// Don't remember why we need to interrupt sleep, but sounds like an alright idea, so sure
 					KinkyDungeonInterruptSleep()
 					// Debug message
 					_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][RavagerSoundHit]: enableSound: ', RavagerGetSetting('ravagerEnableSound'), '\nvolume: ', RavagerGetSetting('ravagerSoundVolume') / 2, '\nonHitChance: ', RavagerGetSetting('onHitChance'))
+					// Might play a sound
 					if (KDToggles.Sound && RavagerGetSetting('ravagerEnableSound') && Math.random() < RavagerGetSetting('onHitChance')) {
 						AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio/" + (KinkyDungeonGagTotal() > 0 ? "Angry21 liliana.ogg" : "Ah1 liliana.ogg"), RavagerGetSetting('ravagerSoundVolume') / 2)
 					}
@@ -390,15 +406,19 @@ window.RavagerData = {
 				}
 			}
 		},
+		// Plays sound on orgasming
 		RavagerSoundOrgasm: {
 			stackable: true,
 			priority: 90,
 			criteria: (C) => {
 				if (C == KinkyDungeonPlayer && KinkyDungeonFlags.get("OrgSuccess") == 7) {
+					// Might play a sound
 					if (KDToggles.Sound && RavagerGetSetting('ravagerEnableSound')) {
 						AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio" + (KinkyDungeonGagTotal > 0 ? "GagOrgasm.ogg" : "Ah1 liliana.ogg"), RavagerGetSetting('ravagerSoundVolume') / 2)
 					}
+					// Text log message
 					KinkyDungeonSendTextMessage(8, "You make a loud moaning noise", "#1fffc7", 1);
+					// Make noise so enemies hear
 					KinkyDungeonMakeNoise(9, KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y)
 					return true
 				}
@@ -417,8 +437,10 @@ window.RavagerData = {
 		}
 	},
 	functions: {
+		// Vanilla game function backups
 		DrawButtonKDEx: DrawButtonKDEx,
 		KinkyDungeonDrawEnemiesHP: KinkyDungeonDrawEnemiesHP,
+		// Format strings used throughout the framework. Handles enemy, restraint, and clothing names, as well as damage strings
 		NameFormat: function(string, entity, restraint, clothing, damage, skipCapitalize) {
 			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Initial string "' + string + '"; entity: ', entity)
 			// Player name
@@ -455,10 +477,12 @@ window.RavagerData = {
 			return string
 		},
 	},
+	// Currently just used for the MimicRavager spoiler
 	conditions: {
 		// Checked to make the MimicRavager spoiler only show when the mimic has not ambushed the player
 		mimicRavSpoiler: enemy => !enemy.ambushtrigger
 	},
+	// Default strings
 	defaults: {
 		releaseMessage: "You feel weak as EnemyCName releases you...",
 		passoutMessage: "Your body is broken and exhausted...",
@@ -468,6 +492,7 @@ window.RavagerData = {
 		addRestraintMessage: "EnemyCName forces you to wear a RestraintName",
 		fallbackNarration: "EnemyCName roughly gropes you! (DamageTaken)",
 	},
+	// Default mod settings values
 	ModConfig: [
 		{
 			type: 'boolean',
@@ -578,12 +603,14 @@ window.RavagerData = {
 		}
 	]
 }
+// Just here so I can have a cool custom colored button in mod config
 DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options) {
 	if (name == "Ravager Framework") {
 		Color = "#ff66ff"
 		FillColor = "#330033"
 		// NoBorder = true
 	}
+	// Run and return the original DrawButtonKDEx
 	return RavagerData.functions.DrawButtonKDEx(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options)
 }
 // Checks if the player can see an enemy; just a shortcut for a call to KDCanSeeEnemy, which I anticipate being useful in the future
@@ -758,6 +785,7 @@ function ravagerFrameworkApplySpicyTendril(reason) {
 	}
 }
 // Mod Settings for disabling ravagers
+// This needs to be reworked and generalized, it's getting annoying to add more enemies
 function ravagerFrameworkRefreshEnemies(reason) {
 	// Shortcut for settings
 	var settings = KDModSettings['RavagerFramework']
