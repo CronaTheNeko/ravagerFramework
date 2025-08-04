@@ -441,11 +441,15 @@ window.RavagerData = {
 		DrawButtonKDEx: DrawButtonKDEx,
 		KinkyDungeonDrawEnemiesHP: KinkyDungeonDrawEnemiesHP,
 		// Format strings used throughout the framework. Handles enemy, restraint, and clothing names, as well as damage strings
+		// Most, if not all, of my narration strings pass through this. We could simplify making varying dialogue by adding a 'choose a random option for this section of the string' functionality. Example: "EnemyName does (option1|option2) to you", where (option1|option2) is two options that will be randomly chosen from. See MimicRavager's ravaging narration for example of dialogue that could be greatly simplified by this addition. --- GOT IT! Fuck that was annoying; handles recursive choices fine (example: "{s{T{R|r}E|tre}tching|swelling}" to be one of "swelling", "stretching", "sTREtching", or "sTrEtching"), and seemingly handles a "|" outside of curly brackets
 		NameFormat: function(string, entity, restraint, clothing, damage, skipCapitalize) {
-			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Initial string "' + string + '"; entity: ', entity)
+			function RFNFTrace(...args) {
+				RavagerData.Variables.RFControl.NameFormatDebug && console.log(...args)
+			}
+			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Initial string "' + string + '"; entity: ', entity)
 			// Player name
 			string = string.replace("PlayerName", KDGameData.PlayerName)
-			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
 			// Enemy name
 			if (entity) {
 				// Definition name
@@ -454,26 +458,95 @@ window.RavagerData = {
 				string = string.replace("EnemyCNameBare", KDEnemyName(entity))
 				// Possible custom entity name (w/ formatting)
 				string = string.replace("EnemyCName", entity.CustomName || KDGetName(entity.id) || "the " + TextGet("Name" + entity.Enemy.name))
-			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
 			}
 			// Restraint name
 			if (restraint) {
 				string = string.replace("RestraintName", TextGet('Restraint' + restraint.name))
-			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
 			}
 			// Clothing name
 			if (clothing) {
 				string = string.replace("ClothingName", TextGet("m_" + clothing.Item).includes("[NotFound]") ? clothing.Item : TextGet("m_" + clothing.Item))
-			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
 			}
 			// Damage string
 			if (damage) {
 				string = string.replace("DamageTaken", damage.string)
-			_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
 			}
+			// In-string randomization
+			function inStringRandom(input) {
+				if (!input.includes("{") && !input.includes("}") && !input.includes("|")) {
+					RFNFTrace("[Ravager Framework][DBG][InStringRandom]: Input string doesn't contain any selections. Skipping.")
+					return input
+				}
+				function characterCount(input, char) {
+					var count = 0
+					for (var i = 0; i < input.length; i++)
+						if (input[i] == char)
+							count++
+					RFNFTrace("[Ravager Framework][DBG][InStringRandom][characterCount]: Found a total of " + count + " of character \"" + char + "\" in input string \"" + input + "\"")
+					return count
+				}
+				var currentLevel = 0
+				var holding = ""
+				var output = ""
+				for (var i = 0; i < input.length; i++) {
+					RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (L) Level: " + currentLevel)
+					if (input[i] == "{") {
+						currentLevel++
+						holding += "{"
+						RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (L+) Holding: " + holding)
+					} else if (input[i] == "}") {
+						currentLevel--
+						holding += "}"
+						RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (L-) Holding: " + holding)
+					} else if (currentLevel > 0) {
+						holding += input[i]
+						RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (L0) Holding: " + holding)
+					} else {
+						output += input[i]
+						RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (L) Output: " + output)
+					}
+					if (currentLevel == 0 && holding.length > 0) {
+						RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P) Holding: " + output)
+						if (!holding.includes("|")) {
+							output += holding
+							RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P)(NC) Output: " + output)
+						} else {
+							var sub = holding.substring(1, holding.length - 1)
+							RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P) Substring: " + output)
+							if (sub.includes("{") && sub.includes("}") && characterCount(sub, "|") > 1) {
+								sub = inStringRandom(sub)
+								RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P)(R) Substring: " + output)
+							}
+							var options = sub.split("|")
+							RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P) Options: ", options)
+							var selection = Math.floor(Math.random() * options.length)
+							RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P) Selection: " + options[selection])
+							output += options[selection]
+							RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P) Output: " + output)
+						}
+						holding = ""
+					}
+				}
+			  if (currentLevel > 0) {
+			    console.warn("[Ravager Framework][NameFormat][InStringRandom]: Input string contains more opening brackets than closing brackets. We will return the input string with an error prefix. Please report this to the author! Offending string:\n" + input)
+			    return "[ERROR]" + input
+			  } else if (currentLevel < 0) {
+			    console.warn("[Ravager Framework][NameFormat][InStringRandom]: Input string contains more closing brackets than opening brackets. We will return the input string with an error prefix. Please report this to the author! Offending string:\n" + input)
+			    return "[ERROR]" + input
+			  }
+			  RFNFTrace("[Ravager Framework][DBG][InStringRandom]: Final output: " + output)
+				return output
+			}
+			string = inStringRandom(string)
+			RFNFTrace('[Ravager Framework][DBG][NameFormat]: inStringRandom transformed to "' + string + '"')
 			// Capitalize
 			if (!skipCapitalize)
 				string = string.replaceAt(0, string[0].toUpperCase())
+			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Final string: "' + string + '"')
 			return string
 		},
 	},
