@@ -602,6 +602,12 @@ window.RavagerData = {
 			block: undefined
 		},
 		{
+			type: 'boolean',
+			refvar: 'ravagerDisableMimic',
+			default: false,
+			block: undefined
+		},
+		{
 			// name: 'Spicy Ravager Tendril Dialogue',
 			type: 'boolean',
 			refvar: 'ravagerSpicyTendril',
@@ -803,7 +809,8 @@ KDEventMapEnemy['tick']['ravagerBubble'] = (e, entity, data) => {
 function ravagerSettingsRefresh(reason) {
 	console.log('[Ravager Framework] Running settings functions for reason: ' + reason)
 	ravagerFrameworkRefreshEnemies(reason)
-	ravagerFrameworkApplySpicyTendril(reason)
+	// ravagerFrameworkApplySpicyTendril(reason)
+	ravagerFrameworkApplySomeSpice(reason)
 	ravagerFrameworkApplySlimeRestrictChance(reason)
 	ravagerFrameworkSetupSound(reason)
 	console.log('[Ravager Framework] Finished running settings functions')
@@ -822,40 +829,59 @@ function ravagerFrameworkApplySlimeRestrictChance(reason) {
 		KinkyDungeonRefreshEnemiesCache()
 	}
 }
-// Mod settings for changing spicy dialogue for tendril
+// Mod settings for changing spicy dialogue for applicable ravagers
 // This NEEDS to be run AFTER ravagerFrameworkRefreshEnemies, as this relies on enemy enabled state being consistent with the relevant setting
-function ravagerFrameworkApplySpicyTendril(reason) {
-	console.log('[Ravager Framework] ravagerFrameworkApplySpicyTendril(' + reason + ')')
-	// Shortcut for settings
-	var settings = KDModSettings['RavagerFramework']
-	var dbg = settings && settings.ravagerDebug;
-	dbg && console.log('[Ravager Framework] Tentacle Pit Spicy Dialogue set to ', settings.ravagerSpicyTendril)
-	// Check index for tendril
-	var tendrilIndex = KinkyDungeonEnemies.findIndex(val => { if (val.name == 'RavagerTendril' && val.addedByMod == 'RavagerFramework') return true })
-	// Only run if tendril is not disabled and is present
-	if (!settings.ravagerDisableTentaclePit && tendrilIndex >= 0) {
-		// Shortcut for tendril
-		var tendril = KinkyDungeonEnemies[tendrilIndex]
-		// Check whether spicy or not
-		if (settings.ravagerSpicyTendril) {
-			// Change to spicy
-			for (var range of tendril.ravage.ranges) {
-				range[1].narration.ItemVulva = range[1].narration.SpicyItemVulva
-				range[1].narration.ItemButt = range[1].narration.SpicyItemButt
-				range[1].narration.ItemMouth = range[1].narration.SpicyItemMouth
-			}
+// If I expand the mod settings into a dedicated page, I'll most likely make a way to enable spicy dialogue per enemy, so this will need to be reworked
+function ravagerFrameworkApplySomeSpice(reason) {
+	// Relevant settings
+	const spice = RavagerGetSetting('ravagerSpicyTendril')
+	RFDebug('[Ravager Framework] ravagerFrameworkApplySomeSpice(' + reason + ')')
+	RFDebug('[Ravager Framework] Spicy Dialogue set to ', spice)
+	// Filter enemies to ravagers that have Spice options
+	const spiceable = KinkyDungeonEnemies.filter(enemy =>
+		// Added by me
+		enemy.addedByMod == 'RavagerFramework' &&
+		// Has ravage settings
+		enemy.ravage &&
+		// Has ranges
+		enemy.ravage.ranges &&
+		// Has ranges that can have spicy dialogue
+		enemy.ravage.ranges.some(([_, data]) =>
+			// Find at least one spiceable narration
+			Object.keys(data.narration).some(n =>
+				// Regex always looks odd
+				n.match(/((Spicy)|(Tame)).*/g)
+			)
+		)
+	)
+	RFTrace('[Ravager Framework][DBG][applySpice] Spiceable enemies: ' + spiceable)
+	// Loop each of the possibly spicy ravager and give it to applySpice
+	spiceable.forEach(enemy => {
+		RFDebug('[Ravager Framework][applySpice] Enemy ranges before refresh: ', enemy.ravage.ranges)
+		// applySpice(e)
+		if (spice) {
+			RFDebug('[Ravager Framework][applySpice] Enabling spice for ' + enemy.name)
+			// For each ravaging range and slot, apply spicy dialogue if it exists
+			enemy.ravage.ranges.forEach(range => {
+				enemy.ravage.targets.forEach(slot => {
+					if (range[1].narration.hasOwnProperty('Spicy' + slot))
+						range[1].narration[slot] = range[1].narration['Spicy' + slot]
+				})
+			})
 		} else {
-			// Change to tame
-			for (var range of tendril.ravage.ranges) {
-				range[1].narration.ItemVulva = range[1].narration.TameItemVulva
-				range[1].narration.ItemButt = range[1].narration.TameItemButt
-				range[1].narration.ItemMouth = range[1].narration.TameItemMouth
-			}
+			RFDebug('[Ravager Framework][applySpice] Disabling spice for ' + enemy.name)
+			// For each ravaging range and slot, apply tame dialogue if it exists
+			enemy.ravage.ranges.forEach(range => {
+				enemy.ravage.targets.forEach(slot => {
+					if (range[1].narration.hasOwnProperty('Tame' + slot))
+						range[1].narration[slot] = range[1].narration['Tame' + slot]
+				})
+			})
 		}
-		dbg && console.log('[Ravager Framework] Tentacle Pit ranges before refresh: ', tendril.ravage.ranges)
-		KinkyDungeonRefreshEnemiesCache()
-		dbg && console.log('[Ravager Framework] Tentacle Pit ranges after refresh: ', tendril.ravage.ranges)
-	}
+		RFDebug('[Ravager Framework][applySpice] Enemy ranges after refresh: ', enemy.ravage.ranges)
+	})
+	// Refresh enemies cache
+	KinkyDungeonRefreshEnemiesCache()
 }
 // Mod Settings for disabling ravagers
 // This needs to be reworked and generalized, it's getting annoying to add more enemies
@@ -954,6 +980,21 @@ function ravagerFrameworkRefreshEnemies(reason) {
 			KinkyDungeonEnemies.push(KDEventMapEnemy['ravagerCallbacks']['definitionPitTendril'])
 		}
 	}
+	// Checking for Mimic
+	var mimicFoundIndex = KinkyDungeonEnemies.findIndex(val => val.name == 'MimicRavager' && val.addedByMod == 'RavagerFramework')
+	const mimicDisabled = RavagerGetSetting('ravagerDisableMimic')
+	// console.warn(mimicDisabled, mimicFoundIndex)
+	if (mimicDisabled) {
+		if (mimicFoundIndex >= 0) {
+		dbg && console.log('[Ravager Framework] Removing Mimic Ravager')
+		KinkyDungeonEnemies.splice(mimicFoundIndex, 1)
+		}
+	} else {
+		if (mimicFoundIndex < 0 || mimicFoundIndex == undefined) {
+			dbg && console.log('[Ravager Framework] Enabling Mimic Ravager')
+			KinkyDungeonEnemies.push(RavagerData.Definitions.mimic)
+		}
+	}
 	// Refresh enemy cache
 	dbg && console.log('[Ravager Framework] Refreshing enemy cache')
 	KinkyDungeonRefreshEnemiesCache()
@@ -987,7 +1028,8 @@ addTextKey('KDModButtonravagerDisableBandit', 'Disable Bandit Ravager')
 addTextKey('KDModButtonravagerDisableWolfgirl', 'Disable Wolfgirl Ravager')
 addTextKey('KDModButtonravagerDisableSlimegirl', 'Disable Slimegirl Ravager')
 addTextKey('KDModButtonravagerDisableTentaclePit', 'Disable Tentacle Pit')
-addTextKey('KDModButtonravagerSpicyTendril', 'Spicy Ravager Tendril Dialogue')
+addTextKey('KDModButtonravagerDisableMimic', 'Disable Mimic Ravager')
+addTextKey('KDModButtonravagerSpicyTendril', 'Spicy Ravager Dialogue')
 addTextKey('KDModButtonravagerSlimeAddChance', 'Slimegirl Restrict Chance')
 addTextKey('KDModButtonravagerEnableSound', 'Enable Sounds')
 addTextKey('KDModButtononHitChance', 'Moan Chance')
