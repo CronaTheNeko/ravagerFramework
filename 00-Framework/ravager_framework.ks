@@ -521,10 +521,10 @@ window.RavagerData = {
 							RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P)(NC) Output: " + output)
 						} else {
 							var sub = holding.substring(1, holding.length - 1)
-							RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P) Substring: " + output)
+							RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P) Substring: " + sub)
 							if (sub.includes("{") && sub.includes("}") && characterCount(sub, "|") > 1) {
 								sub = inStringRandom(sub)
-								RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P)(R) Substring: " + output)
+								RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P)(R) Substring: " + sub)
 							}
 							var options = sub.split("|")
 							RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P) Options: ", options)
