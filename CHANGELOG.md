@@ -78,6 +78,23 @@ v6.1.1
 - Initial addition of extreme debugging logs
 - Bypass stripping PureWind outfits (from PureWind'sTools) to avoid infinite loop of stripping clothes
 
-v6.1.2
-- Colorful settings button~
+v6.2.0
+- Stylized mod settings page~
 - Rework settings code
+- Rework debug message code
+- Added Experience Aware Mode (change dialogue based on the number of times the player has been "used") - Not extensively used, but more will come
+- Removed unimplemented "ravagerTendrilCum" item from Tentacle Pit
+- Reworked framework text formatting
+	+ Added the ability to have randomized parts of text by wrapping options as `{option1|option2}`. See `ravagerDevelopers.md` for text formatting specifics.
+- Added Mimic ravager
+	+ Two new cookies! Bad-Girl Cookie and Suspicious Cookie, found within the defeated mimic
+	+ Added on-death spell to restrain the player
+		- Can set player's outfit to Nude, if the matching user-facing setting is enabled
+	+ Added `ravagerBubble` event to be used for mimic ravager spoiler
+	+ Added helper function for adding ravager bubble conditions
+	+ Generalized ravager spicy dialogue for use with Mimic ravager
+	+ More to come for mimic. This update was taking too long, so I had to cut off feature creep. Gonna be the first ravager to use head slot~
+- Added developer-oriented Ravager Control menu to help with testing and debugging
+	+ To access, either enable debug mode on the title screen twice or headpat the character model twice in the pause menu while debug mode is enabled
+- Added multi-item drop behavior and related user-facing setting - Made for the Mimic Ravager, but can be used by any ravager
+- Updated stat change calls
