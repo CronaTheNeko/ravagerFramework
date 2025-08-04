@@ -603,3 +603,250 @@ Expected return: None
 Notes:
 - Declaring this callback will completely override the normal fallback actions. Using this callback means you want to do your own fallback actions and the framework will do nothing as a fallback. [Issue 7](https://github.com/CronaTheNeko/ravagerFramework/issues/7) is a plan to change this behavior
 - A current limitation of the framework's fallback actions, and thus a reason you may want to use this, is that the restraints added during the fallback actions are currently limited to jail restraints, but a change to this is planned.
+
+## Ravager Bubbles
+A new event has been added to allow custom bubbles for ravagers, with an image, duration, chance, and condition.
+
+To get started, add the following to your enemy's events list:
+```
+{
+  trigger: "tick",
+  type: "ravagerBubble"
+}
+```
+Those are the only values required to run the event, as those define what event to run. The following sub-sections will go over the optional settings for this event.
+
+In the following sub-sections, the above example (the minimum required to add this event) will be referred to as `event`.
+
+### Bubble chance
+The chance on each game tick that the bubble will be shown. Value between `0.0` and `1.0` to represent 0% to 100% chance.
+
+Property path: `event.chance`
+
+Required?: No
+
+Type: Number
+
+Valid values: `0.0` through `1.0`
+
+Default value: `0.3`
+
+### Bubble duration
+The number of game ticks that the bubble will be shown for after first being shown.
+
+Property path: `event.duration`
+
+Required?: No
+
+Type: Number
+
+Valid values: Any number greater than `0`
+
+Default value: `3`
+
+### Bubble image
+The image to be shown as the ravager bubble. The default was designed for the mimic spoiler and is provided by the framework.
+
+Property path: `event.image`
+
+Required?: No
+
+Type: String
+
+Default value: `Hearts`
+
+Note: To provide your own bubble image, the image you wish to use must be in `Conditions/RavBubble/` and be a `.png` image. This due to the framework getting the image using `KinkyDungeonRootDirectory + 'Conditions/RavBubble/${event.image}.png'`.
+
+## Other enemy keys
+
+### addedByMod
+My attempt to suggest a standard for tracking custom enemies.
+
+Entirely optional, but when the framework is modifying its enemies (such as disabling ravagers), the framework will often check this value to avoid modifying an enemy it didn't create.
+
+The main times you'll likely want to use this are:
+
+1) You agree with me and want the usage of this value to become standard
+2) You're making a ravager that you wish to still be modified by the framework (set this to "RavagerFramework")
+3) You're modifying a ravager added by the framework in such a way that is incompatible with how the framework modifies its ravagers (set this to something other than "RavagerFramework"); see notes for some info on modifying ravagers
+
+Property path: `enemy.addedByMod`
+
+Required?: No
+
+Type: String
+
+Notes:
+- The currentl parts of the code where this value is checked to be "RavagerFramework" are:
+  + Enabling/disabling enemies
+  + Determining if the framework will use its custom item drop behvior (see [ravagerCustomDrop](#ravagercustomdrop) for enabling this behavior for your own ravagers)
+  + Modifying the Slimegirl's "add slime restraint" chance
+  + Modifying the "spiciness" of relevant enemy's narration (currently just the RavagerTendril and MimicRavager)
+    - I do plan to change this behavior to allow spiciness of external ravagers to be handled by the framework. If you are seeing this and that behavior has not been changed and there is not an issue open for the plan to do so, please open an issue on GitHub. I am very forgetful.
+- Modifying one of the framework's ravagers:
+  + To allow your modifications to persist across the framework unloading and reloading its enemies, you should modify the root definitions of ravagers
+  + As of writing, ravager definitions are across a two data structures:
+    - The BanditRavager, WolfgirlRavager, SlimeRavager, TentaclePit, and RavagerTendril definitions are stored in `KDEventMapEnemy['ravagerCallbacks']['definition{EnemyName}']`
+    - The MimicRavager definition is stored in `RavagerData.definitions.mimic`
+    - This split in locations is from the in-progress change from using a data structure inherent to the game to my own data structure, which took me a while to figure out how to make it globally accessible.
+    - If you are reading this, I have not yet moved all framework enemy definitions to `RavagerData.definitions`, and there is not an issue open for this on Github, please open an issue. My curse is forgetfulness.
+
+### ravagerCustomDrop
+
+Enables the framework's custom multi-item drop behavior. When enabled, this behavior allows enemies to drop multiple items on death without relying on however the base game handles such a thing.
+
+Property path: `enemy.ravagerCustomDrop`
+
+Required?: No
+
+Type: Boolean
+
+Notes:
+- When enabled, `enemy.maxDrops` is also required. If `enemy.maxDrops` is missing, item drops will be handled by the game's original functionality
+- Even when enabled for your enemy, multi-item drops will only be enabled when the `ravagerCustomDrop` ("Enable multi-item drops") mod setting is enabled by the user (this setting is enabled by default)
+- This functionality prevents dropping the same item multiple times. Because of this, I recommend keeping your `enemy.maxDrops` low relative to the length of your dropTable, as too high a number of drops can cause your enemy's drops to be nearly or entirely constant (except for the amounts of any applicable items). If you'd like to see this behavior changed, feel free to open an issue on Github.
+
+### maxDrops
+
+Defines the maximum number of items that can be dropped when the enemy is using the framework's multi-item drop behavior.
+
+Property path: `enemy.maxDrops`
+
+Required?: No
+
+Type: Number
+
+Valid values: Any number greater than 0
+
+Notes:
+- If you enable the framework's multi-item drop behavior for your ravager, this value is required to enable multi-item drops
+- If this is set to 0 or less, the framework's multi-item drop behavior will not be able to be used
+
+### minDrops
+
+Defines the minimum number of items that can be dropped when the enemy is using the framework's multi-item drop behavior.
+
+Property path: `enemy.minDrops`
+
+Required?: No
+
+Type: Number
+
+Valid values: Any number between 0 and `enemy.maxDrops`
+
+Default value: `1`
+
+## Text Replacements
+
+Across many, if not all, places where the framework uses ravager-defined strings, it passes those strings through many text replacements.
+
+This section will go through all the text replacements available.
+
+Note: In the case of any of these values being at the beginning of the string, the first character will be capitalized so the strings don't turn out looking completely wrong.
+
+Note: Some of these replacements may not have a use for you, as the strings they're made for are not currently controllable through ravager definitions. There are plans to change these strings to be controllable.
+
+If you run into troubles with your strings and need debug info specific to the text replacements, check out [Developer Control Screen](#developer-control-screen) and [Debug NameFormat Function](#debug-nameformat-function)
+
+### PlayerName
+
+Any instance of "PlayerName" will be replaced with the player character's name in the current save file.
+
+### EnemyName
+
+When NameFormat is given an entity that is using this string, any instance of "EnemyName" will be replaced by the text key for the name of that entity
+
+### EnemyCName
+
+When NameFormat is given an entity that is using this string, any instance of "EnemyCName" will be replaced by either the entity's custom name (either by `entity.CustomName` or `KDGetName(entity.id)`), or by the text key for the name of that entity with the word "the" in front of the name.
+
+Using this method allows cleanly using an enemy's custom name when available while avoiding a stray "the" in front of the name. For example, A bandit ravager with a custom name of Jennifer will have "EnemyCName" replaced with "Jennifer", while a bandit ravager with no custom name will have "EnemyCName" replaced with "the Bandit Ravager".
+
+### EnemyCNameBare
+
+When NameFormat is given an entity that is using this string, any instance of "EnemyCNameBare" will be replaced with the result of `KDEnemyName(entity)`. This is separate from EnemyCName as it will not add "the" before the name when there's not a custom name available for the entity.
+
+### RestraintName
+
+When an enemy is adding or removing a restraint from the player, NameFormat will be given that restraint and any instance of "RestraintName" will be replaced by the name of that restraint.
+
+This is one of the options that is likely not currently useful to you, as the string used for with this is not currently controllable by a ravager definition.
+
+### ClothingName
+
+When an enemy is stripping the player, NameFormat will be given clothing item that was removed and any instance of "ClothingName" will be replaced by the name of that item.
+
+This is one of the options that is likely not currently useful to you, as the string that uses this is not currently controllable by a ravager definition.
+
+### DamageTaken
+
+When an enemy is attacking the player, the amount of damage will be given to NameFormat and any instance of "DamageTaken" will be replaced by the corresponding damage string.
+
+### Random String Choices
+
+Random choice strings allow you to make strings with arbitrary variations that will change every time the string is used. The syntax is very basic, but still powerful. Options are wrapped in curly brackets and separated by a vertical bar. Example: "{option 1|option 2}".
+
+These random selections can have any number of choices (such as "{option1|option2|option3|...|option50}"), can be nested inside each other to any depth (such as "{option1 {option1.1 {option1.1.1|option1.1.2}|option1.2}|option2}"), and can have empty options (such as "{modifier1|modifier2|}")
+
+If you would like in-use examples of this functionality, you can check out the narration for the MimicRavager, as it makes heavy use of this feature and has multiple complex examples.
+
+While any sections of curly brackets that don't contain a vertical bar will be passed unmodified into the output, you should consider curly brackets to be unsafe to use in your strings, as this functionality is sensitive to the number of opening and closing brackets and requires the numbers of each to match. If you have a use for mismatching curly brackets in your strings, feel free to tell me and I can modify this functionality to allow escaping brackets.
+
+## Developer Control Screen
+
+Version 6.2.0 adds a more powerful control screen aimed at developers, the "Ravager Hacking" menu.
+
+To access this menu, you'll need to enable to button one of two ways:
+
+1) On the main menu:
+	- After mods finish loading, enable, disable, and re-enable the game's debug mode by clicking on the ball gag in the title three times
+	- After doing so, the pink "Ravager Hacking" button will appear near the bottom left corner of the main menu
+
+2) On the in-game pause menu:
+
+	- With debug mode enabled on the main menu and the "Debug Mode" checkbox in the pause menu enabled, headpat your character twice
+	- After doing so, the pink "Ravager Hacking" button will appear in the bottom right above the "See Perks" button
+
+Currently, it doesn't have a way for external mods to add more settings, but that is a planned feature. If you're reading this, you want to use this menu for your own ravagers, and there isn't an issue open on GitHub, please open an issue. Can you believe how many things I can forget at once?
+
+The current most useful options in this menu are the "Heavy Debugging" and "Debug NameFormat function" options.
+
+### Heavy Debugging
+
+Enabling this option will enable the framework's equivalent of `console.trace` messages. I've done it this way so I don't have to enable trace messages in the console, since the game spits out quite a lot of very large trace messages on its own.
+
+These debugging messages happen A LOT. Their purpose is meant to allow me to follow through almost every line of code that the framework runs on every turn. If you enable this, I sure hope you really like scrolling.
+
+### Debug NameFormat Function
+
+This option is very similar to the Heavy Debugging option, but specifically for the `NameFormat` function that handles [Text Replacements](#text-replacements).
+
+This was split to its own option after adding the randomized text options to the text replacements, as that addition makes NameFormat EASILY capable of printing hundreds of lines to the console every turn.
+
+At the beginning of NameFormat, there will be a message telling you the string it's starting with.
+
+After each of the basic text replacements (EnemyName, PlayerName, DamageTaken, etc.), there will be a message showing what the input text has been transformed into.
+
+Upon reaching the randomized text replacements, you may need a guide to understand each line of output, as this portion prints a message for nearly every line of code.
+
+Every message for the randomized text starts with "[Ravager Framework][DBG][InStringRandom]:" or "[Ravager Framework][DBG][InStringRandom][characterCount]:". As these are markers for stating what function the message comes from, I will be ignoring them for the upcoming explanations.
+
+The random text function loops every character individually, so you'll likely see at least one of the following lines for every character in the string.
+
+- The line "Input string doesn't contain any selections. Skipping." indicates that the input string is missing at least one of "{", "}", or "|" and will no be processed for random choices.
+- A line starting with "Found a total of" is coming from the internal helper function for counting characters within a substring. This helper function is used to detect nested random choices. If you're using nested random choices, the relavant line for your nested choices should show a count of at least 2 for the character "|".
+- A line starting with "(L) Level" is stating the current number of random choices the code is currently looking at. When at a part of the string that doesn't have a random choice, this line should state level 0. While parsing a choice, the level should be at least 1.
+- A line starting with "(L+) Holding" means that the loop has found the opening bracket that signals the beginning of a random choice, the level has been incremented, and shows the text that is being held so that the random choice can actually be chosen when it finds the closing bracket.
+- A line starting with "(L-) Holding" means that the loop has found the closing bracket that signals the end of a random choice, the level has been decremented, and shows the text that is about to be used to decide on the random choice
+- A line starting with "(L0) Holding" means the loop is currently within a random choice section (level is above zero), and shows the text that is being held so that the random choice can actually be chosen when it finds the closing bracket.
+- A line starting with "(L) Output" means the loop is not within a random choice section (level is less than one), and shows the current output string that will be returned at the end of the loop.
+- A line starting with "(P) Holding" means the loop is now parsing the random choice and is going to make the decision shortly, and random selection string it's currently working with.
+- A line starting with "(P)(NC) Output" means there's no "|" character in the currently held string and therefore has no choice to be made, the currently held string has been added to the output (preserving the surrounding brackets), and shows the current output string that will be returned at the end of the loop.
+- A line starting with "(P) Substring" signals the beginning of actually parsing the random choice and shows the current random choice string without the surrounding brackets. Be aware that after this line, the function may recurse to handle nested random choices.
+- A line starting with "(P)(R) Substring" means the function has just returned from a recursive call to itself in order to handle nested random choices, and shows the updated random choice string that no longer has any nested choices.
+- A line starting with "(P) Options" shows all the random choices available by splitting the current random choice string by the "|" character.
+- A line starting with "(P) Selection" shows the random choice from Options that has been selected.
+- A line starting with "(P) Output" signals the end of the current random selection and shows the updated output string that will eventually be returned at the end of the loop.
+- A line starting with "Final Output" signals the end of loop and shows what string is being returned now that all the random choices have been decided. Be aware that there may a number of these lines in the middle of the output if the function has to recurse for nested choices.
+
+There are two possible errors for this section, in the case that the input string has a mismatch between the number of opening brackets and closing brackets. In the case of either of these errors, the string returned will be the input string with "[ERROR]" added onto the beginning.
