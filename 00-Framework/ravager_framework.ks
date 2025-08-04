@@ -440,7 +440,11 @@ window.RavagerData = {
 		// Vanilla game function backups
 		DrawButtonKDEx: DrawButtonKDEx,
 		KinkyDungeonDrawEnemiesHP: KinkyDungeonDrawEnemiesHP,
+		KinkyDungeonDrawGame: KinkyDungeonDrawGame,
+		KinkyDungeonRun: KinkyDungeonRun,
+		KinkyDungeonHandleClick: KinkyDungeonHandleClick,
 		KDDropItems: KDDropItems,
+		DrawCheckboxKDEx: DrawCheckboxKDEx,
 		// Format strings used throughout the framework. Handles enemy, restraint, and clothing names, as well as damage strings
 		// Most, if not all, of my narration strings pass through this. We could simplify making varying dialogue by adding a 'choose a random option for this section of the string' functionality. Example: "EnemyName does (option1|option2) to you", where (option1|option2) is two options that will be randomly chosen from. See MimicRavager's ravaging narration for example of dialogue that could be greatly simplified by this addition. --- GOT IT! Fuck that was annoying; handles recursive choices fine (example: "{s{T{R|r}E|tre}tching|swelling}" to be one of "swelling", "stretching", "sTREtching", or "sTrEtching"), and seemingly handles a "|" outside of curly brackets
 		NameFormat: function(string, entity, restraint, clothing, damage, skipCapitalize) {
@@ -549,6 +553,208 @@ window.RavagerData = {
 				string = string.replaceAt(0, string[0].toUpperCase())
 			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Final string: "' + string + '"')
 			return string
+		},
+		// Draws the ravager control menu
+		// Wanna rework this to dynamically place the buttons
+		RFControlRun: function() {
+			// Draw custom background
+			KDDraw(kdcanvas, kdpixisprites, "bg", `${KinkyDungeonRootDirectory}Backgrounds/${RavagerData.Variables.RFControl.Background}.png`, 0, 0, CanvasWidth, CanvasHeight, undefined, { zIndex: -115 });
+			// All the buttons we'll draw
+			const buttons = [
+				{
+					name: "RFControlBack",
+					func: () => {
+						RFDebugEnabled() && console.log("[Ravager Framework][RFControlRun] Leaving ravager control")
+						RavagerData.Variables.State = RavagerData.Variables.PrevState
+						RavagerData.Variables.DrawState = RavagerData.Variables.PrevDrawState
+					},
+					enabled: true,
+					Left: 1650,
+					Top: 900,
+					Width: 300,
+					Height: 64,
+					Label: "Return"
+				}
+			]
+			// All the checkboxes we'll draw
+			const checkboxes = [
+				{
+					name: "RFControlDebug",
+					func: () => { RavagerFrameworkToggleDebug() },
+					Left: 550,
+					Top: 200,
+					Disabled: false,
+					Text: "Heavy Debugging",
+					IsChecked: _RavagerFrameworkDebugEnabled,
+					enabled: true
+				},
+				{
+					name: "RFControlNameFormatDebug",
+					func: (_bdata) => {
+						RavagerData.Variables.RFControl.NameFormatDebug = !RavagerData.Variables.RFControl.NameFormatDebug
+					},
+					Left: 550,
+					Top: 274,
+					Disabled: false,
+					Text: "Debug NameFormat function",
+					IsChecked: RavagerData.Variables.RFControl.NameFormatDebug,
+					enabled: true
+				},
+				{
+					name: "RFControlExposeMimics",
+					func: (_bdata) => {
+						RavagerData.functions.MimicExposure(!RavagerData.Variables.ExposeMimics)
+					},
+					Left: 550,
+					Top: 348,
+					Disabled: RavagerGetSetting("ravagerDisableMimic"),
+					Text: "Expose Mimics",
+					IsChecked: RavagerData.Variables.ExposeMimics,
+					enabled: !RavagerGetSetting("ravagerDisableMimic"),
+					options: {
+						// HoveringText: "Enable to force the mimic spoiler bubble to be constantly shown" // Apparently HoveringText is only shown within the bounds of the button. How can I make it do a popup?
+					}
+				},
+				{
+					name: "RFControlPassiveMimic",
+					func: () => {
+						RavagerData.functions.MimicPassive(!RavagerData.Variables.RFControl.PassiveMimics)
+					},
+					Left: 550,
+					Top: 422,
+					Disabled: RavagerGetSetting("ravagerDisableMimic"),
+					Text: "Oblivious Mimics",
+					IsChecked: RavagerData.Variables.RFControl.PassiveMimics,
+					enabled: !RavagerGetSetting("ravagerDisableMimic"),
+					options: {
+						// HoveringText: "Enable to make mimic ravagers never notice the player" // Apparently HoveringText is only shown within the bounds of the button. How can I make it do a popup?
+					}
+				}
+			]
+			// All the labels we'll draw
+			const labels = [
+				{
+					Text: "Ravager Controls",
+					X: 1250,
+					Y: 100,
+					Width: 1000
+				}
+			]
+			// All the rectangles we'll draw
+			const rects = [
+				// { // Doesn't fit with new background
+				// 	Container: kdcanvas,
+				// 	Map: kdpixisprites,
+				// 	id: "RFControlTitleHR",
+				// 	Params: {
+				// 		Left: 550,
+				// 		Top: 130,
+				// 		Width: 1400,
+				// 		Height: 1,
+				// 		Color: "#f3f"
+				// 	}
+				// }
+			]
+			// Draw each button
+			for (var btn of buttons)
+				DrawButtonKDEx(
+					btn?.name,
+					btn?.func,
+					btn?.enabled,
+					btn?.Left,
+					btn?.Top,
+					btn?.Width,
+					btn?.Height,
+					btn?.Label,
+					btn?.Color ? btn.Color : KDBaseWhite,
+					btn?.Image,
+					btn?.HoveringText,
+					btn?.Disabled,
+					btn?.NoBorder,
+					btn?.FillColor,
+					btn?.FontSize,
+					btn?.ShiftText,
+					btn?.options
+				)
+			// Draw each checkbox
+			for (var box of checkboxes)
+				DrawCheckboxRFEx(
+					box?.name,
+					box?.func,
+					box?.enabled,
+					box?.Left,
+					box?.Top,
+					box?.Width,
+					box?.Height,
+					box?.Text,
+					box?.IsChecked,
+					box?.Disabled,
+					box?.TextColor,
+					box?._CheckImage,
+					box?.options
+				)
+			// Draw each label
+			for (var label of labels)
+				DrawTextFitKD(
+					label?.Text,
+					label?.X,
+					label?.Y,
+					label?.Width,
+					label?.Color ? label.Color : KDBaseWhite,
+					label?.BackColor,
+					label?.FontSize,
+					label?.Align,
+					label?.zIndex,
+					label?.alpha,
+					label?.border,
+					label?.unique,
+					label?.font
+				)
+			// Draw each rectangle
+			for (var rect of rects)
+				DrawRectKD(
+					rect?.Container,
+					rect?.Map,
+					rect?.id,
+					rect?.Params
+				)
+		},
+		// Sets whether the mimic spoiler is guaranteed
+		// Wanna rework this to keep the bubble chance within RavagerData.Variables
+		MimicExposure: function(exposed) {
+			// Save the setting
+			RavagerData.Variables.ExposeMimics = exposed
+			// Exit early if mimic is disabled
+			if (RavagerGetSetting('ravagerDisableMimic')) {
+				RFDebug("[Ravager Framework][MimicExposure]: Mimic disabled. Nothing to do.")
+				return
+			}
+			RFDebug("[Ravager Framework][MimicExposure]: Setting mimic exposure: " + exposed)
+			// Find the mimic and its bubble event. If exposed, set event chance to 1, otherwise set event chance to the enemy's default
+			KinkyDungeonEnemies.find(enemy =>
+				enemy.addedByMod == "RavagerFramework" &&
+				enemy.name == "MimicRavager" &&
+				enemy.events.some(event =>
+					event.type == "ravagerBubble"
+				)
+			).events.find(event =>
+				event.type == "ravagerBubble"
+			).chance = (exposed ? 1 : RavagerData.Definitions.mimic.events.find(event => event.type == "ravagerBubble").chance)
+		},
+		MimicPassive: function(passive) {
+			// Save the setting
+			RavagerData.Variables.RFControl.PassiveMimics = passive
+			// Early exit if mimic is disabled
+			if (RavagerGetSetting("ravagerDisableMimic")) {
+				RFDebug("[Ravager Framework][MimicPassive]: Mimic disabled. Nothing to do.")
+				return
+			}
+			RFDebug("[Ravager Framework][MimicPassive]: Setting mimic passive to " + passive)
+			// Find the mimic. If passive, set ambushRadius to 0.1, otherwise set to enemy's default
+			KinkyDungeonEnemies.find(enemy =>
+				enemy.addedByMod == "RavagerFramework" &&
+				enemy.name == "MimicRavager"
+			).ambushRadius = (passive ? 0.1 : RavagerData.Definitions.mimic.ambushRadius)
 		},
 		// Custom version of KinkyDungeonGetRestraint so I can have name-based exclusions and per-item weight modifiers
 		// All the same params as KinkyDungeonGetRestraint, but with the addition of:
@@ -754,6 +960,40 @@ window.RavagerData = {
 	},
 	// Variable, general purpose data
 	Variables: {
+		// Tracks the state of mimic exposure
+		ExposeMimics: false,
+		// Runtime user-modifiable values for controlling the placement of a custom button; only in use when developing new buttons
+		TestButton: {
+			Left: 550,
+			Top: 274,
+			Width: 300,
+			Height: 64
+		},
+		// Same as TestButton, but for labels
+		TestLabel: {
+			Container: kdcanvas,
+			Map: kdpixisprites,
+			id: "RFTestingRect",
+			Params: {
+				Left: canvasOffsetX,
+				Top: canvasOffsetY,
+				Width: KinkyDungeonCanvas.width,
+				Height: KinkyDungeonCanvas.height,
+				Color: "#ff4444",
+				LineWidth: 2,
+				zIndex: 10
+			}
+		},
+		// Relating to the ravager control menu
+		RFControl: {
+			Background: "RFControlDark",
+			InGameEnabled: false,
+			WasEnabledInGame: false,
+			PassiveMimics: false,
+			NameFormatDebug: false
+		},
+		DebugWasTurnedOn: false,
+		DebugWasTurnedOff: false,
 		MimicBurstPossibleDress: [ "Leotard", "GreenLeotard", "Bikini", "Lingerie" ]
 	}
 }
@@ -813,7 +1053,175 @@ DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, 
 	// Run and return the original DrawButtonKDEx
 	return RavagerData.functions.DrawButtonKDEx(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options)
 }
-// Checks if the player can see an enemy; just a shortcut for a call to KDCanSeeEnemy, which I anticipate being useful in the future
+// Just here so I can have custom checkbox images in mod config
+DrawCheckboxKDEx = function(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, _CheckImage, options) {
+	// Detect my settings buttons
+	if (KinkyDungeonState == "ModConfig" && ["ravEnableUseCount", "ravUseCountOverride", "ravagerCustomDrop", "ravagerDebug", "ravagerDisableBandit", "ravagerDisableMimic", "ravagerDisableSlimegirl", "ravagerDisableTentaclePit", "ravagerDisableWolfgirl", "ravagerEnableSound", "ravagerSpicyTendril"].includes(name)) {
+		// Call my custom checkbox function for now, as the _CheckImage fix hasn't landed in a release yet
+		DrawCheckboxRFEx(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, "UI/HeartChecked.png", options)
+	} else {
+		// Call original function for all other checkboxes
+		RavagerData.functions.DrawCheckboxKDEx(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, _CheckImage, options)
+	}
+}
+// My own implementation of DrawCheckboxKDEx, as it has (at the time of writing) a bug that makes it impossible to set a custom checked image (https://discord.com/channels/938203644023685181/975621489632116767/1384060387003207721)(Fixed https://github.com/Ada18980/KinkiestDungeon/commit/b7ca59774566aeb123e3320bf0a27a13c9c0b0c7 -- still keeping this as it'll let me set custom defaults)
+window.DrawCheckboxRFEx = function(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, _CheckImage, options) {
+	// Ensure valid checked image; default to mine
+	if (!_CheckImage)
+		_CheckImage = "UI/HeartChecked.png"
+	DrawTextFitKD(
+		Text,
+		Left + 10 + (Width || 64),
+		Top + (Height || 64)/2+1,
+		options?.maxWidth || 1000,
+		// TextColor ? TextColor : KDBaseWhite,
+		enabled ? (TextColor ? TextColor : KDBaseWhite) : "#757575",
+		"#333333",
+		options?.fontSize,
+		"left"
+	)
+	DrawButtonKDEx(
+		name,
+		func,
+		enabled,
+		Left,
+		Top,
+		Width || 64,
+		Height || 64,
+		"",
+		Disabled ? "#ebebe4" : KDBaseWhite,
+		IsChecked ? (KinkyDungeonRootDirectory + _CheckImage) : "",
+		// null,
+		options?.HoveringText,
+		Disabled,
+		undefined,
+		undefined,
+		undefined,
+		undefined,
+		options
+	)
+}
+// Override so I can draw a custom button on the in-game pause menu
+KinkyDungeonDrawGame = function() {
+	// Avoid weirdness with custom draw states -- Leaving RavagerControl (via `KinkyDungeonDrawState = "Restart"`) was putting the game in the Perks2 state
+	if (typeof RavagerData.Variables.DrawState == "string")
+		if (RavagerData.Variables.DrawState == KinkyDungeonDrawState)
+			delete RavagerData.Variables.DrawState
+		else
+			KinkyDungeonDrawState = RavagerData.Variables.DrawState
+	// Call original function
+	const ret = RavagerData.functions.KinkyDungeonDrawGame()
+	// Draw my own button in the in-game pause screen
+	if (
+		KinkyDungeonState == "Game" && // In-game
+		KinkyDungeonDrawState == 'Restart' && // Pause menu
+		TestMode && // Debug enabled at title
+		KDDebugMode && // Debug enabled in pause menu
+		RavagerData.Variables.RFControl.InGameEnabled // Has double headpatted the character
+	) {
+		DrawButtonKDEx(
+			'ravagerControl',
+			() => {
+				RavagerData.Variables.PrevState = KinkyDungeonState
+				RavagerData.Variables.PrevDrawState = KinkyDungeonDrawState
+				KinkyDungeonState = "RavagerControl"
+			},
+			true,
+			1650,
+			830,
+			300,
+			64,
+			'Ravager Hacking',
+			'#f6f',
+			"",
+			undefined,
+			false,
+			false,
+			'#303'
+		)
+	}
+	// Return whatever the original function returned, just in case KinkyDungeonDrawGame ever returns anything
+	return ret
+}
+// Override so I can draw a custom button on the title screen, as well as handling my custom menu
+KinkyDungeonRun = function() {
+	// Avoid same weirdness as custom KinkyDungeonDrawGame
+	if (typeof RavagerData.Variables.State == "string")
+		if (RavagerData.Variables.State == KinkyDungeonState)
+			delete RavagerData.Variables.State
+		else
+			KinkyDungeonState = RavagerData.Variables.State
+	// Run the original KinkyDungeonRun
+	const ret = RavagerData.functions.KinkyDungeonRun()
+	// Draw ravager control button on title screen; only when debug mode has been enabled, disabled, enabled again, and is currently enabled
+	if (
+		KinkyDungeonState == "Menu" &&
+		RavagerData.Variables.DebugWasTurnedOn &&
+		RavagerData.Variables.DebugWasTurnedOff &&
+		TestMode
+	) {
+		DrawButtonKDEx(
+			'ravagerControl',
+			() => {
+				RavagerData.Variables.PrevState = KinkyDungeonState
+				RavagerData.Variables.PrevDrawState = KinkyDungeonDrawState
+				KinkyDungeonState = "RavagerControl"
+			},
+			true,
+			525,
+			926,
+			300,
+			64,
+			'Ravager Hacking',
+			'#f6f',
+			"",
+			undefined,
+			false,
+			false,
+			'#303'
+		)
+	} else if (KinkyDungeonState == "RavagerControl") {
+		// In the ravager control menu, functionality moved to external function because it feels better to me
+		RavagerData.functions.RFControlRun()
+	}
+	// Detect enabling, disabling, then enabling debug mode for enabling ravager control button
+	if (TestMode) {
+		// Track first enable of debug mode
+		if (!RavagerData.Variables.DebugWasTurnedOn)
+			RavagerData.Variables.DebugWasTurnedOn = true
+	} else {
+		// Track first disable of debug mode
+		if (RavagerData.Variables.DebugWasTurnedOn && !RavagerData.Variables.DebugWasTurnedOff)
+			RavagerData.Variables.DebugWasTurnedOff = true
+	}
+	// Return the result of original KinkyDungeonRun incase it ever returns anything
+	return ret
+}
+// Override so I can detect headpatting the character in the pause menu
+// Seems this needs to be extended if I want to have click sounds for the ravager control menu, as this function's return value is the decider on whether to play the sound or not
+// Either this function needs to check for clicks on all my custom buttons, or my custom buttons need to be able to set a flag that will get combined with the return value
+// Although, the in-game pause menu seems to have click sounds regardless of if you click on a button or the background, so a catch for KinkyDungeonState == "RavagerControl" could do
+KinkyDungeonHandleClick = function(event) {
+	let ret = RavagerData.functions.KinkyDungeonHandleClick(event);
+	// Catch headpatting the character preview while in the in-game pause menu to toggle ravager control
+	if (
+		KinkyDungeonState == "Game" && // In-game
+		KinkyDungeonDrawState == "Restart" && // Pause menu
+		TestMode && // Debug mode enabled at title screen
+		KDDebugMode && // Debug mode enabled in pause menu
+		MouseIn(144.422, 86.7996, 133.68, 41.775) // Headpat character
+	) {
+		// Gotta headpat twice to enable ravager control
+		if (RavagerData.Variables.RFControl.WasEnabledInGame)
+			RavagerData.Variables.RFControl.InGameEnabled = !RavagerData.Variables.RFControl.InGameEnabled
+		else
+			RavagerData.Variables.RFControl.WasEnabledInGame = true
+		// Set ret so it'll play a sound
+		ret = true
+	}
+	//
+	return ret
+}
 // Checks if the player can see an enemy; just an overgrown shortcut for a call to KDCanSeeEnemy, which I anticipate being useful in the future
 window.RFPlayerCanSeeEnemy = function(entity) {
 	let canSee = undefined
