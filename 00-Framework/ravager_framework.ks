@@ -440,6 +440,7 @@ window.RavagerData = {
 		// Vanilla game function backups
 		DrawButtonKDEx: DrawButtonKDEx,
 		KinkyDungeonDrawEnemiesHP: KinkyDungeonDrawEnemiesHP,
+		KDDropItems: KDDropItems,
 		// Format strings used throughout the framework. Handles enemy, restraint, and clothing names, as well as damage strings
 		// Most, if not all, of my narration strings pass through this. We could simplify making varying dialogue by adding a 'choose a random option for this section of the string' functionality. Example: "EnemyName does (option1|option2) to you", where (option1|option2) is two options that will be randomly chosen from. See MimicRavager's ravaging narration for example of dialogue that could be greatly simplified by this addition. --- GOT IT! Fuck that was annoying; handles recursive choices fine (example: "{s{T{R|r}E|tre}tching|swelling}" to be one of "swelling", "stretching", "sTREtching", or "sTrEtching"), and seemingly handles a "|" outside of curly brackets
 		NameFormat: function(string, entity, restraint, clothing, damage, skipCapitalize) {
@@ -549,6 +550,59 @@ window.RavagerData = {
 			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Final string: "' + string + '"')
 			return string
 		},
+		// Custom version of KinkyDungeonGetRestraint so I can have name-based exclusions and per-item weight modifiers
+		// All the same params as KinkyDungeonGetRestraint, but with the addition of:
+		//   - `exclude` as an array of strings that are restraint names, which should not be chosen
+		//   - `weightMods` as a dictionary with the keys being restraint names and the values being a number to multiply that restraint's weight by
+		// Also want to add some weight modifiers
+		GetRandomRestraint: function(enemy, Level, Index, exclude, weightMods, Bypass, Lock, RequireWill, LeashingOnly, NoStack, extraTags, agnostic, filter, securityEnemy, curse, useAugmented, augmentedInventory, options) {
+			RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Starting RFGetRestraint(enemy: ", enemy, "; Level: ", Level, "; Index: ", Index, "; exclude: ", exclude, "; weightMods: ", weightMods, "; Bypass: ", Bypass, "; Lock: ", Lock, "; RequireWill: ", RequireWill, "; LeashingOnly: ", LeashingOnly, "; NoStack: ", NoStack, "; extraTags: ", extraTags, "; agnostic: ", agnostic, "; filter: ", filter, "; securityEnemy: ", securityEnemy, "; curse: ", curse, "; useAugmented: ", useAugmented, "; augmentedInventory: ", augmentedInventory, "; options: ", options)
+			// Starting weight stuff
+			let restraintWeightTotal = 0;
+			let restraintWeights = [];
+			// Get restraints
+			let Restraints = KDGetRestraintsEligible(enemy, Level, Index, Bypass, Lock, RequireWill, LeashingOnly, NoStack, extraTags, agnostic, filter, securityEnemy, curse, undefined, undefined, useAugmented, augmentedInventory, options);
+			// console.warn('[Ravager Framework][RFGetRestraint] Restraints: ', Restraints)
+			RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Eligible restraints: ", Restraints)
+			for (let rest of Restraints) {
+				let restraint = rest.restraint;
+				RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Processing restraint ${restraint.name}: `, rest)
+				// Skip restraints in exclude
+				if (exclude && exclude.includes(restraint.name)) {
+					// console.warn('is in excludes: ', restraint.name)
+					RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Skipping excluded restraint")
+					continue
+				}
+				// console.log('did not continue: ', restraint.name)
+				let weight = rest.weight;
+				RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Base weight: ", weight)
+				if (weightMods && Object.keys(weightMods).includes(restraint.name) && typeof weightMods[restraint.name] == "number") {
+					// console.warn('changing modifier for ' + restraint.name + ': ' + weight + ' X' + weightMods[restraint.name])
+					weight = weight * weightMods[restraint.name]
+					RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Modifying weight of ${restraint.name} (X${weightMods[restraint.name]}); New weight: ${weight}`)
+					// console.warn('new weight: ' + weight)
+				}
+				restraintWeights.push({restraint: restraint, weight: restraintWeightTotal, inventoryVariant: rest.inventoryVariant});
+				// weight += rest.weight;
+				restraintWeightTotal += Math.max(0, weight);
+			}
+			// console.warn(`[Ravager Framework][RFGetRestraint] restraintWeightTotal: ${restraintWeightTotal}; restraintWeights: `, restraintWeights)
+
+			let selection = KDRandom() * restraintWeightTotal;
+			RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Restraint weight total: ${restraintWeightTotal}; Restraints: `, restraintWeights, `; Selection: ${selection}`)
+
+			// console.warn('[Ravager Framework][RFGetRestraint] Selection: ', selection)
+
+			for (let L = restraintWeights.length - 1; L >= 0; L--) {
+				if (selection > restraintWeights[L].weight) {
+					// console.warn(`[Ravager Framework][RFGetRestraint]: Decided restraint; L: ${L}; Returning: `, restraintWeights[L])
+					RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Decided restraint. L: ${L}; `, restraintWeights[L])
+					return restraintWeights[L].restraint;
+				}
+			}
+			// console.warn('[Ravager Framework][RFGetRestraint] End RFGetRestraint')
+			RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Looks like there's no restraints left to return. End of RFGetRestraint.")
+		}
 	},
 	// Currently just used for the MimicRavager spoiler
 	conditions: {
@@ -679,8 +733,75 @@ window.RavagerData = {
 			refvar: 'ravUseCountOverride',
 			default: false,
 			block: undefined
+		},
+		{
+			type: "boolean",
+			refvar: "ravagerCustomDrop",
+			default: true,
+			block: undefined
+		},
+		{
+			type: "boolean",
+			refvar: "ravagerEnableNudeOutfit",
+			default: false,
+			block: undefined
 		}
-	]
+	],
+	// Stores enemy definitions
+	Definitions: {
+		Enemies: {},
+		Spells: {}
+	},
+	// Variable, general purpose data
+	Variables: {
+		MimicBurstPossibleDress: [ "Leotard", "GreenLeotard", "Bikini", "Lingerie" ]
+	}
+}
+// Shortcut to custom GetRestraint
+window.RFGetRestraint = RavagerData.functions.GetRandomRestraint
+// Overriding item drops so I can have multiple drops from enemies
+KDDropItems = function(enemy, mapData) {
+	if (RavagerGetSetting("ravagerCustomDrop") && (enemy.Enemy.addedByMod == "RavagerFramework" || enemy.Enemy.ravagerCustomDrop) && enemy.Enemy.maxDrops) {
+		RFTrace(`[Ravager Framework][DBG][KDDropItems]: Dropping items for enemy: ${enemy.Enemy.name}(${enemy.x}, ${enemy.y}): `, enemy)
+		// Multiple drops for enemies that have a maxDrops value, are either added by me or want multiple drops via truthy ravagerCustomDrop, and when custom drop setting is enabled
+		if (!enemy.noDrop && (enemy.playerdmg || !enemy.summoned) && !enemy.droppedItems) {
+			// Set drop count to max
+			let dropCount = enemy.Enemy.maxDrops
+			RFTrace("[Ravager Framework][DBG][KDDropItems]: Drop count initialized to maxDrops: " + dropCount)
+			// If there's a minDrops, pick a random number between min and max (inclusive)
+			if (typeof enemy.Enemy.minDrops == "number") {
+				dropCount = Math.floor(Math.random() * (dropCount - enemy.Enemy.minDrops + 1)) + enemy.Enemy.minDrops
+			} else {
+				dropCount = Math.floor(Math.random() * dropCount) + 1
+			}
+			RFTrace("[Ravager Framework][DBG][KDDropItems]: Drop count changed to " + dropCount)
+			//
+			let dropped = []
+			let dropTable = structuredClone(enemy.Enemy.dropTable)
+			// Loop the drop call until we reach drop count
+			for (let i = 0; i < dropCount; i++) {
+				if (dropTable.length == 0) {
+					RFTrace(`[Ravager Framework][DBG][KDDropItems]: Ran out of items in drop table on loop count ${i} for enemy ${enemy.Enemy.name}(${enemy.x}, ${enemy.y})`)
+					break
+				}
+				let item = KinkyDungeonItemDrop(enemy.x, enemy.y, dropTable, enemy.summoned)
+				if (!item)
+					RFTrace(`[Ravager Framework][DBG][KDDropItems]: KinkyDungeonItemDrop chose not to drop an item on loop count ${i} for enemy ${enemy.Enemy.name}(${enemy.x}, ${enemy.y})`)
+				else {
+					dropped.push(item)
+					RFTrace(`[Ravager Framework][DBG][KDDropItems]: KinkyDungeonItemDrop dropped ${item.name} ` + (item.amount ? `(x${item.amount})` : "") + `(${item.x}, ${item.y}) for enemy ${enemy.Enemy.name}(${enemy.x}, ${enemy.y})`, item)
+					let removed = dropTable.splice(dropTable.findIndex(v => v.name == item.name), 1)
+					RFTrace(`[Ravager Framework][DBG][KDDropItems]: Removed ${removed[0].name} from drop table.`, removed)
+				}
+			}
+			RFTrace(`[Ravager Framework][DBG][KDDropItems]: All items dropped for enemy ${enemy.Enemy.name}(${enemy.x}, ${enemy.y}): `, dropped)
+			// The call we need to change in order to get multiple items
+			//
+			enemy.droppedItems = enemy.droppedItems || Boolean(dropped.length)
+			RFTrace(`[Ravager Framework][DBG][KDDropItems]: Has enemy ${enemy.Enemy.name}(${enemy.x}, ${enemy.y}) dropped items? ` + enemy.droppedItems)
+		}
+	}
+	return RavagerData.functions.KDDropItems(enemy, mapData)
 }
 // Just here so I can have a cool custom colored button in mod config
 DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options) {
@@ -693,11 +814,18 @@ DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, 
 	return RavagerData.functions.DrawButtonKDEx(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options)
 }
 // Checks if the player can see an enemy; just a shortcut for a call to KDCanSeeEnemy, which I anticipate being useful in the future
+// Checks if the player can see an enemy; just an overgrown shortcut for a call to KDCanSeeEnemy, which I anticipate being useful in the future
 window.RFPlayerCanSeeEnemy = function(entity) {
-	const xDist = Math.abs(entity.x - KinkyDungeonPlayerEntity.x)
-	const yDist = Math.abs(entity.y - KinkyDungeonPlayerEntity.y)
-	const largestDist = Math.max(xDist, yDist)
-	return KDCanSeeEnemy(entity, largestDist)
+	let canSee = undefined
+	try {
+		canSee = KDCanSeeEnemy(entity)
+	} catch (error) {
+		RFDebug('[Ravager Framework][RFPlayerCanSeeEnemy] Caught error while trying calling KDCanSeeEnemy. Trying again with player distance. Error: ', error)
+		// KDistChebyshev(xDist, yDist) is basically just shorthand for Math.max(Math.abs(xDist), Math.abs(yDist))
+		canSee = KDCanSeeEnemy(entity, KDistChebyshev(KinkyDungeonPlayerEntity.x - entity.x, KinkyDungeonPlayerEntity.y - entity.y), true)
+	}
+	const visiblilty = KinkyDungeonVisionGet(entity.x, entity.y)
+	return canSee && (visiblilty > 0)
 }
 // Shortcut to getting ravager debug
 window.RFDebugEnabled = function() {
@@ -706,7 +834,7 @@ window.RFDebugEnabled = function() {
 // Currently just used for the mimic spoiler, but there's other ideas of how this can be used, so I've attempted to generalize it
 KinkyDungeonDrawEnemiesHP = function(delta, canvasOffsetX, canvasOffsetY, CamX, CamY, _CamXoffset, _CamYoffset) {
 	// Firstly, call the original function; we'll probably have some bailing happening later
-	RavagerData.functions.KinkyDungeonDrawEnemiesHP(delta, canvasOffsetX, canvasOffsetY, CamX, CamY, _CamXoffset, _CamYoffset)
+	const ret = RavagerData.functions.KinkyDungeonDrawEnemiesHP(delta, canvasOffsetX, canvasOffsetY, CamX, CamY, _CamXoffset, _CamYoffset)
 	// Get all enemies
 	const nearby = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, KDGameData.MaxVisionDist + 1, undefined, true)
 	// Loop enemies
@@ -752,6 +880,8 @@ KinkyDungeonDrawEnemiesHP = function(delta, canvasOffsetX, canvasOffsetY, CamX, 
 			}
 		}
 	}
+	//
+	return ret
 }
 // Conditions helper
 window.RavagerFrameworkAddCondition = function(key, func) {
@@ -813,6 +943,7 @@ function ravagerSettingsRefresh(reason) {
 	ravagerFrameworkApplySomeSpice(reason)
 	ravagerFrameworkApplySlimeRestrictChance(reason)
 	ravagerFrameworkSetupSound(reason)
+	refreshRavagerDataVariables(reason)
 	console.log('[Ravager Framework] Finished running settings functions')
 }
 // Change slime girl's chance to add slime to the player
@@ -1022,6 +1153,17 @@ function ravagerFrameworkSetupSound(reason) {
 	}
 }
 
+function refreshRavagerDataVariables(reason) {
+	RFDebug("[Ravager Framework][refreshRavagerDataVariables]: Refreshing variables for reason: ", reason)
+	if (RavagerGetSetting("ravagerEnableNudeOutfit")) {
+		if (!RavagerData.Variables.MimicBurstPossibleDress.includes("Nude"))
+			RavagerData.Variables.MimicBurstPossibleDress.push("Nude")
+	} else {
+		if (RavagerData.Variables.MimicBurstPossibleDress.includes("Nude"))
+			RavagerData.Variables.MimicBurstPossibleDress.splice(RavagerData.Variables.MimicBurstPossibleDress.findIndex(v => v == "Nude"), 1)
+	}
+}
+
 addTextKey('KDModButtonRavagerFramework', 'Ravager Framework')
 addTextKey('KDModButtonravagerDebug', 'Enable Debug Messages')
 addTextKey('KDModButtonravagerDisableBandit', 'Disable Bandit Ravager')
@@ -1038,6 +1180,8 @@ addTextKey('KDModButtonravEnableUseCount', 'Enable Experience Aware Mode')
 addTextKey('KDModButtonravUseCountMode', 'Exp Aware Mode')
 addTextKey('KDModButtonravUseCountModeChance', 'Exp Aware Chance')
 addTextKey('KDModButtonravUseCountOverride', 'Override Exp Aware Mode')
+addTextKey("KDModButtonravagerCustomDrop", "Enable multi-item drops")
+addTextKey("KDModButtonravagerEnableNudeOutfit", "Enable full nude")
 if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 	KDEventMapGeneric['afterModSettingsLoad']['RavagerFramework'] = (e, data) => {
 		let dbg = KDModSettings['RavagerFramework'] && KDModSettings['RavagerFramework'].ravagerDebug;
@@ -2039,6 +2183,8 @@ function ravRandom(array) {
 	if (array.length === 0) {
 	  return undefined; 
 	}
+	if (array.length === 1)
+		array[0]
 	const randomIndex = Math.floor(Math.random() * array.length);
 	return array[randomIndex];
 }
