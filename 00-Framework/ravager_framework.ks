@@ -332,6 +332,18 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 	}
 	return true
 }
+// Hopeful fallback incase function signatures change
+window.RavagerFrameworkRevertFunctions = function() {
+	const functions = [ 'DrawButtonKDEx', 'KinkyDungeonDrawEnemiesHP', 'KinkyDungeonDrawGame', 'KinkyDungeonRun', 'KinkyDungeonHandleClick', 'KDDropItems', 'DrawCheckboxKDEx' ]
+	for (let f of functions) {
+		console.log(`Reverting ${f} ...`)
+		window[f] = RavagerData.functions[f]
+	}
+	KinkyDungeonState = RavagerData.Variables.PrevState
+	KinkyDungeonState = RavagerData.Variables.PrevState
+	KinkyDungeonDrawState = RavagerData.Variables.PrevDrawState
+	KinkyDungeonDrawState = RavagerData.Variables.PrevDrawState
+}
 // Function to get a mod setting value
 // If settings are undefined, it'll return the default value given to KDModConfigs
 // If there is not matching value given to KDModConfigs, it'll return undefined
@@ -574,6 +586,16 @@ window.RavagerData = {
 					Width: 300,
 					Height: 64,
 					Label: "Return"
+				},
+				{
+					name: "RFControlRevertFunctions",
+					func: () => { RavagerFrameworkRevertFunctions() },
+					enabled: true,
+					Left: 550,
+					Top: 496,
+					Width: 300,
+					Height: 64,
+					Label: "Revert functions"
 				}
 			]
 			// All the checkboxes we'll draw
