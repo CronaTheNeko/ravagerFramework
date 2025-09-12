@@ -854,6 +854,7 @@ window.RavagerData = {
 			refvar: 'ravagerDebug',
 			default: false,
 			block: undefined,
+			hoverDesc: "Print verbose messages to the browser console",
 			textKeyVal: "Enable Debug Messages"
 		},
 		ravagerDisableBandit: {
@@ -901,6 +902,7 @@ window.RavagerData = {
 			refvar: 'ravagerSpicyTendril',
 			default: false,
 			block: undefined,
+			hoverDesc: "Enables some more questionable dialogue for the ravagers that may not be for everyone",
 			textKeyVal: "Spicy Ravager Dialogue"
 		},
 		ravagerSlimeAddChance: {
@@ -912,6 +914,7 @@ window.RavagerData = {
 			rangehigh: 1,
 			stepcount: 0.01,
 			block: undefined,
+			hoverDesc: "The chance of the slime girl to add slime to you. Setting this too high would cause significant difficulty, as this chance is rolled on every attack, including during ravaging.",
 			textKeyVal: "Slimegirl Restrict Chance"
 		},
 		ravagerEnableSound: {
@@ -919,6 +922,7 @@ window.RavagerData = {
 			refvar: 'ravagerEnableSound',
 			default: true,
 			block: undefined,
+			hoverDesc: "Enable moans when getting hit and orgasming. Note: This will have no effect if the Girl Sound mod is loaded.",
 			textKeyVal: "Enable Sounds"
 		},
 		onHitChance: {
@@ -930,6 +934,7 @@ window.RavagerData = {
 			rangehigh: 1,
 			stepcount: 0.05,
 			block: undefined,
+			hoverDesc: "The chance to moan when getting hit.",
 			textKeyVal: "Moan Chance"
 		},
 		ravagerSoundVolume: {
@@ -941,6 +946,7 @@ window.RavagerData = {
 			rangehigh: 2,
 			stepcount: 0.05,
 			block: undefined,
+			hoverDesc: "The volume of moans",
 			textKeyVal: "Moan Volume"
 		},
 		ravEnableUseCount: {
@@ -948,6 +954,7 @@ window.RavagerData = {
 			refvar: 'ravEnableUseCount',
 			default: true,
 			block: undefined,
+			hoverDesc: "Enable special dialogue based on how many times you've been ravaged before.",
 			textKeyVal: "Enable Experience Aware Mode"
 		},
 		ravUseCountMode: {
@@ -957,6 +964,7 @@ window.RavagerData = {
 			options: [ 'Any', 'Sometimes', 'Always' ],
 			default: 'Any',
 			block: undefined,
+			hoverDesc: "Should experience aware dialogue be used sometimes, always, or do you not have a preference? Can be overridden by a ravager wanting a specific mode.",
 			textKeyVal: "Exp Aware Mode"
 		},
 		ravUseCountModeChance: {
@@ -968,6 +976,7 @@ window.RavagerData = {
 			rangehigh: 1,
 			stepcount: 0.05,
 			block: undefined,
+			hoverDesc: "Chance to use experience aware dialogue.",
 			textKeyVal: "Exp Aware Chance"
 		},
 		ravUseCountOverride: {
@@ -975,6 +984,7 @@ window.RavagerData = {
 			refvar: 'ravUseCountOverride',
 			default: false,
 			block: undefined,
+			hoverDesc: "Overrides ravagers wanting a specific experience aware mode. With this enabled, all ravagers will follow your Exp Aware Mode setting. Note: None of the framework's ravagers prefer one mode or the other, so this setting only matters if you're using an external ravager mod that has ravagers that do have a preference.",
 			textKeyVal: "Override Exp Aware Mode"
 		},
 		ravagerCustomDrop: {
@@ -982,6 +992,7 @@ window.RavagerData = {
 			refvar: "ravagerCustomDrop",
 			default: true,
 			block: undefined,
+			hoverDesc: "Allow ravagers to use custom item drop behaviors, which enables dropping random quantaties of multiple items. If enemies stop dropping items, try disabling this, as it may have broken due to a game update.",
 			textKeyVal: "Enable Multi-item Drops"
 		},
 		ravagerEnableNudeOutfit: {
@@ -989,13 +1000,30 @@ window.RavagerData = {
 			refvar: "ravagerEnableNudeOutfit",
 			default: false,
 			block: undefined,
+			hoverDesc: 'Allow ravagers to fully strip you when passing out, instead of leaving you minimally clothed.',
 			textKeyVal: "Enable Full Nude"
+		},
+		ravagerFancyFont: {
+			type: "boolean",
+			refvar: "ravagerFancyFont",
+			default: false,
+			hoverDesc: "Who doesn't like a fancy font in their help messages?",
+			textKeyVal: "Custom font for help"
 		},
 	},
 	// Stores enemy definitions
 	Definitions: {
 		Enemies: {},
-		Spells: {}
+		Spells: {},
+		Fonts: {
+			"Once Upon A Time Italic": {
+				alias: "Once Upon A Time Italic",
+				src: "Game/Fonts/once_upon_a_time/Once upon a time-Italic.otf",
+				mono: false,
+				width: 1
+			}
+		},
+		FontFaces: {}
 	},
 	// Variable, general purpose data
 	Variables: {
@@ -1021,6 +1049,18 @@ window.RavagerData = {
 				Color: "#ff4444",
 				LineWidth: 2,
 				zIndex: 10
+			}
+		},
+		ModConfig: {
+			BoxData: {},
+			Desc: {
+				FontSize: 34,
+				Font: "Once Upon A Time Italic"
+			},
+			Box: {
+				PadV: 25,
+				PadH: 10,
+				XOffset: 68,
 			}
 		},
 		// Relating to the ravager control menu
@@ -1089,6 +1129,20 @@ DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, 
 		if (name == "Ravager Framework") {
 			Color = "#ff66ff"
 			FillColor = "#330033"
+		} else if (KDModToggleTab == "RavagerFramework") {
+			let possibleNewName = name.replace(/ModRangeButton[L|R]?/, "")
+			if (RavagerData.ModConfig[possibleNewName] && RavagerData.ModConfig[possibleNewName].hoverDesc && !RavagerData.Variables.ModConfig.BoxData[possibleNewName]) {
+				RavagerData.Variables.ModConfig.BoxData[possibleNewName] = {
+					name: possibleNewName,
+					Left: Left,
+					Top: Top,
+					Width: RavagerData.ModConfig[possibleNewName].type.match(/list|range/) ? 500 : Width,
+					Height: Height,
+					Text: TextGetKD(`KDModButton${possibleNewName}`),
+					hoverDesc: RavagerData.ModConfig[possibleNewName].hoverDesc,
+					modPage: KDModPage
+				}
+			}
 		// } else if (["ravEnableUseCount", "ravUseCountOverride", "ravagerCustomDrop", "ravagerDebug", "ravagerDisableBandit", "ravagerDisableMimic", "ravagerDisableSlimegirl", "ravagerDisableTentaclePit", "ravagerDisableWolfgirl", "ravagerEnableSound", "ravagerSpicyTendril"].includes(name)) {
 
 		}
@@ -1226,6 +1280,80 @@ KinkyDungeonRun = function() {
 	} else if (KinkyDungeonState == "RavagerControl") {
 		// In the ravager control menu, functionality moved to external function because it feels better to me
 		RavagerData.functions.RFControlRun()
+	} else if (KinkyDungeonState == "ModConfig" && KDModToggleTab == "RavagerFramework") {
+		let modConfig = RavagerData.Variables.ModConfig
+		for (let data in modConfig.BoxData) {
+			let o = modConfig.BoxData[data]
+			if (o.modPage != KDModPage)
+				continue
+			if (MouseIn(o.Left, o.Top, o.Width, o.Height)) {
+				let mult = KDGetFontMult()
+				let descSettings = modConfig.Desc
+				let boxSettings = modConfig.Box
+				let textSplit = KinkyDungeonWordWrap(o.hoverDesc, 20 * mult, 40 * mult).split("\n")
+				let bPadV = boxSettings.PadV
+				// Figure out the box size based on the number of description lines and all the padding needed
+				let bHeight = (bPadV * 4) + ((descSettings.FontSize + 5) * (textSplit.length - 1))
+				let bWidth = 750
+				let bLeft = (
+					o.Left + boxSettings.XOffset + bWidth < CanvasWidth ?
+					o.Left + boxSettings.XOffset :
+					o.Left - boxSettings.PadH - bWidth
+				)
+				let bTop = (
+					o.Top + bHeight < CanvasHeight - 50 ?
+					o.Top :
+					CanvasHeight - bHeight - 50
+				)
+				let bZIndex = 159
+				let bPadH = boxSettings.PadH
+				FillRectKD(
+					kdcanvas,
+					kdpixisprites,
+					'RFModConfigHover_' + o.name,
+					{
+						Left: bLeft,
+						Top: bTop,
+						Width: bWidth,
+						Height: bHeight,
+						Color: "#200020",
+						zIndex: bZIndex,
+						alpha: 0.85
+					}
+				);
+				DrawTextFitKD(
+					o.Text,
+					bLeft + bPadH,
+					bTop + bPadV,
+					bWidth - bPadH * 2,
+					"#efefef",
+					"#000",
+					38,
+					"left",
+					bZIndex + 1,
+					undefined,
+					undefined,
+					undefined,
+					descSettings.Font
+				);
+				for (let n = 0; n < textSplit.length; n++)
+					DrawTextFitKD(
+						textSplit[n],
+						bLeft + bPadH,
+						bTop + bPadV * 3 + n * (descSettings.FontSize + 5),
+						bWidth - bPadH * 2,
+						"#efefef",
+						"#000",
+						descSettings.FontSize,
+						"left",
+						bZIndex + 1,
+						undefined,
+						undefined,
+						undefined,
+						descSettings.Font
+					)
+			}
+		}
 	}
 	// Detect enabling, disabling, then enabling debug mode for enabling ravager control button
 	if (TestMode) {
@@ -1386,6 +1514,31 @@ KDEventMapEnemy['tick']['ravagerBubble'] = (e, entity, data) => {
 	}
 }
 
+// Load or unload custom font
+function RavagerFrameworkRefreshFonts(reason) {
+	for (let font_data in RavagerData.Definitions.Fonts) {
+		let font = structuredClone(RavagerData.Definitions.Fonts[font_data])
+		// If the font isn't already loaded, create a new FontFace object and store it globally, as we need to use the same object to unload a font we previously loaded
+		if (!RavagerData.Definitions.FontFaces.hasOwnProperty(font.alias)) {
+			font.src = KDModFiles[font.src]
+			RavagerData.Definitions.FontFaces[font.alias] = new FontFace(font.alias, `url(${font.src})`)
+		}
+		let font_face = RavagerData.Definitions.FontFaces[font.alias]
+		if (RavagerGetSetting("ravagerFancyFont")) {
+			// Loads the font
+			if (!document.fonts.has(font_face)) {
+				document.fonts.add(font_face)
+				font_face.load().then(() => { console.log(`[Ravager Framework] Loaded font "${font.alias}"`) })
+			}
+		} else {
+			// Unloads the font
+			if (document.fonts.has(font_face)) {
+				document.fonts.delete(font_face)
+				console.log(`[Ravager Framework] Removed font "${font.alias}"`)
+			}
+		}
+	}
+}
 // Base settings function, simplifying reloading settings
 function ravagerSettingsRefresh(reason) {
 	console.log('[Ravager Framework] Running settings functions for reason: ' + reason)
@@ -1395,6 +1548,7 @@ function ravagerSettingsRefresh(reason) {
 	ravagerFrameworkApplySlimeRestrictChance(reason)
 	ravagerFrameworkSetupSound(reason)
 	refreshRavagerDataVariables(reason)
+	RavagerFrameworkRefreshFonts(reason)
 	console.log('[Ravager Framework] Finished running settings functions')
 }
 // Change slime girl's chance to add slime to the player
