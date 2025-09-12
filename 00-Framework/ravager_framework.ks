@@ -350,7 +350,7 @@ window.RavagerFrameworkRevertFunctions = function() {
 window.RavagerGetSetting = function(refvar) {
 	// Mod settings and default config objects
 	const settings = KDModSettings.RavagerFramework
-	var config = RavagerData.ModConfig.find((val) => { if (val.refvar == refvar) return true; })
+	var config = RavagerData.ModConfig[refvar]
 	// Helper for getting default value
 	function RFConfigDefault(refvar, config) {
 		// Check for missing default values; signals either a data structure change or (dev) failure to declare default values
@@ -848,105 +848,118 @@ window.RavagerData = {
 		fallbackNarration: "EnemyCName roughly gropes you! (DamageTaken)",
 	},
 	// Default mod settings values
-	ModConfig: [
-		{
+	ModConfig: {
+		ravagerDebug: {
 			type: 'boolean',
 			refvar: 'ravagerDebug',
 			default: false,
-			block: undefined
+			block: undefined,
+			textKeyVal: "Enable Debug Messages"
 		},
-		{
+		ravagerDisableBandit: {
 			// name: 'Disable Bandit Ravager',
 			type: 'boolean',
 			refvar: 'ravagerDisableBandit',
 			default: false,
-			block: undefined
+			block: undefined,
+			textKeyVal: "Disable Bandit Ravager"
 		},
-		{
+		ravagerDisableWolfgirl: {
 			// name: 'Disable Wolfgirl Ravager',
 			type: 'boolean',
 			refvar: 'ravagerDisableWolfgirl',
 			default: false,
-			block: undefined
+			block: undefined,
+			textKeyVal: "Disable Wolfgirl Ravager"
 		},
-		{
+		ravagerDisableSlimegirl: {
 			// name: 'Disable Slimegirl Ravager',
 			type: 'boolean',
 			refvar: 'ravagerDisableSlimegirl',
 			default: false,
-			block: undefined
+			block: undefined,
+			textKeyVal: "Disable Silmegirl Ravager"
 		},
-		{
+		ravagerDisableTentaclePit: {
 			// name: 'Disable Tentacle Pit',
 			type: 'boolean',
 			refvar: 'ravagerDisableTentaclePit',
 			default: false,
-			block: undefined
+			block: undefined,
+			textKeyVal: "Disable Tentacle Pit"
 		},
-		{
+		ravagerDisableMimic: {
 			type: 'boolean',
 			refvar: 'ravagerDisableMimic',
 			default: false,
-			block: undefined
+			block: undefined,
+			textKeyVal: "Disable Mimic Ravager"
 		},
-		{
+		ravagerSpicyTendril: {
 			// name: 'Spicy Ravager Tendril Dialogue',
 			type: 'boolean',
 			refvar: 'ravagerSpicyTendril',
 			default: false,
-			block: undefined
+			block: undefined,
+			textKeyVal: "Spicy Ravager Dialogue"
 		},
-		{
+		ravagerSlimeAddChance: {
 			type: 'range',
-			name: 'Slimegirl Restrict Chance', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
+			name: 'ravagerSlimeAddChance', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
 			refvar: 'ravagerSlimeAddChance',
 			default: 0.05,
 			rangelow: 0,
 			rangehigh: 1,
 			stepcount: 0.01,
-			block: undefined
+			block: undefined,
+			textKeyVal: "Slimegirl Restrict Chance"
 		},
-		{
+		ravagerEnableSound: {
 			type: 'boolean',
 			refvar: 'ravagerEnableSound',
 			default: true,
-			block: undefined
+			block: undefined,
+			textKeyVal: "Enable Sounds"
 		},
-		{
+		onHitChance: {
 			type: 'range',
-			name: 'Hit Sound Chance', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
+			name: 'onHitChance', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
 			refvar: 'onHitChance',
 			default: 0.3,
 			rangelow: 0,
 			rangehigh: 1,
 			stepcount: 0.05,
-			block: undefined
+			block: undefined,
+			textKeyVal: "Moan Chance"
 		},
-		{
+		ravagerSoundVolume: {
 			type: 'range',
-			name: 'Sound Effect Volume', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
+			name: 'ravagerSoundVolume', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
 			refvar: 'ravagerSoundVolume',
 			default: 1,
 			rangelow: 0,
 			rangehigh: 2,
 			stepcount: 0.05,
-			block: undefined
+			block: undefined,
+			textKeyVal: "Moan Volume"
 		},
-		{
+		ravEnableUseCount: {
 			type: 'boolean',
 			refvar: 'ravEnableUseCount',
 			default: true,
-			block: undefined
+			block: undefined,
+			textKeyVal: "Enable Experience Aware Mode"
 		},
-		{
+		ravUseCountMode: {
 			type: 'list',
 			name: 'ravUseCountMode', // Needed for proper declaration of the left and right selection buttons
 			refvar: 'ravUseCountMode',
 			options: [ 'Any', 'Sometimes', 'Always' ],
 			default: 'Any',
-			block: undefined
+			block: undefined,
+			textKeyVal: "Exp Aware Mode"
 		},
-		{
+		ravUseCountModeChance: {
 			type: 'range',
 			name: 'ravUseCountModeChance',
 			refvar: 'ravUseCountModeChance',
@@ -954,27 +967,31 @@ window.RavagerData = {
 			rangelow: 0,
 			rangehigh: 1,
 			stepcount: 0.05,
-			block: undefined
+			block: undefined,
+			textKeyVal: "Exp Aware Chance"
 		},
-		{
+		ravUseCountOverride: {
 			type: 'boolean',
 			refvar: 'ravUseCountOverride',
 			default: false,
-			block: undefined
+			block: undefined,
+			textKeyVal: "Override Exp Aware Mode"
 		},
-		{
+		ravagerCustomDrop: {
 			type: "boolean",
 			refvar: "ravagerCustomDrop",
 			default: true,
-			block: undefined
+			block: undefined,
+			textKeyVal: "Enable Multi-item Drops"
 		},
-		{
+		ravagerEnableNudeOutfit: {
 			type: "boolean",
 			refvar: "ravagerEnableNudeOutfit",
 			default: false,
-			block: undefined
-		}
-	],
+			block: undefined,
+			textKeyVal: "Enable Full Nude"
+		},
+	},
 	// Stores enemy definitions
 	Definitions: {
 		Enemies: {},
@@ -1082,7 +1099,7 @@ DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, 
 // Just here so I can have custom checkbox images in mod config
 DrawCheckboxKDEx = function(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, _CheckImage, options) {
 	// Detect my settings buttons
-	if (KinkyDungeonState == "ModConfig" && ["ravEnableUseCount", "ravUseCountOverride", "ravagerCustomDrop", "ravagerDebug", "ravagerDisableBandit", "ravagerDisableMimic", "ravagerDisableSlimegirl", "ravagerDisableTentaclePit", "ravagerDisableWolfgirl", "ravagerEnableSound", "ravagerSpicyTendril"].includes(name)) {
+	if (KinkyDungeonState == "ModConfig" && KDModToggleTab == "RavagerFramework") {
 		// Call my custom checkbox function for now, as the _CheckImage fix hasn't landed in a release yet
 		DrawCheckboxRFEx(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, "UI/HeartChecked.png", options)
 	} else {
@@ -1599,23 +1616,6 @@ function refreshRavagerDataVariables(reason) {
 }
 
 addTextKey('KDModButtonRavagerFramework', 'Ravager Framework')
-addTextKey('KDModButtonravagerDebug', 'Enable Debug Messages')
-addTextKey('KDModButtonravagerDisableBandit', 'Disable Bandit Ravager')
-addTextKey('KDModButtonravagerDisableWolfgirl', 'Disable Wolfgirl Ravager')
-addTextKey('KDModButtonravagerDisableSlimegirl', 'Disable Slimegirl Ravager')
-addTextKey('KDModButtonravagerDisableTentaclePit', 'Disable Tentacle Pit')
-addTextKey('KDModButtonravagerDisableMimic', 'Disable Mimic Ravager')
-addTextKey('KDModButtonravagerSpicyTendril', 'Spicy Ravager Dialogue')
-addTextKey('KDModButtonravagerSlimeAddChance', 'Slimegirl Restrict Chance')
-addTextKey('KDModButtonravagerEnableSound', 'Enable Sounds')
-addTextKey('KDModButtononHitChance', 'Moan Chance')
-addTextKey('KDModButtonravagerSoundVolume', 'Moan Volume')
-addTextKey('KDModButtonravEnableUseCount', 'Enable Experience Aware Mode')
-addTextKey('KDModButtonravUseCountMode', 'Exp Aware Mode')
-addTextKey('KDModButtonravUseCountModeChance', 'Exp Aware Chance')
-addTextKey('KDModButtonravUseCountOverride', 'Override Exp Aware Mode')
-addTextKey("KDModButtonravagerCustomDrop", "Enable multi-item drops")
-addTextKey("KDModButtonravagerEnableNudeOutfit", "Enable full nude")
 if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 	KDEventMapGeneric['afterModSettingsLoad']['RavagerFramework'] = (e, data) => {
 		let dbg = KDModSettings['RavagerFramework'] && KDModSettings['RavagerFramework'].ravagerDebug;
@@ -1624,7 +1624,12 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 			dbg && console.log('[Ravager Framework] KDModSettings was null.')
 		}
 		if (KDModConfigs != undefined) {
-			KDModConfigs['RavagerFramework'] = RavagerData.ModConfig
+			// KDModConfigs['RavagerFramework'] = RavagerData.ModConfig
+			let settingsarr = []
+			for (let conf in RavagerData.ModConfig) {
+				settingsarr.push(Object.assign({}, RavagerData.ModConfig[conf]))
+			}
+			KDModConfigs['RavagerFramework'] = settingsarr
 		}
 		let settingsobject = (KDModSettings.hasOwnProperty('RavagerFramework') == false) ? {} : Object.assign({}, KDModSettings['RavagerFramework'])
 		// console.log('ModSettings state: ', KDModSettings['RavagerFramework'], settingsobject)
@@ -1633,6 +1638,9 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 				dbg && console.log('Setting default value for ' + i.refvar + ' ...')
 				settingsobject[i.refvar] = i.default
 			}
+			// Text keys
+			if (i.textKeyVal)
+				addTextKey(`KDModButton${i.refvar}`, i.textKeyVal)
 		}
 		KDModSettings['RavagerFramework'] = settingsobject
 		// ravagerFrameworkRefreshEnemies('load')
