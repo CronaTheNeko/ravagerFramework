@@ -651,6 +651,18 @@ window.RavagerData = {
 					options: {
 						// HoveringText: "Enable to make mimic ravagers never notice the player" // Apparently HoveringText is only shown within the bounds of the button. How can I make it do a popup?
 					}
+				},
+				{
+					name: "RFControlTrackMimics",
+					func: () => {
+						RavagerData.functions.SetTrackMimics(!RavagerData.Variables.RFControl.TrackMimics)
+					},
+					Left: 550,
+					Top: 570,
+					Disabled: RavagerGetSetting("ravagerDisableMimic"),
+					Text: "Track Mimics",
+					IsChecked: RavagerData.Variables.RFControl.TrackMimics,
+					enabled: !RavagerGetSetting("ravagerDisableMimic")
 				}
 			]
 			// All the labels we'll draw
@@ -777,6 +789,60 @@ window.RavagerData = {
 				enemy.addedByMod == "RavagerFramework" &&
 				enemy.name == "MimicRavager"
 			).ambushRadius = (passive ? 0.1 : RavagerData.Definitions.mimic.ambushRadius)
+		},
+		TrackMimics: function(e, enemy, data) {
+			function objToString(obj) {
+				let ret = "{ "
+				for (let k in obj) {
+					ret += k + ": "
+					if (typeof obj[k] == "string")
+						ret += '"' + obj[k] + '", '
+					else
+						ret += obj[k] + ", "
+				}
+				return ret.slice(0, -2) + " }"
+			}
+			let string = `;
+		Name: ${enemy.Enemy.name}
+		ID: ${enemy.id}
+		X: ${enemy.x}
+		Y: ${enemy.y}
+		Visual X: ${enemy.visual_x}
+		Visual Y: ${enemy.visual_y}
+		FX: ${enemy.fx}
+		FY: ${enemy.fy}
+		GX: ${enemy.gx}
+		GY: ${enemy.gy}
+		GXX: ${enemy.gxx}
+		GYY: ${enemy.gyy}
+		Spawn X: ${enemy.spawnX}
+		Spawn Y: ${enemy.spawnY}
+		Home coord: ${objToString(enemy.homeCoord)}
+		HP: ${enemy.hp}
+		AI: ${enemy.AI}
+		Flags: ${objToString(enemy.flags)}
+		Idle: ${enemy.idle}
+		Move points: ${enemy.movePoints}
+		Has moved: ${enemy.moved}
+		Attack points: ${enemy.attackPoints}
+		Target: ${enemy.target}
+		TX: ${enemy.tx}
+		TY: ${enemy.ty}`
+			console.log("[Ravager Framework][TrackMimics]: enemy: ", enemy, string)
+		},
+		SetTrackMimics: function(tracked) {
+			let enemy = KinkyDungeonEnemies.find(enemy =>
+				enemy.addedByMod = "RavagerFramework" &&
+				enemy.name == "MimicRavager"
+			)
+			if (tracked) {
+				KDEventMapEnemy.tickAfter["RavagerFrameworkTrackMimics"] = RavagerData.functions.TrackMimics
+				enemy.events.push({ trigger: "tickAfter", type: "RavagerFrameworkTrackMimics" })
+			}
+			else {
+				delete KDEventMapEnemy.tickAfter.RavagerFrameworkTrackMimics
+			}
+			RavagerData.Variables.RFControl.TrackMimics = tracked
 		},
 		// Custom version of KinkyDungeonGetRestraint so I can have name-based exclusions and per-item weight modifiers
 		// All the same params as KinkyDungeonGetRestraint, but with the addition of:
@@ -1069,7 +1135,8 @@ window.RavagerData = {
 			InGameEnabled: false,
 			WasEnabledInGame: false,
 			PassiveMimics: false,
-			NameFormatDebug: false
+			NameFormatDebug: false,
+			TrackMimics: false
 		},
 		DebugWasTurnedOn: false,
 		DebugWasTurnedOff: false,
