@@ -832,7 +832,7 @@ window.RavagerData = {
 		},
 		SetTrackMimics: function(tracked) {
 			let enemy = KinkyDungeonEnemies.find(enemy =>
-				enemy.addedByMod = "RavagerFramework" &&
+				enemy.addedByMod == "RavagerFramework" &&
 				enemy.name == "MimicRavager"
 			)
 			if (tracked) {
