@@ -663,6 +663,18 @@ window.RavagerData = {
 					Text: "Track Mimics",
 					IsChecked: RavagerData.Variables.RFControl.TrackMimics,
 					enabled: !RavagerGetSetting("ravagerDisableMimic")
+				},
+				{
+					name: "RFControlAnnounceRavagers",
+					func: () => {
+						RavagerData.functions.SetAnnounceRavagers(!RavagerData.Variables.RFControl.AnnounceRavagers)
+					},
+					Left: 550,
+					Top: 644,
+					Disabled: RavagerGetSetting("ravagerDisableBandit") && RavagerGetSetting("ravagerDisableWolfgirl") && RavagerGetSetting("ravagerDisableSlimegirl") && RavagerGetSetting("ravagerDisableTentaclePit") && RavagerGetSetting("ravagerDisableMimic"),
+					Text: "Announce Ravagers",
+					IsChecked: RavagerData.Variables.RFControl.AnnounceRavagers,
+					enabled: !(RavagerGetSetting("ravagerDisableBandit") && RavagerGetSetting("ravagerDisableWolfgirl") && RavagerGetSetting("ravagerDisableSlimegirl") && RavagerGetSetting("ravagerDisableTentaclePit") && RavagerGetSetting("ravagerDisableMimic"))
 				}
 			]
 			// All the labels we'll draw
@@ -843,6 +855,24 @@ window.RavagerData = {
 				delete KDEventMapEnemy.tickAfter.RavagerFrameworkTrackMimics
 			}
 			RavagerData.Variables.RFControl.TrackMimics = tracked
+		},
+		AnnounceRavagers: function(e, enemy, data) {
+			console.log(`[Ravager Framework][AnnounceRavagers]: { ${KinkyDungeonCurrentTick} }  ${enemy.Enemy.name} (id ${enemy.id}) at (${enemy.x}, ${enemy.y})`)
+		},
+		SetAnnounceRavagers: function(enabled) {
+			console.log(`[Ravager Framework][RFControl][SetAnnounceRavagers]: Setting ravager announcement to ${enabled} ...`)
+			let enemies = KinkyDungeonEnemies.filter(enemy => enemy.addedByMod == "RavagerFramework")
+			if (enabled) {
+				KDEventMapGeneric.tick.RavagerFrameworkTrackPlayer = function(e, data) { console.log(`[Ravager Framework][TrackPlayer]: Player at (${KinkyDungeonPlayerEntity.x}, ${KinkyDungeonPlayerEntity.y})`); }
+				KDEventMapGeneric.before
+				KDEventMapEnemy.tickAfter["RavagerFrameworkAnnounceRavagers"] = RavagerData.functions.AnnounceRavagers
+				for (let e of enemies)
+					e.events.push({ trigger: "tickAfter", type: "RavagerFrameworkAnnounceRavagers" })
+			} else {
+				delete KDEventMapGeneric.tick.RavagerFrameworkTrackPlayer
+				delete KDEventMapEnemy.tickAfter.RavagerFrameworkAnnounceRavagers
+			}
+			RavagerData.Variables.RFControl.AnnounceRavagers = enabled
 		},
 		// Custom version of KinkyDungeonGetRestraint so I can have name-based exclusions and per-item weight modifiers
 		// All the same params as KinkyDungeonGetRestraint, but with the addition of:
@@ -1136,7 +1166,8 @@ window.RavagerData = {
 			WasEnabledInGame: false,
 			PassiveMimics: false,
 			NameFormatDebug: false,
-			TrackMimics: false
+			TrackMimics: false,
+			AnnounceRavagers: false,
 		},
 		DebugWasTurnedOn: false,
 		DebugWasTurnedOff: false,
