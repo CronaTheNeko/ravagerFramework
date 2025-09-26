@@ -23,6 +23,7 @@ let mimicRavager = {
     "unflinching",
     "ropeRestraints",
     "ropeRestraints2",
+    "nosignalothers",
   ]),
   evasion: -0.5,
   ignorechance: 1.0,
@@ -47,12 +48,12 @@ let mimicRavager = {
   },
   stamina: 10,
   visionRadius: 100,
-  ambushRadius: 2.9,
+  ambushRadius: 1.5,
   blindSight: 100,
   maxhp: 20,
-  minLevel:1,
-  weight:1.5,
-  movePoints: 1.5,
+  minLevel:2,
+  weight: 8,
+  movePoints: 0.1,
   attackPoints: 2,
   attack: "MeleeEffectSlow",
   attackWidth: 1,
@@ -60,6 +61,7 @@ let mimicRavager = {
   power: 3,
   dmgType: "grope",
   fullBoundBonus: 1,
+  hitsfx: "Grab",
   terrainTags: {
     "rubble": 100,
     "adjChest": 15,
@@ -348,6 +350,10 @@ let mimicRavager = {
       chance: 0.02
     },
     {
+      trigger: "tickAfter",
+      type: "ravagerForceMimicAI"
+    },
+    {
       trigger: "death",
       type: "ravagerRemove"
     },
@@ -362,6 +368,7 @@ let mimicRavager = {
     }
   },
   noDisplace: true,
+  noswap: true,
   focusPlayer: true,
   ravage: {
     bubbleCondition: "mimicRavSpoiler", // Condition name that leads to window.RavagerData.conditions.mimicRavSpoiler. This condition is built into the framework, as I'd like to make more mimic ravagers
@@ -538,6 +545,9 @@ let mimicRavager = {
       } ],
     ]
   },
+  noFlip: true,
+  nonHumanoid: true,
+  noLeash: true,
 }
 RavagerData.Definitions.mimic = structuredClone(mimicRavager) // Gonna change this path to RavagerData.Definitions.Enemies.MimicRavager, but there's multiple places to change that path and I don't want to break things right now
 KinkyDungeonEnemies.push(mimicRavager)
@@ -684,3 +694,10 @@ const text = {
 }
 for (var key in text)
   addTextKey(key, text[key])
+// AI fixing event
+KDEventMapEnemy.tickAfter.ravagerForceMimicAI = function(e, enemy, data) {
+  if (enemy.AI != "ambush") {
+    RFDebug(`[Ravager Framework][ravagerForceMimicAI]: ${enemy.Enemy.name} (${enemy.id}) has the wrong AI (${enemy.AI})! Fixing.`)
+    enemy.AI = "ambush"
+  }
+}

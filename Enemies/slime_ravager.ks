@@ -62,7 +62,7 @@ let slimeRavager = {
 		"closedoors",
 		"slime",  
 		"melee",
-		"elite",
+		// "elite",
 		"meleeresist",
 		"electricweakness",
 		"acidresist",
@@ -82,8 +82,8 @@ let slimeRavager = {
 	// core stats
 	armor: 1.5,
 	maxhp: 10,
-	minLevel:0, //notably this affects the earliest floor they can spawn on
-	weight: 2,
+	minLevel: 2, //notably this affects the earliest floor they can spawn on
+	weight: 6,
 	visionRadius: 5,
 	blindSight: 2.5,
 	movePoints: 3,

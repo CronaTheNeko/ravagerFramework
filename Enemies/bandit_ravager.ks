@@ -40,7 +40,7 @@ let banditRavager = {
 		"bandit", 
 		// "imprisonable", 
 		"melee",
-		"miniboss",
+		// "miniboss",
 		"cacheguard", 
 		"unflinching", // makes enemy unable to be pulled/pushed. maybe don't remove this
 		"chainRestraints", 
@@ -63,8 +63,8 @@ let banditRavager = {
 	// core stats
 	armor: 1.5, 
 	maxhp: 12, 
-	minLevel:0, //notably this affects the earliest floor they can spawn on
-	weight: 8,
+	minLevel: 1, //notably this affects the earliest floor they can spawn on
+	weight: 6,
 	visionRadius: 7, 
 	movePoints: 3,
 	 

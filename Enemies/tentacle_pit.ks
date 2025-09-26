@@ -13,7 +13,7 @@ let pit = {
 		'poisonresist',
 		'soulimmune',
 		'melee',
-		'elite',
+		// 'elite',
 		'unflinching',
 		'fireweakness',
 		'crushweakness',
@@ -126,7 +126,11 @@ let pit = {
 		// 	amountMax: 5,
 		// 	weight: 1
 		// }
-	]
+	],
+	noDisplace: true,
+	noswap: true,
+	noFlip: true,
+	nonHumanoid: true
 }
 // Summon spell definition
 let summonSpell = {
@@ -483,7 +487,11 @@ let tendril = {
 			name: 'Ravage'
 		}
 	},
-	focusPlayer: true
+	focusPlayer: true,
+	noDisplace: true,
+	noswap: true,
+	noFlip: true,
+	nonHumanoid: true
 }
 
 KinkyDungeonEnemies.push(tendril)
@@ -493,3 +501,13 @@ addTextKey('NameRavagerTendril', 'Dripping Tentacle')
 addTextKey('KillRavagerTendril', 'The tentacle thrashes and vanishes below the ground')
 addTextKey('AttackRavagerTendril', 'The tentacle roughly gropes you')
 // END Ravaging Tendril
+
+// Dedicated event to remove the RavagerTendrils that for some reason get spawned during map generation
+KDEventMapGeneric.postMapgen.RFRemovePrespawnedTendrils = function(e, data) {
+	// console.log('[Ravager Framework][RFTestTentacle]: e:', e, '; data: ', data, '; Enemies: ', KDNearbyEnemies(0, 0, 10000))
+	let tendrils = KDNearbyEnemies(0, 0, 10000).filter(v => v.Enemy.name == "RavagerTendril")
+	for (let t of tendrils) {
+		RFDebug(`[Ravager Framework][RFRemovePrespawnedTendrils]: Removing pre-spawned tendril (ID: ${t.id})`)
+		KDRemoveEntity(t)
+	}
+}
