@@ -2833,6 +2833,9 @@ KDEventMapInventory["remove"]["ravagerRemove"] = (e, item, data) => {
 
 // Remove pin if this enemy was the last one ravaging on death
 KDEventMapEnemy["death"]["ravagerRemove"] = (e, enemy, data) => {
+	if (enemy.hp > 0) {
+		return
+	}
 	if (enemy.ravage && KinkyDungeonPlayerEntity.ravage) {
 		ravagerFreeAndClearAllDataIfNoRavagers()
 	}
