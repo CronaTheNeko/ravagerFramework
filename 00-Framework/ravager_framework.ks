@@ -1,3 +1,14 @@
+// Verbosity function for normal level debugging
+window.RFDebug = (...args) => {
+	if (RavagerData.Variables.IWantToHelpDebug)
+		RavagerData.Variables.IWantToHelpDebugBuffer.push(...args)
+	RFDebugEnabled() && console.log(...args)
+}
+// Verbosity function for extreme level debugging
+window.RFTrace = (...args) => {
+	_RavagerFrameworkDebugEnabled && console.log(...args)
+}
+
 /* 
 	RAVAGER FRAMEWORK 0.01
 	No enemies are added by this file. It's just the framework.
@@ -1911,14 +1922,6 @@ if (KDEventMapGeneric['afterModConfig'] != undefined) {
 //
 
 
-// Verbosity function for normal level debugging
-window.RFDebug = (...args) => {
-	RFDebugEnabled() && console.log(...args)
-}
-// Verbosity function for extreme level debugging
-window.RFTrace = (...args) => {
-	_RavagerFrameworkDebugEnabled && console.log(...args)
-}
 
 //things, in order, to remove for a given slot goal
 let ravageEquipmentSlotTargets = {
