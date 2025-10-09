@@ -227,7 +227,7 @@ KDEventMapEnemy['ravagerCallbacks']['definitionSlimegirlRavager'] = slimeRavager
 
 //textkeys
 addTextKey("NameSlimeRavager", "Slimegirl")
-addTextKey('AttackSlimeRavager','The slime girl holds you close, sticking you to her body!')
+addTextKey('AttackSlimeRavager','~~{RavagerFrameworkNoMessageDisplay}~~')
 addTextKey("KillSlimeRavager", "The slime girl scrambles away, waiting for her next chance...")
 addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandAssault', 'You shouldn\'t be out here on your own~')
 addTextKey('KinkyDungeonRemindJailSlimeAdvHitPlayer', 'We\'ll take good care of you~')

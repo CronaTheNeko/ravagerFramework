@@ -468,6 +468,7 @@ window.RavagerData = {
 		KinkyDungeonHandleClick: KinkyDungeonHandleClick,
 		KDDropItems: KDDropItems,
 		DrawCheckboxKDEx: DrawCheckboxKDEx,
+		KinkyDungeonSendTextMessage: KinkyDungeonSendTextMessage,
 		// Format strings used throughout the framework. Handles enemy, restraint, and clothing names, as well as damage strings
 		// Most, if not all, of my narration strings pass through this. We could simplify making varying dialogue by adding a 'choose a random option for this section of the string' functionality. Example: "EnemyName does (option1|option2) to you", where (option1|option2) is two options that will be randomly chosen from. See MimicRavager's ravaging narration for example of dialogue that could be greatly simplified by this addition. --- GOT IT! Fuck that was annoying; handles recursive choices fine (example: "{s{T{R|r}E|tre}tching|swelling}" to be one of "swelling", "stretching", "sTREtching", or "sTrEtching"), and seemingly handles a "|" outside of curly brackets
 		NameFormat: function(string, entity, restraint, clothing, damage, skipCapitalize) {
@@ -686,7 +687,19 @@ window.RavagerData = {
 					Text: "Announce Ravagers",
 					IsChecked: RavagerData.Variables.RFControl.AnnounceRavagers,
 					enabled: !(RavagerGetSetting("ravagerDisableBandit") && RavagerGetSetting("ravagerDisableWolfgirl") && RavagerGetSetting("ravagerDisableSlimegirl") && RavagerGetSetting("ravagerDisableTentaclePit") && RavagerGetSetting("ravagerDisableMimic"))
-				}
+				},
+				{
+					name: "RFControlDebugVanillaTextOverrides",
+					func: () => {
+						RavagerData.Variables.RFControl.DebugVanillaTextOverrides = !RavagerData.Variables.RFControl.DebugVanillaTextOverrides
+					},
+					Left: 550,
+					Top: 718,
+					Disabled: false,
+					Text: "Debug Text Replacements",
+					IsChecked: RavagerData.Variables.RFControl.DebugVanillaTextOverrides,
+					enabled: true,
+				},
 			]
 			// All the labels we'll draw
 			const labels = [
@@ -1187,6 +1200,15 @@ window.RavagerData = {
 }
 // Shortcut to custom GetRestraint
 window.RFGetRestraint = RavagerData.functions.GetRandomRestraint
+// Here so I can remove the messages from Attack{EnemyName}* during the ravage event (those messages are all the same and always end with "(no damage)", and they interupt my narration)
+KinkyDungeonSendTextMessage = function(priority, text, color, time, noPush, noDupe, entity, filter) {
+	if (text.match(/^~~\{RavagerFrameworkNoMessageDisplay\}~~/)) {
+		RavagerData.Variables.RFControl.DebugVanillaTextOverrides && console.log('[Ravager Framework][KinkyDungeonSendTextMessage]: Found ravager string to skip.')
+		return false
+	}
+	RavagerData.Variables.RFControl.DebugVanillaTextOverrides && console.log('[Ravager Framework][KinkyDungeonSendTextMessage]: priority: ', priority, '; text: ', text, '; color: ', color, '; time: ', time, '; noPush: ', noPush, '; noDupe: ', noDupe, '; entity: ', entity, '; filter: ', filter)
+	return RavagerData.functions.KinkyDungeonSendTextMessage(priority, text, color, time, noPush, noDupe, entity, filter)
+}
 // Overriding item drops so I can have multiple drops from enemies
 KDDropItems = function(enemy, mapData) {
 	if (RavagerGetSetting("ravagerCustomDrop") && (enemy.Enemy.addedByMod == "RavagerFramework" || enemy.Enemy.ravagerCustomDrop) && enemy.Enemy.maxDrops) {

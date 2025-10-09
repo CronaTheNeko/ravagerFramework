@@ -286,7 +286,7 @@ KDEventMapEnemy['ravagerCallbacks']['definitionWolfgirlRavager'] = wolfRavager
 //textkeys
 // addTextKey("NameSlimeRavager", "Slimegirl")
 addTextKey('NameWolfgirlRavager', 'Wolfgirl Alpha')
-addTextKey('AttackWolfgirlRavager','The alpha charges and captures you in a powerful hug!')
+addTextKey('AttackWolfgirlRavager','~~{RavagerFrameworkNoMessageDisplay}~~')
 addTextKey('AttackWolfgirlRavagerDash','The alpha yanks your body against her hard!')
 addTextKey("KillWolfgirlRavager", "The alpha scrambles away, waiting for her next chance...")
 // Still need , , 

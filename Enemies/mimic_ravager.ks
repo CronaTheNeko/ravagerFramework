@@ -688,7 +688,7 @@ KDPlayerEffects["MimicRavBindings"] = playerEffect
 const text = {
   NameMimicRavager: "Mimic Ravager",
   KillMimicRavager: "The Mimic Ravager spills its moist contents.",
-  AttackMimicRavager: "The Mimic's tentacles roughly grope you",
+  AttackMimicRavager: "~~{RavagerFrameworkNoMessageDisplay}~~",
   AttackMimicRavagerSlow: "The mimic's tentacles swarm your body and cover you in a thick liquid",
   RavagerFrameworkMimicRavBurst: "Restraints launched from the mimic's body latch themselves to your body!"
 }

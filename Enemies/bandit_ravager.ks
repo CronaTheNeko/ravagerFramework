@@ -218,8 +218,12 @@ KinkyDungeonEnemies.push(banditRavager)
 KDEventMapEnemy['ravagerCallbacks']['definitionBanditRavager'] = banditRavager
 
 //textkeys
-addTextKey("NameBanditRavager", "Bandit Ravager")
-addTextKey('AttackBanditRavagerDash','The bandit charges and captures you in a powerful hug!')
-addTextKey('AttackBanditRavagerBlind','The bandit pins you against her soft body effortlessly!')
-addTextKey("KillBanditRavager", "The bandit scrambles away, waiting for her next chance...")
 // Need 'AttackBanditRavager' (happens when jailed)
+const keys = {
+	NameBanditRavager: "BanditRavager",
+	AttackBanditRavagerDash: "The bandit charges and captures you in a powerful hug!",
+	AttackBanditRavagerBlind: "~~{RavagerFrameworkNoMessageDisplay}~~",
+	KillBanditRavager: "The bandit scrambles away, waiting for her next chance..."
+}
+for (k in keys)
+	addTextKey(k, keys[k])

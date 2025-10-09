@@ -499,7 +499,7 @@ KDEventMapEnemy['ravagerCallbacks']['definitionPitTendril'] = tendril
 // Text keys
 addTextKey('NameRavagerTendril', 'Dripping Tentacle')
 addTextKey('KillRavagerTendril', 'The tentacle thrashes and vanishes below the ground')
-addTextKey('AttackRavagerTendril', 'The tentacle roughly gropes you')
+addTextKey('AttackRavagerTendril', '~~{RavagerFrameworkNoMessageDisplay}~~')
 // END Ravaging Tendril
 
 // Dedicated event to remove the RavagerTendrils that for some reason get spawned during map generation
