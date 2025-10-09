@@ -225,5 +225,5 @@ const keys = {
 	AttackBanditRavagerBlind: "~~{RavagerFrameworkNoMessageDisplay}~~",
 	KillBanditRavager: "The bandit scrambles away, waiting for her next chance..."
 }
-for (k in keys)
+for (let k in keys)
 	addTextKey(k, keys[k])
