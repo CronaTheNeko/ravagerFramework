@@ -345,7 +345,7 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 }
 // Hopeful fallback incase function signatures change
 window.RavagerFrameworkRevertFunctions = function() {
-	const functions = [ 'DrawButtonKDEx', 'KinkyDungeonDrawEnemiesHP', 'KinkyDungeonDrawGame', 'KinkyDungeonRun', 'KinkyDungeonHandleClick', 'KDDropItems', 'DrawCheckboxKDEx' ]
+	const functions = [ 'DrawButtonKDEx', 'KinkyDungeonDrawEnemiesHP', 'KinkyDungeonDrawGame', 'KinkyDungeonRun', 'KinkyDungeonHandleClick', 'KDDropItems', 'DrawCheckboxKDEx', 'KinkyDungeonSendTextMessage' ]
 	for (let f of functions) {
 		console.log(`Reverting ${f} ...`)
 		window[f] = RavagerData.functions[f]
