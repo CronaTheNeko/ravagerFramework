@@ -809,7 +809,7 @@ window.RavagerData = {
 				)
 			).events.find(event =>
 				event.type == "ravagerBubble"
-			).chance = (exposed ? 1 : RavagerData.Definitions.mimic.events.find(event => event.type == "ravagerBubble").chance)
+			).chance = (exposed ? 1 : RavagerData.Definitions.Enemies.MimicRavager.events.find(event => event.type == "ravagerBubble").chance)
 		},
 		MimicPassive: function(passive) {
 			// Save the setting
@@ -824,7 +824,7 @@ window.RavagerData = {
 			KinkyDungeonEnemies.find(enemy =>
 				enemy.addedByMod == "RavagerFramework" &&
 				enemy.name == "MimicRavager"
-			).ambushRadius = (passive ? 0.1 : RavagerData.Definitions.mimic.ambushRadius)
+			).ambushRadius = (passive ? 0.1 : RavagerData.Definitions.Enemies.MimicRavager.ambushRadius)
 		},
 		TrackMimics: function(e, enemy, data) {
 			function objToString(obj) {
@@ -1751,119 +1751,29 @@ function ravagerFrameworkApplySomeSpice(reason) {
 	KinkyDungeonRefreshEnemiesCache()
 }
 // Mod Settings for disabling ravagers
-// This needs to be reworked and generalized, it's getting annoying to add more enemies
+// Any enemy within RavagerData.Definitions.Enemies that has a value for enemy.RFDisableRefvar can be disabled with this function
 function ravagerFrameworkRefreshEnemies(reason) {
-	// Shortcut for settings
-	var settings = KDModSettings['RavagerFramework']
-	let dbg = settings && settings.ravagerDebug;
-	dbg && console.log('[Ravager Framework] ravagerFrameworkRefreshEnemies(' + reason + ')')
-	// Checking for bandit
-	var banditFoundIndex = KinkyDungeonEnemies.findIndex((val) => { if (val.name == 'BanditRavager' && val.addedByMod == 'RavagerFramework') return true })
-	// Check if we're supposed to be removing or adding the ravager
-	if (settings.ravagerDisableBandit) {
-		// Remove ravager
-		// Check the returned index of the ravager. Will be >= 0 if it exists, but -1 if not
-		if (banditFoundIndex >= 0) {
-			// Log message
-			dbg && console.log('[Ravager Framework] Removing Bandit Ravager')
-			// Remove the ravager
-			KinkyDungeonEnemies.splice(banditFoundIndex, 1)
-		}
-	} else {
-		// Ensure ravager is present
-		if (banditFoundIndex < 0 || banditFoundIndex == undefined) {
-			// Log message
-			dbg && console.log('[Ravager Framework] Adding Bandit Ravager')
-			// Add ravager to enemy list. To simplify this ability, I've stored the ravager definition in the event map dictionary I'm already using for callbacks
-			KinkyDungeonEnemies.push(KDEventMapEnemy['ravagerCallbacks']['definitionBanditRavager'])
+	RFDebug(`[Ravager Framework] ravagerFrameworkRefreshEnemies(${reason})`)
+	for (let en in RavagerData.Definitions.Enemies) {
+		let enemy = RavagerData.Definitions.Enemies[en]
+		if (enemy.RFDisableRefvar) {
+			let enemyIndex = KinkyDungeonEnemies.findIndex(e => e.name == enemy.name && e.addedByMod == "RavagerFramework")
+			if (RavagerGetSetting(enemy.RFDisableRefvar)) {
+				if (enemyIndex >= 0) {
+					RFDebug(`[Ravager Framework][ravagerFrameworkRefreshEnemies]: Removing ${enemy.name}`)
+					KinkyDungeonEnemies.splice(enemyIndex, 1)
+				}
+			} else {
+				if (enemyIndex < 0 || enemyIndex == undefined) {
+					RFDebug(`[Ravager Framework][ravagerFrameworkRefreshEnemies]: Adding ${enemy.name}`)
+					KinkyDungeonEnemies.push(structuredClone(enemy))
+				}
+			}
+		} else {
+			RFDebug(`Enemy ${enemy.name} does not contain a value for RFDisableRefvar, and cannot be disabled by us.`)
 		}
 	}
-	// Checking for slime
-	var slimeFoundIndex = KinkyDungeonEnemies.findIndex((val) => { if (val.name == 'SlimeRavager' && val.addedByMod == 'RavagerFramework') return true })
-	// Check if we're supposed to be removing or adding the ravager
-	if (settings.ravagerDisableSlimegirl) {
-		// Remove ravager
-		// Check the returned index of the ravager. Will be >= 0 if it exists, but -1 if not
-		if (slimeFoundIndex >= 0) {
-			// Log message
-			dbg && console.log('[Ravager Framework] Removing Slime Ravager')
-			// Remove the ravager
-			KinkyDungeonEnemies.splice(slimeFoundIndex, 1)
-		}
-	} else {
-		// Ensure ravager is present
-		if (slimeFoundIndex < 0 || slimeFoundIndex == undefined) {
-			// Log message
-			dbg && console.log('[Ravager Framework] Adding Slime Ravager')
-			// Add ravager to enemy list. To simplify this ability, I've stored the ravager definition in the event map dictionary I'm already using for callbacks
-			KinkyDungeonEnemies.push(KDEventMapEnemy['ravagerCallbacks']['definitionSlimegirlRavager'])
-		}
-	}
-	// // Checking for wolf
-	var wolfFoundIndex = KinkyDungeonEnemies.findIndex((val) => { if (val.name == 'WolfgirlRavager' && val.addedByMod == 'RavagerFramework') return true })
-	// Check if we're supposed to be removing or adding the ravager
-	if (settings.ravagerDisableWolfgirl) {
-		// Remove ravager
-		// Check the returned index of the ravager. Will be >= 0 if it exists, but -1 if not
-		if (wolfFoundIndex >= 0) {
-			// Log message
-			dbg && console.log('[Ravager Framework] Removing Wolfgirl Ravager')
-			// Attempt to remove the ravager
-			KinkyDungeonEnemies.splice(wolfFoundIndex, 1)
-		}
-	} else {
-		// Ensure ravager is present
-		if (wolfFoundIndex < 0 || wolfFoundIndex == undefined) {
-			// Log message
-			dbg && console.log('[Ravager Framework] Adding Wolfgirl Ravager')
-			// Add ravager to enemy list. To simplify this ability, I've stored the ravager definition in the event map dictionary I'm already using for callbacks
-			KinkyDungeonEnemies.push(KDEventMapEnemy['ravagerCallbacks']['definitionWolfgirlRavager'])
-		}
-	}
-	// Checking for Tentacle Pit
-	var tentacleFoundIndex = KinkyDungeonEnemies.findIndex((val) => {if (val.name == 'TentaclePit' && val.addedByMod == 'RavagerFramework') return true })
-	var tendrilFoundIndex = KinkyDungeonEnemies.findIndex((val) => {if (val.name == 'RavagerTendril' && val.addedByMod == 'RavagerFramework') return true })
-	if (settings.ravagerDisableTentaclePit) {
-		if (tentacleFoundIndex >= 0) {
-			dbg && console.log('[Ravager Framework] Removing Tentacle Pit')
-			KinkyDungeonEnemies.splice(tentacleFoundIndex, 1)
-		}
-		if (tendrilFoundIndex >= 0) {
-			dbg && console.log('[Ravager Framework] Removing Pit Tendril')
-			KinkyDungeonEnemies.splice(tendrilFoundIndex, 1)
-		}
-		tendrilFoundIndex = KinkyDungeonEnemies.findIndex((val) => {if (val.name == 'RavagerTendril' && val.addedByMod == 'RavagerFramework') return true })
-		if (tendrilFoundIndex >= 0) {
-			dbg && console.log('[Ravager Framework] Removing Pit Tendril')
-			KinkyDungeonEnemies.splice(tendrilFoundIndex, 1)
-		}
-	} else {
-		if (tentacleFoundIndex < 0 || tentacleFoundIndex == undefined) {
-			dbg && console.log('[Ravager Framework] Adding Tentacle Pit')
-			KinkyDungeonEnemies.push(KDEventMapEnemy['ravagerCallbacks']['definitionTentaclePit'])
-		}
-		if (tendrilFoundIndex < 0 || tendrilFoundIndex == undefined) {
-			dbg && console.log('[Ravager Framework] Adding Pit Tendril')
-			KinkyDungeonEnemies.push(KDEventMapEnemy['ravagerCallbacks']['definitionPitTendril'])
-		}
-	}
-	// Checking for Mimic
-	var mimicFoundIndex = KinkyDungeonEnemies.findIndex(val => val.name == 'MimicRavager' && val.addedByMod == 'RavagerFramework')
-	const mimicDisabled = RavagerGetSetting('ravagerDisableMimic')
-	// console.warn(mimicDisabled, mimicFoundIndex)
-	if (mimicDisabled) {
-		if (mimicFoundIndex >= 0) {
-		dbg && console.log('[Ravager Framework] Removing Mimic Ravager')
-		KinkyDungeonEnemies.splice(mimicFoundIndex, 1)
-		}
-	} else {
-		if (mimicFoundIndex < 0 || mimicFoundIndex == undefined) {
-			dbg && console.log('[Ravager Framework] Enabling Mimic Ravager')
-			KinkyDungeonEnemies.push(RavagerData.Definitions.mimic)
-		}
-	}
-	// Refresh enemy cache
-	dbg && console.log('[Ravager Framework] Refreshing enemy cache')
+	RFDebug("[Ravager Framework][ravagerFrameworkRefreshEnemies]: Refreshing enemy cache.")
 	KinkyDungeonRefreshEnemiesCache()
 }
 

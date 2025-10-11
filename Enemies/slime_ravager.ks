@@ -49,6 +49,7 @@ let slimeRavager = {
 	// Key to signal we added this so we can make sure we don't remove an enemy with the same name added by someone else (such as someone else making a mod to modify the bandit ravager)
 	// If you're making your own ravager, change this key or just remove it
 	addedByMod: 'RavagerFramework',
+	RFDisableRefvar: "ravagerDisableSlimegirl",
 	// id data
 	name: "SlimeRavager",
 	faction: "Slime",
@@ -223,7 +224,7 @@ let slimeRavager = {
 	focusPlayer: true, // obvious
 }
 KinkyDungeonEnemies.push(slimeRavager)
-KDEventMapEnemy['ravagerCallbacks']['definitionSlimegirlRavager'] = slimeRavager
+RavagerData.Definitions.Enemies.SlimegirlRavager = structuredClone(slimeRavager)
 
 //textkeys
 addTextKey("NameSlimeRavager", "Slimegirl")

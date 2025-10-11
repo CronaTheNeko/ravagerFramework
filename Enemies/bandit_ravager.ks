@@ -25,6 +25,8 @@ let banditRavager = {
 	// Key to signal we added this so we can make sure we don't remove an enemy with the same name added by someone else (such as someone else making a mod to modify the bandit ravager)
 	// If you're making your own ravager, change this key or just remove it
 	addedByMod: 'RavagerFramework',
+	// Signal for which mod config this is tied to
+	RFDisableRefvar: 'ravagerDisableBandit',
 	// id data
 	name: "BanditRavager", 
 	faction: "Bandit", 
@@ -214,16 +216,25 @@ let banditRavager = {
 	focusPlayer: true, // obvious
 }
 
-KinkyDungeonEnemies.push(banditRavager)
-KDEventMapEnemy['ravagerCallbacks']['definitionBanditRavager'] = banditRavager
-
 //textkeys
 // Need 'AttackBanditRavager' (happens when jailed)
 const keys = {
-	NameBanditRavager: "BanditRavager",
-	AttackBanditRavagerDash: "The bandit charges and captures you in a powerful hug!",
-	AttackBanditRavagerBlind: "~~{RavagerFrameworkNoMessageDisplay}~~",
-	KillBanditRavager: "The bandit scrambles away, waiting for her next chance..."
+	NameEnemyName: "Bandit Ravager",
+	AttackEnemyNameDash: "The bandit charges and captures you in a powerful hug!",
+	AttackEnemyNameBlind: "~~{RavagerFrameworkNoMessageDisplay}~~",
+	KillEnemyName: "The bandit scrambles away, waiting for her next chance..."
 }
-for (let k in keys)
-	addTextKey(k, keys[k])
+
+const enemies = [ banditRavager ]
+for (let i in enemies) {
+	i = Number(i)
+	if (i > 0) {
+		enemies[i].name = enemies[i].name + i.toString()
+		enemies[i].maxhp = (i + 1) * enemies[i].maxhp
+		KDModFiles[`Game/Enemies/${enemies[i].name}.png`] = KDModFiles[`Game/Enemies/${enemies[0].name}.png`]
+	}
+	KinkyDungeonEnemies.push(enemies[i])
+	RavagerData.Definitions.Enemies[enemies[i].name] = structuredClone(enemies[i])
+	for (let k in keys)
+		addTextKey(k.replace('EnemyName', enemies[i].name), keys[k])
+}

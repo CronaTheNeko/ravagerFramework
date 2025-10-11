@@ -2,6 +2,7 @@
 // Tentacle Pit definition
 let pit = {
 	addedByMod: 'RavagerFramework',
+	RFDisableRefvar: "ravagerDisableTentaclePit",
 	name: 'TentaclePit',
 	faction: 'Plant',
 	clusterWith: 'plant',
@@ -178,7 +179,7 @@ let summonCondition = (enemy, target) => {
 KDCastConditions['tentaclePitSummon'] = summonCondition
 KinkyDungeonSpellListEnemies.push(summonSpell)
 KinkyDungeonEnemies.push(pit)
-KDEventMapEnemy['ravagerCallbacks']['definitionTentaclePit'] = pit
+RavagerData.Definitions.Enemies.TentaclePit = structuredClone(pit)
 // Text keys
 addTextKey('NameTentaclePit', 'Tentacle Pit')
 addTextKey('AttackTentaclePitStun', 'A strong tentacle wraps around your torso and pulls you towards the pit')
@@ -232,6 +233,7 @@ if (!RavagerAddCallback('pitTendrilEffectCallback', pitTendrilEffect)) {
 // Tendril definition
 let tendril = {
 	addedByMod: 'RavagerFramework',
+	RFDisableRefvar: "ravagerDisableTentaclePit",
 	name: 'RavagerTendril',
 	faction: 'Plant',
 	color: '#99ff99',
@@ -495,7 +497,7 @@ let tendril = {
 }
 
 KinkyDungeonEnemies.push(tendril)
-KDEventMapEnemy['ravagerCallbacks']['definitionPitTendril'] = tendril
+RavagerData.Definitions.Enemies.PitTendril = structuredClone(tendril)
 // Text keys
 addTextKey('NameRavagerTendril', 'Dripping Tentacle')
 addTextKey('KillRavagerTendril', 'The tentacle thrashes and vanishes below the ground')

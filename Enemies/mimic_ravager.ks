@@ -1,5 +1,6 @@
 let mimicRavager = {
   addedByMod: 'RavagerFramework',
+  RFDisableRefvar: "ravagerDisableMimic",
   name: "MimicRavager",
   blockVisionWhileStationary: true,
   tags: KDMapInit([
@@ -549,7 +550,7 @@ let mimicRavager = {
   nonHumanoid: true,
   noLeash: true,
 }
-RavagerData.Definitions.mimic = structuredClone(mimicRavager) // Gonna change this path to RavagerData.Definitions.Enemies.MimicRavager, but there's multiple places to change that path and I don't want to break things right now
+RavagerData.Definitions.Enemies.MimicRavager = structuredClone(mimicRavager)
 KinkyDungeonEnemies.push(mimicRavager)
 // On-death spell
 const spell = {
