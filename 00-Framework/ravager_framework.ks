@@ -1192,6 +1192,7 @@ window.RavagerData = {
 			NameFormatDebug: false,
 			TrackMimics: false,
 			AnnounceRavagers: false,
+			DebugVanillaTextOverrides: false,
 		},
 		DebugWasTurnedOn: false,
 		DebugWasTurnedOff: false,
