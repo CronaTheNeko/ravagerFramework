@@ -1,8 +1,13 @@
 // Verbosity function for normal level debugging
 window.RFDebug = (...args) => {
+	let inInit = false
+	if (typeof(args[args.length - 1]) == 'object' && args[args.length - 1].RFIsBeingInitiliazed) {
+		args.pop()
+		inInit = true
+	}
 	if (RavagerData.Variables.IWantToHelpDebug)
 		RavagerData.Variables.IWantToHelpDebugBuffer.push(...args)
-	RFDebugEnabled() && console.log(...args)
+	RFDebugEnabled(inInit) && console.log(...args)
 }
 // Verbosity function for extreme level debugging
 window.RFTrace = (...args) => {
@@ -358,7 +363,7 @@ window.RavagerFrameworkRevertFunctions = function() {
 // Function to get a mod setting value
 // If settings are undefined, it'll return the default value given to KDModConfigs
 // If there is not matching value given to KDModConfigs, it'll return undefined
-window.RavagerGetSetting = function(refvar) {
+window.RavagerGetSetting = function(refvar, inInit = false) {
 	// Mod settings and default config objects
 	const settings = KDModSettings.RavagerFramework
 	var config = RavagerData.ModConfig[refvar]
@@ -371,15 +376,29 @@ window.RavagerGetSetting = function(refvar) {
 		}
 		return config.default
 	}
+	// Helper for checking localStorage, incase the user has set mod settings previously but we're currently in mod initialization, where mod settings aren't available
+	function RFConfigCheckLocalStorage(refvar, config) {
+		// Chain to get the previous setting for the refvar we're looking for
+		if (localStorage.hasOwnProperty('KDModSettings')) {
+			const savedSettings = JSON.parse(localStorage.KDModSettings)
+			if (savedSettings.hasOwnProperty('RavagerFramework') && savedSettings.RavagerFramework[refvar] != undefined) {
+				return savedSettings.RavagerFramework[refvar]
+			}
+		}
+		// Default to returning the default value in ModConfig
+		return RFConfigDefault(refvar, config)
+	}
 	// No settings, return default; probably should never happen, but I believe I've seen it in the past when there's no localData
 	if (!settings) {
-		console.warn('[Ravager Framework]: RavagerGetSetting couldn\'t get current settings for the framework!')
-		return RFConfigDefault(refvar, config)
+		if (!inInit)
+			console.warn('[Ravager Framework]: RavagerGetSetting couldn\'t get current settings for the framework!')
+		return RFConfigCheckLocalStorage(refvar, config)
 	}
 	// Requested setting isn't set, return default
 	if (settings[refvar] == undefined) {
-		console.warn('[Ravager Framework]: RavagerGetSetting couldn\'t get the current setting for ' + refvar)
-		return RFConfigDefault(refvar, config)
+		if (!inInit)
+			console.warn('[Ravager Framework]: RavagerGetSetting couldn\'t get the current setting for ' + refvar)
+		return RFConfigCheckLocalStorage(refvar, config)
 	}
 	// Return setting
 	return settings[refvar]
@@ -1539,8 +1558,8 @@ window.RFPlayerCanSeeEnemy = function(entity) {
 	return canSee && (visiblilty > 0)
 }
 // Shortcut to getting ravager debug
-window.RFDebugEnabled = function() {
-	return RavagerGetSetting('ravagerDebug')
+window.RFDebugEnabled = function(inInit) {
+	return RavagerGetSetting('ravagerDebug', inInit)
 }
 // Currently just used for the mimic spoiler, but there's other ideas of how this can be used, so I've attempted to generalize it
 KinkyDungeonDrawEnemiesHP = function(delta, canvasOffsetX, canvasOffsetY, CamX, CamY, _CamXoffset, _CamYoffset) {
