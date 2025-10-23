@@ -225,16 +225,4 @@ const keys = {
 	KillEnemyName: "The bandit scrambles away, waiting for her next chance..."
 }
 
-const enemies = [ banditRavager ]
-for (let i in enemies) {
-	i = Number(i)
-	if (i > 0) {
-		enemies[i].name = enemies[i].name + i.toString()
-		enemies[i].maxhp = (i + 1) * enemies[i].maxhp
-		KDModFiles[`Game/Enemies/${enemies[i].name}.png`] = KDModFiles[`Game/Enemies/${enemies[0].name}.png`]
-	}
-	KinkyDungeonEnemies.push(enemies[i])
-	RavagerData.Definitions.Enemies[enemies[i].name] = structuredClone(enemies[i])
-	for (let k in keys)
-		addTextKey(k.replace('EnemyName', enemies[i].name), keys[k])
-}
+RavagerFrameworkPushEnemiesWithStrongVariations(banditRavager, 4, keys)

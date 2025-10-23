@@ -223,40 +223,27 @@ let slimeRavager = {
 	noDisplace: true, // theoretically stops enemies from shoving this one out of the way. didn't seem to work by its lonesome for me
 	focusPlayer: true, // obvious
 }
-KinkyDungeonEnemies.push(slimeRavager)
-RavagerData.Definitions.Enemies.SlimegirlRavager = structuredClone(slimeRavager)
 
-//textkeys
-addTextKey("NameSlimeRavager", "Slimegirl")
-addTextKey('AttackSlimeRavager','~~{RavagerFrameworkNoMessageDisplay}~~')
-addTextKey("KillSlimeRavager", "The slime girl scrambles away, waiting for her next chance...")
-addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandAssault', 'You shouldn\'t be out here on your own~')
-addTextKey('KinkyDungeonRemindJailSlimeAdvHitPlayer', 'We\'ll take good care of you~')
-addTextKey('KinkyDungeonRemindJailPlaySlimeAdv2', 'What\'s a pretty thing like you doing here?~')
-// KinkyDungeonRemindJailChaseSlimeAdvDefendHonor2
-addTextKey('KinkyDungeonRemindJailChaseSlimeAdvDefendHonor2', 'You won\'t get away this time~')
-// KinkyDungeonRemindJailChaseSlimeAdvAttack0
-addTextKey('KinkyDungeonRemindJailChaseSlimeAdvAttack0', 'Why don\'t you make this easy?~')
-// KinkyDungeonRemindJailChaseSlimeAdvAttack1
-addTextKey('KinkyDungeonRemindJailChaseSlimeAdvAttack1', 'Ooh, a feisty one!~')
-// KinkyDungeonRemindJailChaseSlimeAdvAttack2
-addTextKey('KinkyDungeonRemindJailChaseSlimeAdvAttack2', 'You\'re gonna get yourself into trouble~')
-// KinkyDungeonRemindJailChaseSlimeAdvAttack3
-addTextKey('KinkyDungeonRemindJailChaseSlimeAdvAttack3', 'Mmm let\'s train you to be good~')
-// Assuming this one will be needed, but hasn't been reported so far
-addTextKey('KinkyDungeonRemindJailChaseSlimeAdvDefend1', 'Aww, give in and I\'ll take good care of you~')
-// KinkyDungeonRemindJailChaseSlimeAdvDefend2
-addTextKey('KinkyDungeonRemindJailChaseSlimeAdvDefend2', 'That\'s enough trouble, miss')
-// KinkyDungeonRemindJailChaseSlimeAdvDefend3
-addTextKey('KinkyDungeonRemindJailChaseSlimeAdvDefend3', 'You\'re in for it now, honey~')
-// KinkyDungeonRemindJailSlimeAdvMissedMe
-addTextKey('KinkyDungeonRemindJailSlimeAdvMissedMe', 'Nuh uh uh, sweetie~')
-// KinkyDungeonRemindJailSlimeAdvMiss
-addTextKey('KinkyDungeonRemindJailSlimeAdvMiss', 'Playing hard to get?~')
-// KinkyDungeonRemindJailChaseSlimeAdvCommandBlock
-addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandBlock', 'Get back here, sweetie~')
-// KinkyDungeonRemindJailChaseSlimeAdvCommandDefend
-addTextKey('KinkyDungeonRemindJailChaseSlimeAdvCommandDefend', '') // Based on vanilla text entries, 'CommandDefend' seems to be shown when showing up to assist another npc. Might just leave this empty (as Fuuka does)
-addTextKey('KinkyDungeonRemindJailChaseSlimeAdvAlert', '') // Left empty because I'm not sure what to write here
-addTextKey('KinkyDungeonRemindJailSlimeAdvBlockedMe', 'I\'m too slippery for that~') // Only saw this when trying to debug bind her
-// Text keys still needed: 
+let keys = {
+	NameEnemyName: "Slimegirl",
+	AttackEnemyName: "~~{RavagerFrameworkNoMessageDisplay}~~",
+	KillEnemyName: "The slime girl scrambles away, waiting for her next chance...",
+	KinkyDungeonRemindJailChaseSlimeAdvCommandAssault: "You shouldn\'t be out here on your own~",
+	KinkyDungeonRemindJailSlimeAdvHitPlayer: "We\'ll take good care of you~",
+	KinkyDungeonRemindJailPlaySlimeAdv2: "What\'s a pretty thing like you doing here?~",
+	KinkyDungeonRemindJailChaseSlimeAdvDefendHonor2: "You won\'t get away this time~",
+	KinkyDungeonRemindJailChaseSlimeAdvAttack0: "Why don\'t you make this easy?~",
+	KinkyDungeonRemindJailChaseSlimeAdvAttack1: "Ooh, a feisty one!~",
+	KinkyDungeonRemindJailChaseSlimeAdvAttack2: "You\'re gonna get yourself into trouble~",
+	KinkyDungeonRemindJailChaseSlimeAdvAttack3: "Mmm let\'s train you to be good~",
+	KinkyDungeonRemindJailChaseSlimeAdvDefend1: "Aww, give in and I\'ll take good care of you~", // Assuming this one will be needed, but hasn't been reported so far
+	KinkyDungeonRemindJailChaseSlimeAdvDefend2: "That\'s enough trouble, miss",
+	KinkyDungeonRemindJailChaseSlimeAdvDefend3: "You\'re in for it now, honey~",
+	KinkyDungeonRemindJailSlimeAdvMissedMe: "Nuh uh uh, sweetie~",
+	KinkyDungeonRemindJailSlimeAdvMiss: "Playing hard to get?~",
+	KinkyDungeonRemindJailChaseSlimeAdvCommandBlock: "Get back here, sweetie~",
+	KinkyDungeonRemindJailChaseSlimeAdvCommandDefend: "", // Based on vanilla text entries, 'CommandDefend' seems to be shown when showing up to assist another npc. Might just leave this empty (as Fuuka does)
+	KinkyDungeonRemindJailChaseSlimeAdvAlert: "", // Left empty because I'm not sure what to write here
+	KinkyDungeonRemindJailSlimeAdvBlockedMe: "I\'m too slippery for that~", // Only saw this when trying to debug bind her
+}
+RavagerFrameworkPushEnemiesWithStrongVariations(slimeRavager, 5, keys, false)

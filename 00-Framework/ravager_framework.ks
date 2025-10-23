@@ -20,6 +20,66 @@ window.RFTrace = (...args) => {
 	_RavagerFrameworkDebugEnabled && console.log(...args)
 }
 
+// Verbose, but acturate name. Easy way to create stronger versions of enemies.
+/* Params:
+		- enemy : The enemy definition to use
+		- count : The number of variations to add, plus one for the original enemy. If you want your enemy and 3 additional variations, set this to 4
+		- textKeys : The dictionary of text values, key/value pairs being textKey/textValue
+		- higherLevelIncrease : Optional. Default true. Use faster enemy.minLevel increases. When false, minLevel is always increased by slowLevelIncreaseAmount
+		- slowLevelIncreaseAmount : Optional. Default 1. The number to increment minLevel by when higherLevelIncrease is false
+		- enemyDefinitionDictionary : Optional. Default RavagerData.Definitions.Enemies. Points to the dictionary where enemy definitions should be saved for your use (NOT for use by the game directly). This should be a dictionary where you can set a definition via `enemyDefinitionDictionary[enemy.name] = enemy`, as that's what this function does. If you do not use your enemy definitions after creation, or do not care where they get stored, you don't need to include this parameter
+		- options.skipTextKeyWarning : Optional. Default false. Skips the warning message about textKeys parameter being empty. If you're intending to handle the text keys yourself, set this to true
+		- options.skipEnemyDefinitionDictionaryWarning: Optional. Default false. If you don't want to set enemyDefinitionDictionary, but don't want the related warning message shown, set this to true.
+*/
+window.RavagerFrameworkPushEnemiesWithStrongVariations = function(enemy, count, textKeys, higherLevelIncrease = true, slowLevelIncreaseAmount = 1, enemyDefinitionDictionary = RavagerData.Definitions.Enemies, options = { skipTextKeyWarning: false, skipEnemyDefinitionDictionaryWarning: false }) {
+	RFDebug('[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: enemy: ', enemy, '; count: ', count, '; textKeys: ', textKeys, '; higherLevelIncrease: ', higherLevelIncrease, '; slowLevelIncreaseAmount: ', slowLevelIncreaseAmount, '; options: { skipTextKeyWarning: ', options?.skipTextKeyWarning, ', skipEnemyDefinitionDictionaryWarning: ', options?.skipEnemyDefinitionDictionaryWarning, ' }', { RFIsBeingInitiliazed: true })
+	if (!enemy) {
+		console.error("[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: 'enemy' parameter is undefined! Cannot continue. Whatever enemy this is supposed to be will not be in the game. If you're using an external ravager mod, report this to that author, otherwise report this to the Ravager Framework")
+		return false
+	}
+	if (count == undefined) {
+		console.warn(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: 'count' parameter is undefined for enemy "${enemy.name}". Count will be defaulted to one, no stronger variations will be added. You should report this to the author of this ravager.`)
+		count = 1
+	}
+	if (count < 1) {
+		console.warn(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: 'count' parameter is less than one for enemy "${enemy.name}". This enemy will not be added. You should report this to the author of this ravager.`)
+		return false
+	}
+	if (!textKeys && !options.skipTextKeyWarning) {
+		console.warn(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: 'textKeys' parameter for enemy "${enemy.name}" has no text keys. This enemy will have no text keys added by this function.`)
+	}
+	if (enemyDefinitionDictionary == undefined) {
+		if (!(options.skipEnemyDefinitionDictionaryWarning || enemy.addedByMod == "RavagerFramework"))
+			console.warn(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: options.enemyDefinitionDictionary was undefined for enemy "${enemy.name}". Definitions dictionary will be defaulted to RavagerData.Definitions.Enemies. You should report this to the author of this ravager.`)
+		enemyDefinitionDictionary = RavagerData.Definitions.Enemies
+	}
+	if (higherLevelIncrease == false && slowLevelIncreaseAmount == undefined) {
+		RFDebug(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: options.slowLevelIncreaseAmount is undefined for enemy "${enemy.name}" and this enemy will need to use this value to increase minLevel. This value will be defaulted to 1. You should report this to the author of this ravager.`, { RFIsBeingInitiliazed: true })
+		slowLevelIncreaseAmount = 1
+	}
+	let prevEnemy = undefined
+	let currentEnemy = structuredClone(enemy)
+	for (let i = 0; i < count; i++) {
+		RFTrace(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: Starting loop #${i} for enemy ${enemy.name}`)
+		if (i > 0) {
+			prevEnemy = structuredClone(currentEnemy)
+			currentEnemy = structuredClone(enemy)
+			currentEnemy.name = currentEnemy.name + i.toString()
+			currentEnemy.maxhp = currentEnemy.maxhp * (1 + i)
+			currentEnemy.minLevel = prevEnemy.minLevel + (higherLevelIncrease ? i : slowLevelIncreaseAmount)
+			currentEnemy.armor = prevEnemy.armor + 0.5
+			KDModFiles[`Game/Enemies/${currentEnemy.name}.png`] = KDModFiles[`Game/Enemies/${enemy.name}.png`]
+		}
+		RFTrace(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: Pushing enemy ${currentEnemy.name}:`, currentEnemy)
+		KinkyDungeonEnemies.push(currentEnemy)
+		enemyDefinitionDictionary[currentEnemy.name] = structuredClone(currentEnemy)
+		RFTrace(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: Adding text keys for enemy ${currentEnemy.name}`)
+		for (let key in textKeys)
+			addTextKey(key.replace("EnemyName", currentEnemy.name), textKeys[key])
+	}
+	return true
+}
+
 /* 
 	RAVAGER FRAMEWORK 0.01
 	No enemies are added by this file. It's just the framework.

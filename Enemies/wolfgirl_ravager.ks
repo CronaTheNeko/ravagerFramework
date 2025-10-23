@@ -281,13 +281,11 @@ let wolfRavager = {
 	noDisplace: true, // theoretically stops enemies from shoving this one out of the way. didn't seem to work by its lonesome for me
 	focusPlayer: true, // obvious
 }
-KinkyDungeonEnemies.push(wolfRavager)
-RavagerData.Definitions.Enemies.WolfgirlRavager = structuredClone(wolfRavager)
-
 //textkeys
-// addTextKey("NameSlimeRavager", "Slimegirl")
-addTextKey('NameWolfgirlRavager', 'Wolfgirl Alpha')
-addTextKey('AttackWolfgirlRavager','~~{RavagerFrameworkNoMessageDisplay}~~')
-addTextKey('AttackWolfgirlRavagerDash','The alpha yanks your body against her hard!')
-addTextKey("KillWolfgirlRavager", "The alpha scrambles away, waiting for her next chance...")
-// Still need , , 
+let keys = {
+	NameEnemyName: "Wolfgirl Alpha",
+	AttackEnemyName: "~{RavagerFrameworkNoMessageDisplay}~~",
+	AttackEnemyNameDash: "The alpha yanks your body against her hard!",
+	KillEnemyName: "The alpha scrambles away, waiting for her next chance...",
+}
+RavagerFrameworkPushEnemiesWithStrongVariations(wolfRavager, 4, keys)
