@@ -1,3 +1,9 @@
+// Check for heavy debugging during initialization
+window._RavagerFrameworkDebugEnabled = false;
+if (localStorage.hasOwnProperty('RavagerFrameworkTraceMessages')) {
+	_RavagerFrameworkDebugEnabled = localStorage.RavagerFrameworkTraceMessages
+}
+
 // Verbosity function for normal level debugging
 window.RFDebug = (...args) => {
 	let inInit = false
@@ -141,15 +147,15 @@ for (var key in debugCallbacks) {
 }
 
 // Hidden option to enable way too many console messages
-window._RavagerFrameworkDebugEnabled = false;
-window.RavagerFrameworkToggleDebug = function() {
-	if (_RavagerFrameworkDebugEnabled) {
-		console.log('[Ravager Framework] Serious debug mode disabled.')
-		_RavagerFrameworkDebugEnabled = false
-	} else {
+window.RavagerFrameworkToggleDebug = function(enable = false) {
+	if (!_RavagerFrameworkDebugEnabled || enable) {
 		console.log('[Ravager Framework] Serious debug mode enabled. Hope you like lots of text and variables!')
 		_RavagerFrameworkDebugEnabled = true
+	} else {
+		console.log('[Ravager Framework] Serious debug mode disabled.')
+		_RavagerFrameworkDebugEnabled = false
 	}
+	localStorage.RavagerFrameworkTraceMessages = _RavagerFrameworkDebugEnabled
 }
 // Developer helper function to verify a ravager's EAM values - please don't have a bug ;-;
 window.RavagerFrameworkVerifyEAM = function(ravagerName) {
