@@ -1,23 +1,70 @@
+// Flag to know when we finish initializing
+window._RavagerFrameworkInInit = true;
 // Check for heavy debugging during initialization
 window._RavagerFrameworkDebugEnabled = false;
 if (localStorage.hasOwnProperty('RavagerFrameworkTraceMessages')) {
 	_RavagerFrameworkDebugEnabled = localStorage.RavagerFrameworkTraceMessages
 }
 
-// Verbosity function for normal level debugging
-window.RFDebug = (...args) => {
-	let inInit = false
-	if (typeof(args[args.length - 1]) == 'object' && args[args.length - 1].RFIsBeingInitiliazed) {
-		args.pop()
-		inInit = true
+// Helper for pushing to debug log buffer
+window.RavagerFrameworkPushToLogBuffer = (msg, level = "INFO") => {
+	// Check if we actually want to add logs to a potential log file (assuming yes during initialization)
+	if (RavagerData.Variables.IWantToHelpDebug || _RavagerFrameworkInInit) {
+		// A structured log line, with extra info so we can know when it happened while reading a log after the events
+		let logLine = {
+			level: level,
+			gameState: {
+				currentTick: KinkyDungeonCurrentTick,
+				state: KinkyDungeonState, // State tracks things like Menu, NewGame, Wardrobe, Game
+				drawState: KinkyDungeonDrawState // DrawState tracks the state within Game
+			},
+			callStack: undefined,
+			msg: structuredClone(msg)
+		}
+		// Build a string to track the call stack
+		// - Start by getting call stack by creating an error
+		let stack_str_base = new Error().stack.replace("Error\n", "").replaceAll("    at ", "")
+		// - Will be our final call stack string
+		let stack_str = ""
+		// - Each function in the call stack is on its own line; trim each line to the function name and add to our final string
+		stack_str_base.split("\n").forEach(v => {
+			v = v.trim()
+			// Only add the current function call to the call stack if it's not one of the console message wrappers and not this function
+			if (!v.match(/window\.(RF(Error|Warn|Info|Debug|Trace)|RavagerFrameworkPushToLogBuffer)/))
+				stack_str += v.split(" ")[0] + " <= "
+		})
+		// - Save our call stack, but remove the trailing " <= " from it
+		logLine.callStack = stack_str.substr(0, stack_str.length - 4)
+		// Push this log line to our buffer
+		RavagerData.Variables.IWantToHelpDebugBuffer.push(logLine)
 	}
-	if (RavagerData.Variables.IWantToHelpDebug)
-		RavagerData.Variables.IWantToHelpDebugBuffer.push(...args)
-	RFDebugEnabled(inInit) && console.log(...args)
+}
+// Verbosity function for normal level debugging
+// This is just console.log wrapped in a function to see if we're debugging
+window.RFDebug = (...args) => {
+	RavagerFrameworkPushToLogBuffer(args)
+	RFDebugEnabled() && console.log(...args)
 }
 // Verbosity function for extreme level debugging
+// This is just console.log wrapped in a function to see if we're doing heavy debugging
 window.RFTrace = (...args) => {
+	RavagerFrameworkPushToLogBuffer(args, "TRACE")
 	_RavagerFrameworkDebugEnabled && console.log(...args)
+}
+// Wrapper around console.warn
+window.RFWarn = (...args) => {
+	RavagerFrameworkPushToLogBuffer(args, "WARN")
+	console.warn(...args)
+}
+// Wrapper around console.error
+window.RFError = (...args) => {
+	RavagerFrameworkPushToLogBuffer(args, "ERROR")
+	console.error(...args)
+}
+// Wrapper around console.log, but this one will always print the message
+window.RFInfo = (...args) => {
+	RavagerFrameworkPushToLogBuffer(args, "INFO")
+	console.log(...args)
 }
 
 // Verbose, but acturate name. Easy way to create stronger versions of enemies.
@@ -34,33 +81,33 @@ window.RFTrace = (...args) => {
 window.RFPushEnemiesWithStrongVariations = function(enemy, count, textKeys, higherLevelIncrease = true, slowLevelIncreaseAmount = 1, enemyDefinitionDictionary = RavagerData.Definitions.Enemies, options = { skipTextKeyWarning: false, skipEnemyDefinitionDictionaryWarning: false }) {
 	RFDebug('[Ravager Framework][RFPushEnemiesWithStrongVariations]: enemy: ', enemy, '; count: ', count, '; textKeys: ', textKeys, '; higherLevelIncrease: ', higherLevelIncrease, '; slowLevelIncreaseAmount: ', slowLevelIncreaseAmount, '; options: { skipTextKeyWarning: ', options?.skipTextKeyWarning, ', skipEnemyDefinitionDictionaryWarning: ', options?.skipEnemyDefinitionDictionaryWarning, ' }')
 	if (!enemy) {
-		console.error("[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: 'enemy' parameter is undefined! Cannot continue. Whatever enemy this is supposed to be will not be in the game. If you're using an external ravager mod, report this to that author, otherwise report this to the Ravager Framework")
+		RFError("[Ravager Framework][RFPushEnemiesWithStrongVariations]: 'enemy' parameter is undefined! Cannot continue. Whatever enemy this is supposed to be will not be in the game. If you're using an external ravager mod, report this to that author, otherwise report this to the Ravager Framework")
 		return false
 	}
 	if (count == undefined) {
-		console.warn(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: 'count' parameter is undefined for enemy "${enemy.name}". Count will be defaulted to one, no stronger variations will be added. You should report this to the author of this ravager.`)
+		RFWarn(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: 'count' parameter is undefined for enemy "${enemy.name}". Count will be defaulted to one, no stronger variations will be added. You should report this to the author of this ravager.`)
 		count = 1
 	}
 	if (count < 1) {
-		console.warn(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: 'count' parameter is less than one for enemy "${enemy.name}". This enemy will not be added. You should report this to the author of this ravager.`)
+		RFWarn(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: 'count' parameter is less than one for enemy "${enemy.name}". This enemy will not be added. You should report this to the author of this ravager.`)
 		return false
 	}
 	if (!textKeys && !options.skipTextKeyWarning) {
-		console.warn(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: 'textKeys' parameter for enemy "${enemy.name}" has no text keys. This enemy will have no text keys added by this function.`)
+		RFWarn(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: 'textKeys' parameter for enemy "${enemy.name}" has no text keys. This enemy will have no text keys added by this function.`)
 	}
 	if (enemyDefinitionDictionary == undefined) {
 		if (!(options.skipEnemyDefinitionDictionaryWarning || enemy.addedByMod == "RavagerFramework"))
-			console.warn(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: options.enemyDefinitionDictionary was undefined for enemy "${enemy.name}". Definitions dictionary will be defaulted to RavagerData.Definitions.Enemies. You should report this to the author of this ravager.`)
+			RFWarn(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: enemyDefinitionDictionary was undefined for enemy "${enemy.name}". Definitions dictionary will be defaulted to RavagerData.Definitions.Enemies. You should report this to the author of this ravager.`)
 		enemyDefinitionDictionary = RavagerData.Definitions.Enemies
 	}
 	if (higherLevelIncrease == false && slowLevelIncreaseAmount == undefined) {
-		RFDebug(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: options.slowLevelIncreaseAmount is undefined for enemy "${enemy.name}" and this enemy will need to use this value to increase minLevel. This value will be defaulted to 1. You should report this to the author of this ravager.`, { RFIsBeingInitiliazed: true })
+		RFDebug(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: slowLevelIncreaseAmount is undefined for enemy "${enemy.name}" and this enemy will need to use this value to increase minLevel. This value will be defaulted to 1. You should report this to the author of this ravager.`)
 		slowLevelIncreaseAmount = 1
 	}
 	let prevEnemy = undefined
 	let currentEnemy = structuredClone(enemy)
 	for (let i = 0; i < count; i++) {
-		RFTrace(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: Starting loop #${i} for enemy ${enemy.name}`)
+		RFTrace(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: Starting loop #${i} for enemy ${enemy.name}`)
 		if (i > 0) {
 			prevEnemy = structuredClone(currentEnemy)
 			currentEnemy = structuredClone(enemy)
@@ -70,10 +117,10 @@ window.RFPushEnemiesWithStrongVariations = function(enemy, count, textKeys, high
 			currentEnemy.armor = prevEnemy.armor + 0.5
 			KDModFiles[`Game/Enemies/${currentEnemy.name}.png`] = KDModFiles[`Game/Enemies/${enemy.name}.png`]
 		}
-		RFTrace(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: Pushing enemy ${currentEnemy.name}:`, currentEnemy)
+		RFTrace(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: Pushing enemy ${currentEnemy.name}:`, currentEnemy)
 		KinkyDungeonEnemies.push(currentEnemy)
 		enemyDefinitionDictionary[currentEnemy.name] = structuredClone(currentEnemy)
-		RFTrace(`[Ravager Framework][RavagerFrameworkPushEnemiesWithStrongVariations]: Adding text keys for enemy ${currentEnemy.name}`)
+		RFTrace(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: Adding text keys for enemy ${currentEnemy.name}`)
 		for (let key in textKeys)
 			addTextKey(key.replace("EnemyName", currentEnemy.name), textKeys[key])
 	}
@@ -166,7 +213,7 @@ window.RavagerAddCallback = (key, func) => {
 			throw new Error('[Ravager Framework] Failed to initialize the ravager callbacks key! Something seems to have gone very wrong. Please report this to the Ravager Framework with as much info as you can provide.')
 		}
 	}
-	console.log('[Ravager Framework] Adding callback function with key: ', key)
+	RFDebug('[Ravager Framework] Adding callback function with key: ', key)
 	KDEventMapEnemy['ravagerCallbacks'][key] = func
 	return Boolean(KDEventMapEnemy['ravagerCallbacks'][key])
 }
@@ -203,16 +250,16 @@ let debugCallbacks = {
 }
 for (var key in debugCallbacks) {
 	if (!RavagerAddCallback(key, debugCallbacks[key]))
-		console.error('[Ravager Framework] Failed to add debug callback: ', key)
+		RFError('[Ravager Framework] Failed to add debug callback: ', key)
 }
 
 // Hidden option to enable way too many console messages
 window.RavagerFrameworkToggleDebug = function(enable = false) {
 	if (!_RavagerFrameworkDebugEnabled || enable) {
-		console.log('[Ravager Framework] Serious debug mode enabled. Hope you like lots of text and variables!')
+		RFDebug('[Ravager Framework] Serious debug mode enabled. Hope you like lots of text and variables!')
 		_RavagerFrameworkDebugEnabled = true
 	} else {
-		console.log('[Ravager Framework] Serious debug mode disabled.')
+		RFDebug('[Ravager Framework] Serious debug mode disabled.')
 		_RavagerFrameworkDebugEnabled = false
 	}
 	localStorage.RavagerFrameworkTraceMessages = _RavagerFrameworkDebugEnabled
@@ -222,17 +269,17 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 	const ravager = KDEnemiesCache.get(ravagerName)
 	// Check that enemy exists
 	if (!ravager) {
-		console.error('[RavagerFrameworkVerifyEAM] Could not find an enemy by the name of ', ravagerName)
+		RFError('[RavagerFrameworkVerifyEAM] Could not find an enemy by the name of ', ravagerName)
 		return false
 	}
 	// Check for ravager.ravage to make sure this is a ravager
 	if (!ravager.ravage) {
-		console.error('[RavagerFrameworkVerifyEAM] Enemy does not have a "ravage" property. Either you\'re checking the wrong enemy, or you\'ve defined your ravager wrong.')
+		RFError('[RavagerFrameworkVerifyEAM] Enemy does not have a "ravage" property. Either you\'re checking the wrong enemy, or you\'ve defined your ravager wrong.')
 		return false
 	}
 	// Check that ravager has ranges
 	if (!ravager.ravage.ranges || ravager.ravage.ranges.length < 1) {
-		console.error('[RavagerFrameworkVerifyEAM] Ravager has no ranges. This ravager will be unable to ravage the player.')
+		RFError('[RavagerFrameworkVerifyEAM] Ravager has no ranges. This ravager will be unable to ravage the player.')
 		return false
 	}
 	// Track failed ranges
@@ -245,7 +292,7 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 	for (var range of ravager.ravage.ranges) {
 		// Check for rangeData
 		if (range.length < 2 || !range[1]) {
-			console.error('[RavagerFrameworkVerifyEAM] Invalid range: ', range)
+			RFError('[RavagerFrameworkVerifyEAM] Invalid range: ', range)
 			// return false
 			failedRanges.push(range)
 			continue
@@ -255,39 +302,39 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 		if (rangeData.hasOwnProperty('useCount')) {
 			let useCount = rangeData.useCount
 			if (typeof useCount == undefined) {
-				console.warn('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount defined, but it is set to undefined. Doing so is not well tested. If this is not your last range, the expected behavior is to block incrementing use count, but that is unnecessary, as that is the default bahvior. If this is in your last range, this will result in incrementing the use count by 1 regardless of slot. It is recommended you either remove this setting if it is not in your last range, or set useCount to 0 if this is in your last range and you wish to block incrementing use counts.')
+				RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount defined, but it is set to undefined. Doing so is not well tested. If this is not your last range, the expected behavior is to block incrementing use count, but that is unnecessary, as that is the default bahvior. If this is in your last range, this will result in incrementing the use count by 1 regardless of slot. It is recommended you either remove this setting if it is not in your last range, or set useCount to 0 if this is in your last range and you wish to block incrementing use counts.')
 			} else if (typeof useCount == 'number') {
 				if (useCount == 0)
-					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to zero. If this is the last range, this will prevent incrementing use counts. If this is not the last range, this setting is unnecessary.')
+					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to zero. If this is the last range, this will prevent incrementing use counts. If this is not the last range, this setting is unnecessary.')
 				else if (useCount < 0)
-					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to a negative value. This will result in DECREMENTING use counts instead of incrementing them.')
+					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to a negative value. This will result in DECREMENTING use counts instead of incrementing them.')
 				else if (useCount > 0)
-					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use counts by ', useCount, ' for every slot')
+					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use counts by ', useCount, ' for every slot')
 				else
-					console.error('[RavagerFrameworkVerifyEAM] wtf just happened? (useCount = number)')
+					RFError('[RavagerFrameworkVerifyEAM] wtf just happened? (useCount = number)')
 			} else if (typeof useCount == 'object') {
 				let hasSlots = false
 				if (useCount.hasOwnProperty('ItemVulva')) {
-					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemVulva by ', useCount.ItemVulva)
+					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemVulva by ', useCount.ItemVulva)
 					hasSlots = true
 				}
 				if (useCount.hasOwnProperty('ItemMouth')) {
-					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemMouth by ', useCount.ItemMouth)
+					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemMouth by ', useCount.ItemMouth)
 					hasSlots = true
 				}
 				if (useCount.hasOwnProperty('ItemButt')) {
-					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemButt by ', useCount.ItemButt)
+					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemButt by ', useCount.ItemButt)
 					hasSlots = true
 				}
 				if (useCount.hasOwnProperty('ItemHead')) {
-					console.log('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemHead by ', useCount.ItemHead)
+					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemHead by ', useCount.ItemHead)
 					hasSlots = true
 				}
 				if (!hasSlots) {
-					console.warn('[RavagerFrameworkVerifyEAM] Range ', range, ' defines useCount as a dictionary, but has no slots. This will result in never incrementing use counts.')
+					RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' defines useCount as a dictionary, but has no slots. This will result in never incrementing use counts.')
 				}
 			} else {
-				console.error('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to an unknown type. This scenario is untested. If you beleive this is a mistake, please report the issue. Otherwise, it is recommended to fix your definition of useCount.')
+				RFError('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to an unknown type. This scenario is untested. If you beleive this is a mistake, please report the issue. Otherwise, it is recommended to fix your definition of useCount.')
 			}
 		}
 		// Track if this range has any EAM settings
@@ -299,7 +346,7 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 			for (var count of rangeData.experiencedTaunts) {
 				// Check structure of taunt range
 				if (count.length < 2 || !count[1]) {
-					console.warn('[RavagerFrameworkVerifyEAM] This range has an invalid EAM taunt definition: ', count)
+					RFWarn('[RavagerFrameworkVerifyEAM] This range has an invalid EAM taunt definition: ', count)
 					if (!eamFailedRanges.includes(count))
 						eamFailedRanges.push(count)
 					continue
@@ -316,25 +363,25 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 						continue
 					let stringsValid = Array.isArray(countData[slot])
 					if (!stringsValid) {
-						console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
+						RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
 						continue
 					}
 					for (var string of countData[slot]) {
 						stringsValid = stringsValid && typeof string == 'string'
 					}
 					if (!stringsValid) {
-						console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains taunts which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
+						RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains taunts which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
 					}
 					// hasSlots = hasSlots || stringsValid
 					hasSlots = true
 				}
 				// Warn if there's no slots
 				if (!hasSlots)
-					console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
+					RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
 				tauntsValid = tauntsValid && hasSlots
 			}
 			if (!tauntsValid)
-				console.warn('[RavagerFrameworkVerifyEAM] experiencedTaunts is defined for range ' + range[0] + '. Either experiencedTaunts is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
+				RFWarn('[RavagerFrameworkVerifyEAM] experiencedTaunts is defined for range ' + range[0] + '. Either experiencedTaunts is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
 			hasEAMProps = hasEAMProps || tauntsValid
 		}
 		// Check for narration
@@ -342,7 +389,7 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 			let narrationValid = true
 			for (var count of rangeData.experiencedTaunts) {
 				if (count.length < 2 || !count[1]) {
-					console.warn('[RavagerFrameworkVerifyEAM] This range has an invalid EAM narration definition: ', count)
+					RFWarn('[RavagerFrameworkVerifyEAM] This range has an invalid EAM narration definition: ', count)
 					if (!eamFailedRanges.includes(count))
 						eamFailedRanges.push(count)
 					continue
@@ -354,23 +401,23 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 						continue
 					let stringsValid = Array.isArray(countData[slot])
 					if (!stringsValid) {
-						console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
+						RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
 						continue
 					}
 					for (var string of countData[slot]) {
 						stringsValid = stringsValid && typeof string == 'string'
 					}
 					if (!stringsValid) {
-						console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains narrations which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
+						RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains narrations which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
 					}
 					hasSlots = true
 				}
 				if (!hasSlots)
-					console.warn('[RavagerFrameworkVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
+					RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
 				narrationValid = narrationValid && hasSlots
 			}
 			if (!narrationValid)
-				console.warn('[RavagerFrameworkVerifyEAM] experiencedNarration is defined for range ' + range[0] + '. Either experiencedNarration is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
+				RFWarn('[RavagerFrameworkVerifyEAM] experiencedNarration is defined for range ' + range[0] + '. Either experiencedNarration is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
 			hasEAMProps = hasEAMProps || narrationValid
 		}
 		//
@@ -378,38 +425,38 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 		let hasAlways = rangeData.hasOwnProperty('experiencedAlways')
 		//
 		if (!hasEAMProps && (hasChance || hasAlways)) {
-			console.warn('[RavagerFrameworkVerifyEAM] Range ', range, 'defines EAM chance or always, but does not appear to have any valid taunts or narrations. Without taunts or narrations to use, EAM text will not be used, and the chance and always settings are pointless')
+			RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, 'defines EAM chance or always, but does not appear to have any valid taunts or narrations. Without taunts or narrations to use, EAM text will not be used, and the chance and always settings are pointless')
 		}
 		//
 		hasEAMProps = hasEAMProps || hasChance || hasAlways
 		//
 		if (hasChance && hasAlways && rangeData.experiencedAlways) {
-			console.warn('[RavagerFrameworkVerifyEAM] Range ', range, ' defines both experiencedChance and experiencedAlways. experiencedAlways overrides experiencedChance, so it\'s pointless to have them both declared at the same time.')
+			RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' defines both experiencedChance and experiencedAlways. experiencedAlways overrides experiencedChance, so it\'s pointless to have them both declared at the same time.')
 			continue
 		}
 		// Check for chance
 		if (hasChance && rangeData.experiencedChance <= 0) {
-			console.warn('[RavagerFrameworkVerifyEAM] Range ', range, ' has experiencedChance set to or below 0. This setting will result in EAM text never being used unless the user overrides your ravager\'s preference.')
+			RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' has experiencedChance set to or below 0. This setting will result in EAM text never being used unless the user overrides your ravager\'s preference.')
 		}
 		// Check for always
 		if (hasAlways && !rangeData.experiencedAlways) {
-			console.warn('[RavagerFrameworkVerifyEAM] Range ', range, ' has experiencedAlways set to false. Doing so is entirely unneeded, as this setting only has any effect when true.')
+			RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' has experiencedAlways set to false. Doing so is entirely unneeded, as this setting only has any effect when true.')
 		}
 		hasEAMRanges = hasEAMRanges || hasEAMProps
 	}
 	// Bail on failed ranges
 	if (failedRanges.length > 0) {
-		console.error('[RavagerFrameworkVerifyEAM] The following ranges are invalid and may cause crashes: ', failedRanges)
+		RFError('[RavagerFrameworkVerifyEAM] The following ranges are invalid and may cause crashes: ', failedRanges)
 		return false
 	}
 	// Bail of EAM failures in ranges
 	if (eamFailedRanges.length > 0) {
-		console.error('[RavagerFrameworkVerifyEAM] The following ranges have invalid EAM properties and may cause crashes: ', eamFailedRanges)
+		RFError('[RavagerFrameworkVerifyEAM] The following ranges have invalid EAM properties and may cause crashes: ', eamFailedRanges)
 		return false
 	}
 	//
 	if (!hasEAMRanges) {
-		console.error('[RavagerFrameworkVerifyEAM] Ravager doesn\'t appear to have any ranges with valid EAM properties.')
+		RFError('[RavagerFrameworkVerifyEAM] Ravager doesn\'t appear to have any ranges with valid EAM properties.')
 		return false
 	}
 	return true
@@ -418,7 +465,7 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 window.RavagerFrameworkRevertFunctions = function() {
 	const functions = [ 'DrawButtonKDEx', 'KinkyDungeonDrawEnemiesHP', 'KinkyDungeonDrawGame', 'KinkyDungeonRun', 'KinkyDungeonHandleClick', 'KDDropItems', 'DrawCheckboxKDEx', 'KinkyDungeonSendTextMessage' ]
 	for (let f of functions) {
-		console.log(`Reverting ${f} ...`)
+		RFDebug(`Reverting ${f} ...`)
 		window[f] = RavagerData.functions[f]
 	}
 	KinkyDungeonState = RavagerData.Variables.PrevState
@@ -429,7 +476,9 @@ window.RavagerFrameworkRevertFunctions = function() {
 // Function to get a mod setting value
 // If settings are undefined, it'll return the default value given to KDModConfigs
 // If there is not matching value given to KDModConfigs, it'll return undefined
-window.RavagerGetSetting = function(refvar, inInit = false) {
+window.RavagerGetSetting = function(refvar) {
+	if (refvar == "ravagerDebug" && _RavagerFrameworkDebugEnabled)
+		return true
 	// Mod settings and default config objects
 	const settings = KDModSettings.RavagerFramework
 	var config = RavagerData.ModConfig[refvar]
@@ -437,7 +486,7 @@ window.RavagerGetSetting = function(refvar, inInit = false) {
 	function RFConfigDefault(refvar, config) {
 		// Check for missing default values; signals either a data structure change or (dev) failure to declare default values
 		if (config == undefined) {
-			console.error('[Ravager Framework]: RavagerGetSetting couldn\'t find ModConfig values for ' + refvar + ' !')
+			RFError('[Ravager Framework]: RavagerGetSetting couldn\'t find ModConfig values for ' + refvar + ' !')
 			return undefined
 		}
 		return config.default
@@ -456,14 +505,14 @@ window.RavagerGetSetting = function(refvar, inInit = false) {
 	}
 	// No settings, return default; probably should never happen, but I believe I've seen it in the past when there's no localData
 	if (!settings) {
-		if (!inInit)
-			console.warn('[Ravager Framework]: RavagerGetSetting couldn\'t get current settings for the framework!')
+		if (!_RavagerFrameworkInInit)
+			RFWarn('[Ravager Framework]: RavagerGetSetting couldn\'t get current settings for the framework!')
 		return RFConfigCheckLocalStorage(refvar, config)
 	}
 	// Requested setting isn't set, return default
 	if (settings[refvar] == undefined) {
-		if (!inInit)
-			console.warn('[Ravager Framework]: RavagerGetSetting couldn\'t get the current setting for ' + refvar)
+		if (!_RavagerFrameworkInInit)
+			RFWarn('[Ravager Framework]: RavagerGetSetting couldn\'t get the current setting for ' + refvar)
 		return RFConfigCheckLocalStorage(refvar, config)
 	}
 	// Return setting
@@ -494,7 +543,7 @@ window.RavagerData = {
 					// Don't remember why we need to interrupt sleep, but sounds like an alright idea, so sure
 					KinkyDungeonInterruptSleep()
 					// Debug message
-					_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework][RavagerSoundHit]: enableSound: ', RavagerGetSetting('ravagerEnableSound'), '\nvolume: ', RavagerGetSetting('ravagerSoundVolume') / 2, '\nonHitChance: ', RavagerGetSetting('onHitChance'))
+					RFTrace('[Ravager Framework][RavagerSoundHit]: enableSound: ', RavagerGetSetting('ravagerEnableSound'), '\nvolume: ', RavagerGetSetting('ravagerSoundVolume') / 2, '\nonHitChance: ', RavagerGetSetting('onHitChance'))
 					// Might play a sound
 					if (KDToggles.Sound && RavagerGetSetting('ravagerEnableSound') && Math.random() < RavagerGetSetting('onHitChance')) {
 						AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio/" + (KinkyDungeonGagTotal() > 0 ? "Angry21 liliana.ogg" : "Ah1 liliana.ogg"), RavagerGetSetting('ravagerSoundVolume') / 2)
@@ -558,9 +607,9 @@ window.RavagerData = {
 		// Most, if not all, of my narration strings pass through this. We could simplify making varying dialogue by adding a 'choose a random option for this section of the string' functionality. Example: "EnemyName does (option1|option2) to you", where (option1|option2) is two options that will be randomly chosen from. See MimicRavager's ravaging narration for example of dialogue that could be greatly simplified by this addition. --- GOT IT! Fuck that was annoying; handles recursive choices fine (example: "{s{T{R|r}E|tre}tching|swelling}" to be one of "swelling", "stretching", "sTREtching", or "sTrEtching"), and seemingly handles a "|" outside of curly brackets
 		NameFormat: function(string, entity, restraint, clothing, damage, skipCapitalize) {
 			function RFNFTrace(...args) {
-				RavagerData.Variables.RFControl.NameFormatDebug && console.log(...args)
+				RavagerData.Variables.RFControl.NameFormatDebug && RFDebug(...args)
 			}
-			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Initial string "' + string + '"; entity: ', entity)
+			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Initial string "' + string + '"; entity: ', entity, '; restraint: ', restraint, '; clothing: ', clothing, '; damage: ', damage, '; skipCapitalize: ', skipCapitalize)
 			// Player name
 			string = string.replace("PlayerName", KDGameData.PlayerName)
 			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
@@ -646,10 +695,10 @@ window.RavagerData = {
 					}
 				}
 			  if (currentLevel > 0) {
-			    console.warn("[Ravager Framework][NameFormat][InStringRandom]: Input string contains more opening brackets than closing brackets. We will return the input string with an error prefix. Please report this to the author! Offending string:\n" + input)
+			    RFWarn("[Ravager Framework][NameFormat][InStringRandom]: Input string contains more opening brackets than closing brackets. We will return the input string with an error prefix. Please report this to the author! Offending string:\n" + input)
 			    return "[ERROR]" + input
 			  } else if (currentLevel < 0) {
-			    console.warn("[Ravager Framework][NameFormat][InStringRandom]: Input string contains more closing brackets than opening brackets. We will return the input string with an error prefix. Please report this to the author! Offending string:\n" + input)
+			    RFWarn("[Ravager Framework][NameFormat][InStringRandom]: Input string contains more closing brackets than opening brackets. We will return the input string with an error prefix. Please report this to the author! Offending string:\n" + input)
 			    return "[ERROR]" + input
 			  }
 			  RFNFTrace("[Ravager Framework][DBG][InStringRandom]: Final output: " + output)
@@ -673,7 +722,7 @@ window.RavagerData = {
 				{
 					name: "RFControlBack",
 					func: () => {
-						RFDebugEnabled() && console.log("[Ravager Framework][RFControlRun] Leaving ravager control")
+						RFDebug("[Ravager Framework][RFControlRun] Leaving ravager control")
 						RavagerData.Variables.State = RavagerData.Variables.PrevState
 						RavagerData.Variables.DrawState = RavagerData.Variables.PrevDrawState
 					},
@@ -693,6 +742,16 @@ window.RavagerData = {
 					Width: 300,
 					Height: 64,
 					Label: "Revert functions"
+				},
+				{
+					name: "RFControlEndIWantToHelpDebugMode",
+					func: () => { KDModSettings.RavagerFramework.ravagerHelpDebug = false; RavagerFrameworkIWantToHelpDebug('Finish') },
+					enabled: true,
+					Left: 550,
+					Top: 792,
+					Width: 300,
+					Height: 64,
+					Label: "End Debug Log"
 				}
 			]
 			// All the checkboxes we'll draw
@@ -949,7 +1008,7 @@ window.RavagerData = {
 		Target: ${enemy.target}
 		TX: ${enemy.tx}
 		TY: ${enemy.ty}`
-			console.log("[Ravager Framework][TrackMimics]: enemy: ", enemy, string)
+			RFDebug("[Ravager Framework][TrackMimics]: enemy: ", enemy, string)
 		},
 		SetTrackMimics: function(tracked) {
 			let enemy = KinkyDungeonEnemies.find(enemy =>
@@ -966,13 +1025,13 @@ window.RavagerData = {
 			RavagerData.Variables.RFControl.TrackMimics = tracked
 		},
 		AnnounceRavagers: function(e, enemy, data) {
-			console.log(`[Ravager Framework][AnnounceRavagers]: { ${KinkyDungeonCurrentTick} }  ${enemy.Enemy.name} (id ${enemy.id}) at (${enemy.x}, ${enemy.y})`)
+			RFDebug(`[Ravager Framework][AnnounceRavagers]: { ${KinkyDungeonCurrentTick} }  ${enemy.Enemy.name} (id ${enemy.id}) at (${enemy.x}, ${enemy.y})`)
 		},
 		SetAnnounceRavagers: function(enabled) {
-			console.log(`[Ravager Framework][RFControl][SetAnnounceRavagers]: Setting ravager announcement to ${enabled} ...`)
+			RFDebug(`[Ravager Framework][RFControl][SetAnnounceRavagers]: Setting ravager announcement to ${enabled} ...`)
 			let enemies = KinkyDungeonEnemies.filter(enemy => enemy.addedByMod == "RavagerFramework")
 			if (enabled) {
-				KDEventMapGeneric.tick.RavagerFrameworkTrackPlayer = function(e, data) { console.log(`[Ravager Framework][TrackPlayer]: Player at (${KinkyDungeonPlayerEntity.x}, ${KinkyDungeonPlayerEntity.y})`); }
+				KDEventMapGeneric.tick.RavagerFrameworkTrackPlayer = function(e, data) { RFDebug(`[Ravager Framework][TrackPlayer]: Player at (${KinkyDungeonPlayerEntity.x}, ${KinkyDungeonPlayerEntity.y})`); }
 				KDEventMapGeneric.before
 				KDEventMapEnemy.tickAfter["RavagerFrameworkAnnounceRavagers"] = RavagerData.functions.AnnounceRavagers
 				for (let e of enemies)
@@ -995,45 +1054,45 @@ window.RavagerData = {
 			let restraintWeights = [];
 			// Get restraints
 			let Restraints = KDGetRestraintsEligible(enemy, Level, Index, Bypass, Lock, RequireWill, LeashingOnly, NoStack, extraTags, agnostic, filter, securityEnemy, curse, undefined, undefined, useAugmented, augmentedInventory, options);
-			// console.warn('[Ravager Framework][RFGetRestraint] Restraints: ', Restraints)
+			// RFWarn('[Ravager Framework][RFGetRestraint] Restraints: ', Restraints)
 			RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Eligible restraints: ", Restraints)
 			for (let rest of Restraints) {
 				let restraint = rest.restraint;
 				RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Processing restraint ${restraint.name}: `, rest)
 				// Skip restraints in exclude
 				if (exclude && exclude.includes(restraint.name)) {
-					// console.warn('is in excludes: ', restraint.name)
+					// RFWarn('is in excludes: ', restraint.name)
 					RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Skipping excluded restraint")
 					continue
 				}
-				// console.log('did not continue: ', restraint.name)
+				// RFDebug('did not continue: ', restraint.name)
 				let weight = rest.weight;
 				RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Base weight: ", weight)
 				if (weightMods && Object.keys(weightMods).includes(restraint.name) && typeof weightMods[restraint.name] == "number") {
-					// console.warn('changing modifier for ' + restraint.name + ': ' + weight + ' X' + weightMods[restraint.name])
+					// RFWarn('changing modifier for ' + restraint.name + ': ' + weight + ' X' + weightMods[restraint.name])
 					weight = weight * weightMods[restraint.name]
 					RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Modifying weight of ${restraint.name} (X${weightMods[restraint.name]}); New weight: ${weight}`)
-					// console.warn('new weight: ' + weight)
+					// RFWarn('new weight: ' + weight)
 				}
 				restraintWeights.push({restraint: restraint, weight: restraintWeightTotal, inventoryVariant: rest.inventoryVariant});
 				// weight += rest.weight;
 				restraintWeightTotal += Math.max(0, weight);
 			}
-			// console.warn(`[Ravager Framework][RFGetRestraint] restraintWeightTotal: ${restraintWeightTotal}; restraintWeights: `, restraintWeights)
+			// RFWarn(`[Ravager Framework][RFGetRestraint] restraintWeightTotal: ${restraintWeightTotal}; restraintWeights: `, restraintWeights)
 
 			let selection = KDRandom() * restraintWeightTotal;
 			RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Restraint weight total: ${restraintWeightTotal}; Restraints: `, restraintWeights, `; Selection: ${selection}`)
 
-			// console.warn('[Ravager Framework][RFGetRestraint] Selection: ', selection)
+			// RFWarn('[Ravager Framework][RFGetRestraint] Selection: ', selection)
 
 			for (let L = restraintWeights.length - 1; L >= 0; L--) {
 				if (selection > restraintWeights[L].weight) {
-					// console.warn(`[Ravager Framework][RFGetRestraint]: Decided restraint; L: ${L}; Returning: `, restraintWeights[L])
+					// RFWarn(`[Ravager Framework][RFGetRestraint]: Decided restraint; L: ${L}; Returning: `, restraintWeights[L])
 					RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Decided restraint. L: ${L}; `, restraintWeights[L])
 					return restraintWeights[L].restraint;
 				}
 			}
-			// console.warn('[Ravager Framework][RFGetRestraint] End RFGetRestraint')
+			// RFWarn('[Ravager Framework][RFGetRestraint] End RFGetRestraint')
 			RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Looks like there's no restraints left to return. End of RFGetRestraint.")
 		}
 	},
@@ -1215,6 +1274,13 @@ window.RavagerData = {
 			hoverDesc: "Who doesn't like a fancy font in their help messages?",
 			textKeyVal: "Custom font for help"
 		},
+		ravagerHelpDebug: {
+			type: "boolean",
+			refvar: "ravagerHelpDebug",
+			default: false,
+			hoverDesc: "Turn on heavy debugging mode so that you can provide a log file to help CTN with tracking down bugs.",
+			textKeyVal: "I want to help debug"
+		},
 	},
 	// Stores enemy definitions
 	Definitions: {
@@ -1281,7 +1347,9 @@ window.RavagerData = {
 		},
 		DebugWasTurnedOn: false,
 		DebugWasTurnedOff: false,
-		MimicBurstPossibleDress: [ "Leotard", "GreenLeotard", "Bikini", "Lingerie" ]
+		MimicBurstPossibleDress: [ "Leotard", "GreenLeotard", "Bikini", "Lingerie" ],
+		IWantToHelpDebug: false,
+		IWantToHelpDebugBuffer: []
 	}
 }
 // Shortcut to custom GetRestraint
@@ -1289,10 +1357,10 @@ window.RFGetRestraint = RavagerData.functions.GetRandomRestraint
 // Here so I can remove the messages from Attack{EnemyName}* during the ravage event (those messages are all the same and always end with "(no damage)", and they interupt my narration)
 KinkyDungeonSendTextMessage = function(priority, text, color, time, noPush, noDupe, entity, filter) {
 	if (text.match(/^~~\{RavagerFrameworkNoMessageDisplay\}~~/)) {
-		RavagerData.Variables.RFControl.DebugVanillaTextOverrides && console.log('[Ravager Framework][KinkyDungeonSendTextMessage]: Found ravager string to skip.')
+		RavagerData.Variables.RFControl.DebugVanillaTextOverrides && RFDebug('[Ravager Framework][KinkyDungeonSendTextMessage]: Found ravager string to skip.')
 		return false
 	}
-	RavagerData.Variables.RFControl.DebugVanillaTextOverrides && console.log('[Ravager Framework][KinkyDungeonSendTextMessage]: priority: ', priority, '; text: ', text, '; color: ', color, '; time: ', time, '; noPush: ', noPush, '; noDupe: ', noDupe, '; entity: ', entity, '; filter: ', filter)
+	RavagerData.Variables.RFControl.DebugVanillaTextOverrides && RFDebug('[Ravager Framework][KinkyDungeonSendTextMessage]: priority: ', priority, '; text: ', text, '; color: ', color, '; time: ', time, '; noPush: ', noPush, '; noDupe: ', noDupe, '; entity: ', entity, '; filter: ', filter)
 	return RavagerData.functions.KinkyDungeonSendTextMessage(priority, text, color, time, noPush, noDupe, entity, filter)
 }
 // Overriding item drops so I can have multiple drops from enemies
@@ -1624,8 +1692,8 @@ window.RFPlayerCanSeeEnemy = function(entity) {
 	return canSee && (visiblilty > 0)
 }
 // Shortcut to getting ravager debug
-window.RFDebugEnabled = function(inInit) {
-	return RavagerGetSetting('ravagerDebug', inInit)
+window.RFDebugEnabled = function() {
+	return RavagerGetSetting('ravagerDebug')
 }
 // Currently just used for the mimic spoiler, but there's other ideas of how this can be used, so I've attempted to generalize it
 KinkyDungeonDrawEnemiesHP = function(delta, canvasOffsetX, canvasOffsetY, CamX, CamY, _CamXoffset, _CamYoffset) {
@@ -1731,6 +1799,32 @@ KDEventMapEnemy['tick']['ravagerBubble'] = (e, entity, data) => {
 	}
 }
 
+// Enable heavy debugging from modconfig
+function RavagerFrameworkIWantToHelpDebug(reason) {
+	if (RavagerGetSetting("ravagerHelpDebug")) {
+		// Set my own variables to track debugging
+		RavagerData.Variables.IWantToHelpDebug = true
+		RavagerFrameworkToggleDebug(true)
+		KDModSettings.RavagerFramework.ravagerDebug = true
+		// Reset ravagerHelpDebug in localStorage, as we don't want this to be persistent
+		let j = JSON.parse(localStorage.KDModSettings)
+		j.RavagerFramework.ravagerHelpDebug = false
+		localStorage.KDModSettings = JSON.stringify(j)
+	} else if (RavagerData.Variables.IWantToHelpDebug) {
+		// Disable help debugging mode in variable
+		RavagerData.Variables.IWantToHelpDebug = false
+		RFDebug("[Ravager Framework][RavagerFrameworkIWantToHelpDebug]: Disabling debug logging and saving the log")
+		// Save the buffer to a file
+		const element = document.createElement("a");
+		const now = new Date()
+	  element.setAttribute("href", `data:text/plain;charset=utf-8,${encodeURIComponent(LZString.compressToBase64(JSON.stringify(RavagerData.Variables.IWantToHelpDebugBuffer/*, undefined, "  "*/)))}`);
+	  element.setAttribute("download", `RavagerDebug_${now.getFullYear()}_${String(now.getMonth()).padStart(2, "0")}_${String(now.getDate()).padStart(2, "0")}-${Intl.DateTimeFormat("en-US", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(now)}.txt`); // Disgusting chain
+	  element.style.display = "none"; // Hide the element
+	  document.body.appendChild(element);
+	  element.click();
+	  document.body.removeChild(element);
+	}
+}
 // Load or unload custom font
 function RavagerFrameworkRefreshFonts(reason) {
 	for (let font_data in RavagerData.Definitions.Fonts) {
@@ -1745,20 +1839,20 @@ function RavagerFrameworkRefreshFonts(reason) {
 			// Loads the font
 			if (!document.fonts.has(font_face)) {
 				document.fonts.add(font_face)
-				font_face.load().then(() => { console.log(`[Ravager Framework] Loaded font "${font.alias}"`) })
+				font_face.load().then(() => { RFDebug(`[Ravager Framework] Loaded font "${font.alias}"`) })
 			}
 		} else {
 			// Unloads the font
 			if (document.fonts.has(font_face)) {
 				document.fonts.delete(font_face)
-				console.log(`[Ravager Framework] Removed font "${font.alias}"`)
+				RFDebug(`[Ravager Framework] Removed font "${font.alias}"`)
 			}
 		}
 	}
 }
 // Base settings function, simplifying reloading settings
 function ravagerSettingsRefresh(reason) {
-	console.log('[Ravager Framework] Running settings functions for reason: ' + reason)
+	RFInfo('[Ravager Framework] Running settings functions for reason: ' + reason)
 	ravagerFrameworkRefreshEnemies(reason)
 	// ravagerFrameworkApplySpicyTendril(reason)
 	ravagerFrameworkApplySomeSpice(reason)
@@ -1766,19 +1860,19 @@ function ravagerSettingsRefresh(reason) {
 	ravagerFrameworkSetupSound(reason)
 	refreshRavagerDataVariables(reason)
 	RavagerFrameworkRefreshFonts(reason)
-	console.log('[Ravager Framework] Finished running settings functions')
+	RavagerFrameworkIWantToHelpDebug(reason)
+	RFInfo('[Ravager Framework] Finished running settings functions')
 }
 // Change slime girl's chance to add slime to the player
 function ravagerFrameworkApplySlimeRestrictChance(reason) {
 	var settings = KDModSettings['RavagerFramework'];
-	var dbg = settings && settings.ravagerDebug;
-	dbg && console.log('[Ravager Framework] ravagerFrameworkApplySlimeRestrictChance(' + reason + ')')
-	dbg && console.log('[Ravager Framework] Setting Slime Girl\'s restrict chance to ' + settings.ravagerSlimeAddChance)
+	RFDebug('[Ravager Framework] ravagerFrameworkApplySlimeRestrictChance(' + reason + ')')
+	RFDebug('[Ravager Framework] Setting Slime Girl\'s restrict chance to ' + settings.ravagerSlimeAddChance)
 	var slimeIndex = KinkyDungeonEnemies.findIndex(val => { if (val.name == 'SlimeRavager' && val.addedByMod == 'RavagerFramework') return true });
 	if (!settings.ravagerDisableSlimegirl && slimeIndex >= 0) {
 		var slime = KinkyDungeonEnemies[slimeIndex]
 		slime.ravage.addSlimeChance = settings.ravagerSlimeAddChance
-		dbg && console.log('[Ravager Framework] Refreshing enemy cache')
+		RFDebug('[Ravager Framework] Refreshing enemy cache')
 		KinkyDungeonRefreshEnemiesCache()
 	}
 }
@@ -1807,7 +1901,7 @@ function ravagerFrameworkApplySomeSpice(reason) {
 			)
 		)
 	)
-	RFTrace('[Ravager Framework][DBG][applySpice] Spiceable enemies: ' + spiceable)
+	RFTrace('[Ravager Framework][DBG][applySpice] Spiceable enemies: ', spiceable)
 	// Loop each of the possibly spicy ravager and give it to applySpice
 	spiceable.forEach(enemy => {
 		RFDebug('[Ravager Framework][applySpice] Enemy ranges before refresh: ', enemy.ravage.ranges)
@@ -1865,18 +1959,17 @@ function ravagerFrameworkRefreshEnemies(reason) {
 
 function ravagerFrameworkSetupSound(reason) {
 	var settings = KDModSettings['RavagerFramework'];
-	var dbg = settings.ravagerDebug;
-	dbg && console.log('[Ravager Framework] ravagerFrameworkSetupSound(' + reason + ')')
+	RFDebug('[Ravager Framework] ravagerFrameworkSetupSound(' + reason + ')')
 	var otherSoundFound = KDAllModFiles.filter((val) => { if (val.filename.toLowerCase().includes('girlsound.ks')) return true; }).length > 0
 	if (settings.ravagerEnableSound && !otherSoundFound) {
-		dbg && console.log('[Ravager Framework] Enabling sound effects ...')
+		RFDebug('[Ravager Framework] Enabling sound effects ...')
 		window.RavagerSoundGotHit = false
 		KDEventMapGeneric.beforeDamage.RavagerSoundHit = RavagerData.KDEventMapGeneric.beforeDamage.RavagerSoundHit
 		KDEventMapGeneric.tick.RavagerSoundTick = RavagerData.KDEventMapGeneric.tick.RavagerSoundTick
 		KDExpressions.RavagerSoundHit = RavagerData.KDExpressions.RavagerSoundHit
 		KDExpressions.RavagerSoundOrgasm = RavagerData.KDExpressions.RavagerSoundOrgasm
 	} else {
-		dbg && console.log('[Ravager Framework] Disabling sound effects ...')
+		RFDebug('[Ravager Framework] Disabling sound effects ...')
 		delete window.RavagerSoundGotHit
 		delete KDEventMapGeneric.beforeDamage.RavagerSoundHit
 		delete KDEventMapGeneric.tick.RavagerSoundTick
@@ -1899,10 +1992,10 @@ function refreshRavagerDataVariables(reason) {
 addTextKey('KDModButtonRavagerFramework', 'Ravager Framework')
 if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 	KDEventMapGeneric['afterModSettingsLoad']['RavagerFramework'] = (e, data) => {
-		let dbg = KDModSettings['RavagerFramework'] && KDModSettings['RavagerFramework'].ravagerDebug;
+		_RavagerFrameworkInInit = false
 		if (KDModSettings == null) {
 			KDModSettings = {}
-			dbg && console.log('[Ravager Framework] KDModSettings was null.')
+			RFDebug('[Ravager Framework] KDModSettings was null.')
 		}
 		if (KDModConfigs != undefined) {
 			// KDModConfigs['RavagerFramework'] = RavagerData.ModConfig
@@ -1916,7 +2009,7 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 		// console.log('ModSettings state: ', KDModSettings['RavagerFramework'], settingsobject)
 		for (var i of KDModConfigs['RavagerFramework']) {
 			if (settingsobject[i.refvar] == undefined) {
-				dbg && console.log('Setting default value for ' + i.refvar + ' ...')
+				RFDebug('Setting default value for ' + i.refvar + ' ...')
 				settingsobject[i.refvar] = i.default
 			}
 			// Text keys
@@ -1950,9 +2043,8 @@ let ravageEquipmentSlotTargets = {
 }
 
 KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bullet, entity) => {
-	let dbg = KDModSettings['RavagerFramework'] && KDModSettings['RavagerFramework'].ravagerDebug;
-	dbg && console.log('[Ravager Framework]: Effect: Ravage; Ravaging entity is', entity, 'target is', target)
-	_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: Ravager PlayerEffect; target: ', target, '; damage: ', damage, '; playerEffect: ', playerEffect, '; spell: ', spell, '; faction: ', faction, '; bullet: ', bullet, '; entity: ', entity)
+	RFDebug('[Ravager Framework]: Effect: Ravage; Ravaging entity is', entity, 'target is', target)
+	RFTrace('[Ravager Framework DBG]: Ravager PlayerEffect; target: ', target, '; damage: ', damage, '; playerEffect: ', playerEffect, '; spell: ', spell, '; faction: ', faction, '; bullet: ', bullet, '; entity: ', entity)
 	let enemy = entity.Enemy
 	if(!enemy.ravage) throw 'Ravaging enemies need to have ravage settings!'
 
@@ -1969,10 +2061,10 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 	if (typeof enemy.ravage.effectCallback == 'string' &&
 		KDEventMapEnemy['ravagerCallbacks'] &&
 		typeof KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.effectCallback] == 'function') {
-		dbg && console.log('[Ravager Framework] Running effectCallback with enemy: ', entity, '; target: ', target)
+		RFDebug('[Ravager Framework] Running effectCallback with enemy: ', entity, '; target: ', target)
 		skipEverything = KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.effectCallback](entity, target)
 	}
-	dbg && console.log('[Ravager Framework]: skipEverything: ', skipEverything)
+	RFDebug('[Ravager Framework]: skipEverything: ', skipEverything)
 	if (!skipEverything) {
 		//clothing targts
 		let clothingTargetsPelvis = KDGetDressList()[KinkyDungeonCurrentDress].filter(article=> {
@@ -1985,7 +2077,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					return true
 			}
 		})
-		_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect clothingTargetsPelvis: ', clothingTargetsPelvis)
+		RFTrace('[Ravager Framework DBG]: PlayerEffect clothingTargetsPelvis: ', clothingTargetsPelvis)
 
 		let clothingTargetsMouth = KDGetDressList()[KinkyDungeonCurrentDress].filter(article=> {
 				if (["InnocentDesireSuit", "NightCatSuit", "MikosSuitLV1", "MikosSuitLV2", "MikosSuitLV3", "Nake", "EtherMageSuit"].some(str => KinkyDungeonCurrentDress == str)) return false // Working around a function override for PureWind'sTools outfits
@@ -2005,7 +2097,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 			}
 		})
 
-		dbg && console.log('[Ravager Framework]: Clothing targets: Pelvis: ', clothingTargetsPelvis, '; Mouth: ', clothingTargetsMouth, '; Head: ', clothingTargetsHead)
+		RFDebug('[Ravager Framework]: Clothing targets: Pelvis: ', clothingTargetsPelvis, '; Mouth: ', clothingTargetsMouth, '; Head: ', clothingTargetsHead)
 
 		// Equipment/clothing targets object
 		// Has an array for each slot of specific stuff to remove
@@ -2045,8 +2137,8 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 		for (const slot in stripOptions.equipment) {
 			ravageEquipmentSlotTargets[slot].forEach(groupName => {
 				let restraintInSlot = KinkyDungeonGetRestraintItem(groupName)
-				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect creating array of worn equipment; groupName: ', groupName, '; restraintInSlot: ', restraintInSlot)
-				_RavagerFrameworkDebugEnabled && restraintInSlot && console.log('	; if eval: restraintInSlot: ', Boolean(restraintInSlot), '; InSlot name: ', restraintInSlot.name, '; InSlot name != Stripped: ', restraintInSlot.name != "Stripped", '; InSlot name not includes RavagerOccupied: ', !restraintInSlot.name.includes("RavagerOccupied"), '; not bypassed: ', !bypassed(restraintInSlot), '; not bypassAll: ', !enemy.ravage.bypassAll, '; Total: ', restraintInSlot && restraintInSlot.name != "Stripped" && !restraintInSlot.name.includes("RavagerOccupied") && !bypassed(restraintInSlot) && !enemy.ravage.bypassAll)
+				RFTrace('[Ravager Framework DBG]: PlayerEffect creating array of worn equipment; groupName: ', groupName, '; restraintInSlot: ', restraintInSlot)
+				restraintInSlot && RFTrace('	; if eval: restraintInSlot: ', Boolean(restraintInSlot), '; InSlot name: ', restraintInSlot.name, '; InSlot name != Stripped: ', restraintInSlot.name != "Stripped", '; InSlot name not includes RavagerOccupied: ', !restraintInSlot.name.includes("RavagerOccupied"), '; not bypassed: ', !bypassed(restraintInSlot), '; not bypassAll: ', !enemy.ravage.bypassAll, '; Total: ', restraintInSlot && restraintInSlot.name != "Stripped" && !restraintInSlot.name.includes("RavagerOccupied") && !bypassed(restraintInSlot) && !enemy.ravage.bypassAll)
 				if(
 					restraintInSlot && 
 					restraintInSlot.name != "Stripped" && 
@@ -2076,7 +2168,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 			ItemMouth: stripOptions.equipment.ItemMouth.length == 0 && stripOptions.clothing.ItemMouth.length == 0
 		}
 
-		dbg && console.log('[Ravager Framework]: Slot state: stripOptions: ', stripOptions, '; uncovered: ', uncovered)
+		RFDebug('[Ravager Framework]: Slot state: stripOptions: ', stripOptions, '; uncovered: ', uncovered)
 
 		////////////////////////////////////////////////////////////////////////
 		/* TARGETING SECTION  - an enemy should "claim" a slot for consistency
@@ -2120,18 +2212,18 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 		// If all slots are taken, gotta fallback
 		// TODO!!! prioritize oral if target is belted
 		let canRavage = true
-		_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect validSlots; needs to choose slot: ', !entity.ravage.slot, 'slot ocuppier type = object: ', typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object", '; entity not in desired slot: ', (typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object" && KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity), '; Total: ', !entity.ravage.slot || (typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object" && KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity))
-		_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect validSlots; validSlots.length: ', validSlots.length)
+		RFTrace('[Ravager Framework DBG]: PlayerEffect validSlots; needs to choose slot: ', !entity.ravage.slot, 'slot ocuppier type = object: ', typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object", '; entity not in desired slot: ', (typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object" && KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity), '; Total: ', !entity.ravage.slot || (typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object" && KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity))
+		RFTrace('[Ravager Framework DBG]: PlayerEffect validSlots; validSlots.length: ', validSlots.length)
 		if(!entity.ravage.slot || (typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object" && KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity)) {
-			dbg && console.log('[Ravager Framework]: validSlots: ', validSlots, '; entity.ravage.slot: ', entity.ravage.slot, '; entity not in desired player slot: ', KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity, '; desired player slot: ', KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot])
+			RFDebug('[Ravager Framework]: validSlots: ', validSlots, '; entity.ravage.slot: ', entity.ravage.slot, '; entity not in desired player slot: ', KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity, '; desired player slot: ', KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot])
 			if(validSlots.length) entity.ravage.slot = ravRandom(validSlots)
 			else canRavage = false
 		}
-		_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect validSlots; entity slot: ', entity.ravage.slot, '; canRavage: ', canRavage)
+		RFTrace('[Ravager Framework DBG]: PlayerEffect validSlots; entity slot: ', entity.ravage.slot, '; canRavage: ', canRavage)
 
 		////////////////////////////////////////////////////////////////////////
 		/* RAVAGE SECTION - If target is player, lower body is nude, and is pinned */
-		_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: playerEffect section determination; target is player: ', target == KinkyDungeonPlayerEntity, '; canRavage: ', canRavage, '; uncovered[' + entity.ravage.slot + ']: ', uncovered[entity.ravage.slot], '; Pinned tag: ', Boolean(KinkyDungeonPlayerTags.get("Item_Pinned")), '; refractory: ', Boolean(entity.ravageRefractory))
+		RFTrace('[Ravager Framework DBG]: playerEffect section determination; target is player: ', target == KinkyDungeonPlayerEntity, '; canRavage: ', canRavage, '; uncovered[' + entity.ravage.slot + ']: ', uncovered[entity.ravage.slot], '; Pinned tag: ', Boolean(KinkyDungeonPlayerTags.get("Item_Pinned")), '; refractory: ', Boolean(entity.ravageRefractory))
 		if(
 			target == KinkyDungeonPlayerEntity &&
 			canRavage &&
@@ -2168,26 +2260,26 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 
 			let submitRoll = Math.random() * 100
 			let baseSubmitChance = KinkyDungeonGoddessRep["Ghost"] + 30 // Starts at -50, this gives it some offset
-			dbg && console.log('[Ravager Framework] Enemy: ', enemy)
+			RFDebug('[Ravager Framework] Enemy: ', enemy)
 			// if(enemy.ravage.submitChanceModifierCallback) baseSubmitChance = enemy.ravage.submitChanceModifierCallback(entity, target, baseSubmitChance)
-			dbg && console.log('[Ravager Framework]: Checking for submitChanceModifierCallback ...')
+			RFDebug('[Ravager Framework]: Checking for submitChanceModifierCallback ...')
 			if (
 				typeof enemy.ravage.submitChanceModifierCallback == 'string' &&
 				KDEventMapEnemy['ravagerCallbacks'] &&
 				typeof KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.submitChanceModifierCallback] == 'function'
 			) {
-				dbg && console.log('[Ravager Framework] Calling submitChanceModifierCallback from ravager ', entity, ' ...')
+				RFDebug('[Ravager Framework] Calling submitChanceModifierCallback from ravager ', entity, ' ...')
 				let tmp_baseSubmitChance = KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.submitChanceModifierCallback](entity, target, baseSubmitChance)
 				switch (typeof tmp_baseSubmitChance) {
 				case 'undefined':
-					console.warn('[Ravager Framework] WARNING: Ravager ', entity.Enemy.name, '(', TextGet('name' + entity.Enemy.name), ') used a submitChanceModifierCallback which returned no value! This result will be ignored. Please report this issue to the author of this ravager!')
+					RFWarn('[Ravager Framework] WARNING: Ravager ', entity.Enemy.name, '(', TextGet('name' + entity.Enemy.name), ') used a submitChanceModifierCallback which returned no value! This result will be ignored. Please report this issue to the author of this ravager!')
 					break
 				case 'number':
 					baseSubmitChance = tmp_baseSubmitChance
-					dbg && console.log('[Ravager Framework] Base submit chance changed to ', baseSubmitChance)
+					RFDebug('[Ravager Framework] Base submit chance changed to ', baseSubmitChance)
 					break
 				default:
-					console.warn('[Ravager Framework] WARNING: Ravager ', entity.Enemy.name, '(', TextGet('name' + entity.Enemy.name), ') used a submitChanceModifierCallback which returned a non-number value (', tmp_baseSubmitChance, ')! This result will be ignored. Please report this issue to the author of this ravager!')
+					RFWarn('[Ravager Framework] WARNING: Ravager ', entity.Enemy.name, '(', TextGet('name' + entity.Enemy.name), ') used a submitChanceModifierCallback which returned a non-number value (', tmp_baseSubmitChance, ')! This result will be ignored. Please report this issue to the author of this ravager!')
 					break
 				}
 			}
@@ -2223,40 +2315,39 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 			}
 			// Helper to increase player ravaged counts
 			function increasePlayerRavagedCount(range, slot, target, enemy, assumeIncrement) {
-				const dbg = RavagerGetSetting('ravagerDebug')
-				dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: range: ', range, '; slot: ', slot, '; target: ', target, '; enemy: ', enemy, '; assumeIncrement: ', assumeIncrement)
+				RFDebug('[Ravager Framework][increasePlayerRavagedCount]: range: ', range, '; slot: ', slot, '; target: ', target, '; enemy: ', enemy, '; assumeIncrement: ', assumeIncrement)
 				// Bail if use-count-aware mode is disabled
 				if (!RavagerGetSetting('ravEnableUseCount')) {
-					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: EA mode disabled. Bailing.')
+					RFDebug('[Ravager Framework][increasePlayerRavagedCount]: EA mode disabled. Bailing.')
 					return
 				}
 				// Check that player.ravagedCount exists
 				if (target.ravagedCounts == undefined) {
-					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Creating player\'s ravagedCounts')
+					RFDebug('[Ravager Framework][increasePlayerRavagedCount]: Creating player\'s ravagedCounts')
 					target.ravagedCounts = {}
 				}
 				// Check for last incremented, so we don't repeatedly increment the same slot
 				if (target.ravagedCounts.lastIncremented == undefined) {
-					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Creating player\'s ravagedCounts.lastIncremented')
+					RFDebug('[Ravager Framework][increasePlayerRavagedCount]: Creating player\'s ravagedCounts.lastIncremented')
 					target.ravagedCounts.lastIncremented = {}
 				}
 				if (range == undefined) {
-					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Invalid range')
+					RFDebug('[Ravager Framework][increasePlayerRavagedCount]: Invalid range')
 					return false
 				} else if (target.ravagedCounts.lastIncremented[slot] == range[0]) {
-					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Matched range against previous incremented range')
+					RFDebug('[Ravager Framework][increasePlayerRavagedCount]: Matched range against previous incremented range')
 					return false
 				} else {
-					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Last incremented range not matching; deleting')
+					RFDebug('[Ravager Framework][increasePlayerRavagedCount]: Last incremented range not matching; deleting')
 					delete target.ravagedCounts.lastIncremented[slot]
 				}
 				// Check the range's increment setting for all/specified slot
 				let incCount = range[1].useCount
 				if (incCount == undefined && assumeIncrement) { // Failed to think through the fact that we want to increment slots by default at the end. So if rangeData.useCount is missing, we default to incrementing by one for all slots. This should still respect being able to not increment on specific slots via making an object without that slot, or setting the slot to false, and disabling entirely by setting rangeData.useCount to false
-					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Assuming increment by default; we\'re hopefully at the end of a session')
+					RFDebug('[Ravager Framework][increasePlayerRavagedCount]: Assuming increment by default; we\'re hopefully at the end of a session')
 					incCount = 1
 				}
-				dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: incCount: ', incCount)
+				RFDebug('[Ravager Framework][increasePlayerRavagedCount]: incCount: ', incCount)
 				if (incCount) {
 					// Normalize incCount
 					if ((typeof incCount).toLowerCase() == "object") {
@@ -2268,22 +2359,22 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					} else {
 						incCount = Number(incCount)
 					}
-					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Normalized incCount: ', incCount)
+					RFDebug('[Ravager Framework][increasePlayerRavagedCount]: Normalized incCount: ', incCount)
 					// Check if specified slot's use count is undefined
 					if (target.ravagedCounts[slot] == undefined || target.ravagedCounts[slot] < 0) {
 						// Set use count to range's increment count (Cast to Number to handle Boolean meaning increment by one)
 						target.ravagedCounts[slot] = incCount
-						dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Set slot\'s count to ', incCount)
+						RFDebug('[Ravager Framework][increasePlayerRavagedCount]: Set slot\'s count to ', incCount)
 					} else {
 						// Increment use count by range's increment count (cast to Number to handle Boolean meaning increment)
 						target.ravagedCounts[slot] += incCount
-						dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Incremented slot\'s count by ', incCount)
+						RFDebug('[Ravager Framework][increasePlayerRavagedCount]: Incremented slot\'s count by ', incCount)
 					}
 					target.ravagedCounts.lastIncremented[slot] = range[0]
-					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: Set slot\'s last incremented to ', range[0])
+					RFDebug('[Ravager Framework][increasePlayerRavagedCount]: Set slot\'s last incremented to ', range[0])
 					return true
 				} else {
-					dbg && console.log('[Ravager Framework][increasePlayerRavagedCount]: incCount invalid')
+					RFDebug('[Ravager Framework][increasePlayerRavagedCount]: incCount invalid')
 					return false
 				}
 			}
@@ -2309,7 +2400,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				function decideToDoExperiencedText(obj, slot, rangeData) {
 					// Check that use-count-aware mode is enabled before continuing
 					if (!RavagerGetSetting('ravEnableUseCount')) {
-						dbg && console.log('[Ravager Framework][decideToDoExperiencedText]: EA mode disabled. Bailing.')
+						RFDebug('[Ravager Framework][decideToDoExperiencedText]: EA mode disabled. Bailing.')
 						return false
 					}
 					// Initial value, just checks that there is narration
@@ -2325,7 +2416,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 						} else if (pref == 'always') {
 							return true
 						} else {
-							console.error('[Ravager Framework][decideToDoExperiencedText][experiencedTextDecideUser]: Invalid preference: ', pref)
+							RFError('[Ravager Framework][decideToDoExperiencedText][experiencedTextDecideUser]: Invalid preference: ', pref)
 							return false
 						}
 					}
@@ -2401,13 +2492,13 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				}
 				entity.ravage.progress++
 
-				dbg && console.log('[Ravager Framework] Checking for range callback at range ', range[1], ' ...')
+				RFDebug('[Ravager Framework] Checking for range callback at range ', range[1], ' ...')
 				if (
 					typeof rangeData.callback == 'string' &&
 					KDEventMapEnemy['ravagerCallbacks'] &&
 					typeof KDEventMapEnemy['ravagerCallbacks'][rangeData.callback] == 'function'
 				) {
-					dbg && console.log('[Ravager Framework] Calling rangeData callback for range ', range[1], ' ...')
+					RFDebug('[Ravager Framework] Calling rangeData callback for range ', range[1], ' ...')
 					KDEventMapEnemy['ravagerCallbacks'][rangeData.callback](entity, target, entity.ravage.slot)
 				}
 				if (
@@ -2415,10 +2506,10 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					KDEventMapEnemy['ravagerCallbacks'] &&
 					typeof KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.allRangeCallback] == 'function'
 				) {
-					dbg && console.log('[Ravager Framework] Calling all range callback ', enemy.ravage.allRangeCallback, ' ...')
+					RFDebug('[Ravager Framework] Calling all range callback ', enemy.ravage.allRangeCallback, ' ...')
 					KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.allRangeCallback](entity, target, entity.ravage.slot)
 				}
-				dbg && console.log('[Ravager Framework]: Attempting to increment slot use count...')
+				RFDebug('[Ravager Framework]: Attempting to increment slot use count...')
 				increasePlayerRavagedCount(getPreviousRange(range, enemy), slotOfChoice, target, enemy)
 			} else {			
 				// Done playing, if they were
@@ -2442,7 +2533,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				}
 
 				// Check for increasing ravaged count
-				dbg && console.log('[Ravager Framework]: Attempting to increment slot use count at end of session...')
+				RFDebug('[Ravager Framework]: Attempting to increment slot use count at end of session...')
 				increasePlayerRavagedCount(getPreviousRange(range, enemy), slotOfChoice, target, enemy, !(enemy.ravage.ranges.filter(v => v[1].useCount).length > 0))
 
 				// if(enemy.ravage.doneTaunts) KinkyDungeonSendDialogue(entity, ravRandom(enemy.ravage.doneTaunts).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6);
@@ -2453,7 +2544,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					KDEventMapEnemy['ravagerCallbacks'] &&
 					typeof KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.completionCallback] == 'function'
 				) {
-					dbg && console.log('[Ravager Framework] Calling completion callback ', enemy.ravage.completionCallback, ' ...')
+					RFDebug('[Ravager Framework] Calling completion callback ', enemy.ravage.completionCallback, ' ...')
 					KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.completionCallback](entity, target, passedOut)
 				}
 				// Character gets exhausted by this interaction.
@@ -2492,18 +2583,18 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				// KinkyDungeonSendTextMessage(10, `EnemyName tears your ${TextGet("Restraint" + targetRestraint.name)} away!`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff0000", 4);	
 				KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.restraintTearMessage, entity, targetRestraint), "#f00", 4) // Maybe make this controllable for a rav dev?
 			} else if(stripOptions.clothing[entity.ravage.slot].length) {
-				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; clothing strip options: ', stripOptions.clothing[entity.ravage.slot])
+				RFTrace('[Ravager Framework DBG]: PlayerEffect stripping clothing; clothing strip options: ', stripOptions.clothing[entity.ravage.slot])
 				let stripped = stripOptions.clothing[entity.ravage.slot][0]
-				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped: ', stripped)
-				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; slot check; slot not = ItemMouth: ', entity.ravage.slot != "ItemMouth", '; !getRestraintItem ItemPelvis: ', !KinkyDungeonGetRestraintItem("ItemPelvis"), '; clothing includes shorts, bikini, or panties: ', ["Shorts", "Bikini", "Panties"].some(str => stripped.Item.includes(str)), '; Total: ', entity.ravage.slot != "ItemMouth" && !KinkyDungeonGetRestraintItem("ItemPelvis") && ["Shorts", "Bikini", "Panties"].some(str => stripped.Item.includes(str)))
+				RFTrace('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped: ', stripped)
+				RFTrace('[Ravager Framework DBG]: PlayerEffect stripping clothing; slot check; slot not = ItemMouth: ', entity.ravage.slot != "ItemMouth", '; !getRestraintItem ItemPelvis: ', !KinkyDungeonGetRestraintItem("ItemPelvis"), '; clothing includes shorts, bikini, or panties: ', ["Shorts", "Bikini", "Panties"].some(str => stripped.Item.includes(str)), '; Total: ', entity.ravage.slot != "ItemMouth" && !KinkyDungeonGetRestraintItem("ItemPelvis") && ["Shorts", "Bikini", "Panties"].some(str => stripped.Item.includes(str)))
 				if(entity.ravage.slot != "ItemMouth" && !KinkyDungeonGetRestraintItem("ItemPelvis") && ["Shorts", "Bikini", "Panties"].some(str => stripped.Item.includes(str))) {
 					if (!entity.Enemy.ravage.bypassAll) KinkyDungeonAddRestraintIfWeaker("Stripped") // Since panties are sacred normally
 				}
 				// KinkyDungeonSendTextMessage(10, `EnemyName tears your ${stripped.Item} away!`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff0000", 4);
 				KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.clothingTearMessage, entity, undefined, stripped), "#f00", 4) // Maybe make this controllable for a rav dev?
-				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped.Lost = ', stripped.Lost)
+				RFTrace('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped.Lost = ', stripped.Lost)
 				stripped.Lost = true
-				_RavagerFrameworkDebugEnabled && console.log('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped.Lost = ', stripped.Lost)
+				RFTrace('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped.Lost = ', stripped.Lost)
 			} else {
 				KinkyDungeonAddRestraintIfWeaker("Pinned")
 				// KinkyDungeonSendTextMessage(10, `EnemyName gets a good grip on you...`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff00ff	", 4);
@@ -2521,20 +2612,20 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				KDEventMapEnemy['ravagerCallbacks'] &&
 				typeof KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.fallbackCallback] == 'function'
 			) { // Call the ravager's custom fallback if available
-				dbg && console.log('[Ravager Framework] Calling fallback callback: ', enemy.ravage.fallbackCallback, ' ...')
+				RFDebug('[Ravager Framework] Calling fallback callback: ', enemy.ravage.fallbackCallback, ' ...')
 				KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.fallbackCallback](entity, target)
 			} else { // Otherwise, we'll do the default fallback
 				// Restraint adding
 				let didRestrain = false
 				if (typeof enemy.ravage.restrainChance == 'number' && Math.random() < enemy.ravage.restrainChance) {
-					dbg && console.log('[Ravager Framework] We\'re trying to add a restraint to the player during fallback!')
+					RFDebug('[Ravager Framework] We\'re trying to add a restraint to the player during fallback!')
 					// Get jail restraints -- we're using these until I can figure out how to get a specific set of jail restraints or until I can be bothered to make a way of cleanly defining a list of restraints in the ravager declaration
 					let possibleRestraints = KDGetJailRestraints()
 					// Filter out restraints that can't be added
 					possibleRestraints = possibleRestraints.filter((item) => {
 						return KDCanAddRestraint(KinkyDungeonGetRestraintByName(item.Name))
 					})
-					dbg && console.log('[Ravager Framework] Valid restraints for fallback: ', possibleRestraints)
+					RFDebug('[Ravager Framework] Valid restraints for fallback: ', possibleRestraints)
 					// Check that the possible restraints list is not empty
 					if (possibleRestraints.length > 0) {
 						// Pick a random restraint from possibilities
@@ -2551,15 +2642,15 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 									didRestrain = true
 								}
 							} catch (e) {
-								console.warn('[Ravager Framework] Caught error while adding a restraint as a fallback: ', e)
+								RFWarn('[Ravager Framework] Caught error while adding a restraint as a fallback: ', e)
 							}
-						} else { console.error('[Ravager Framework] CANIDATE RESTRAINT INVALID! ', canidateRestraint) }
+						} else { RFError('[Ravager Framework] CANIDATE RESTRAINT INVALID! ', canidateRestraint) }
 					}
 				}
 				//
 				// Grope damage dealing
 				if (!didRestrain) {
-					dbg && console.log('[Ravager Framework] We DIDN\'T add a restraint, let\'s grope')
+					RFDebug('[Ravager Framework] We DIDN\'T add a restraint, let\'s grope')
 					let dmg = KinkyDungeonDealDamage({damage: 1, type: "grope"});
 					if (!enemy.ravage.noFallbackNarration) {
 						if(enemy.ravage.fallbackNarration) {
@@ -2570,7 +2661,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 							KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.fallbackNarration, entity, undefined, undefined, dmg), "#f0f", 4)
 						}
 					} else {
-						deb && console.log('[Ravager Framework] ', enemy.name, ' requests no fallback narration.')
+						RFDebug('[Ravager Framework] ', enemy.name, ' requests no fallback narration.')
 					}
 				}
 				//
@@ -2748,14 +2839,14 @@ KinkyDungeonRestraints.push(
 
 // Handles preventing enemies from interfering with ravaging, with some narration included
 KDEventMapInventory["tickAfter"]["ravagerSitDownAndShutUp"] = (e, item, data) => {
-	console.log("[RavagerFramework] [ravagerSitDownAndShutUp]\ne: ", e, "\nitem: ", item, "\ndata: ", data)
+	RFDebug("[RavagerFramework] [ravagerSitDownAndShutUp]\ne: ", e, "\nitem: ", item, "\ndata: ", data)
 	let nearby = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 5)
 	let stunnedCount = 0
 	let enemyName = ""
 	nearby.forEach(enemy => {
 		// Make sure we're only stunning non-ravagers
 		if (!enemy.Enemy.ravage) {
-			console.log("[RavagerFramework] [ravagerSitDownAndShutUp] Stunning ", enemy.Enemy.name)
+			RFDebug("[RavagerFramework] [ravagerSitDownAndShutUp] Stunning ", enemy.Enemy.name)
 			// Stun 2 will stun an enemy for only the next turn
 			enemy.stun = 2
 			// We'll count an enemy for the witness narration if they're not a beast and haven't already been in a narration
@@ -2786,15 +2877,23 @@ KDEventMapInventory["tickAfter"]["ravagerSitDownAndShutUp"] = (e, item, data) =>
 
 // Each tick, check to see if the player is still pinned by anyone
 KDEventMapInventory["tickAfter"]["ravagerPinCheck"] = (e, item, data) => {
+	RFTrace('[Ravager Framework][ravagerPinCheck]: e: ', e, '; item: ', item, '; data: ', data)
 	let nearby = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 4)
 	let cleared = true
+	RFTrace('[Ravager Framework][ravagerPinCheck]: nearby: ', nearby)
 	nearby.forEach(enemy=>{
+		RFTrace('[Ravager Framework][ravagerPinCheck]: enemy: ', enemy, '; ravage: ', enemy.ravage, '; stun: ', enemy.stun, '; ravageRefractory: ', enemy.ravageRefractory)
 		if(enemy.ravage && !enemy.stun && !enemy.ravageRefractory) {
+			RFTrace(`[Ravager Framework][ravagerPinCheck]: Found enemy playing with player! (${enemy.id})`)
 			cleared = false
 			enemy.playWithPlayer = 5 // Keep them playing until they're done
 		}
 	})
-	if(cleared) ravagerFreeAndClearAllData(); else {
+	if(cleared) {
+		RFTrace('[Ravager Framework][ravagerPinCheck]: Player is free, clearing all data ...')
+		ravagerFreeAndClearAllData();
+	} else {
+		RFTrace('[Ravager Framework][ravagerPinCheck]: Player is NOT free, applying block and evasion penalties ...')
 		KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
 			id: "RavagerNoDodge",
 			duration: 1,
@@ -2822,7 +2921,7 @@ KDEventMapInventory["tickAfter"]["RavagerCheckForPinned"] = (e, item, data) => {
 // We handle narration in an event since it's easier to get everything across multiple enemies grouped nicely this way
 KDEventMapInventory["tickAfter"]["ravagerNarration"] = (e, item, data) => {
 	let playerRavage = KinkyDungeonPlayerEntity.ravage
-	KDModSettings['RavagerFramework'] && KDModSettings['RavagerFramework'].ravagerDebug && console.log('[Ravager Framework][ravagerNarration] ', playerRavage)
+	RFDebug('[Ravager Framework][ravagerNarration] ', playerRavage)
 	if(playerRavage) {
 		playerRavage.narrationBuffer.forEach(narration=>{
 			KinkyDungeonSendActionMessage(20, narration, "#ff00ff", 1, false, true);
@@ -2834,6 +2933,7 @@ KDEventMapInventory["tickAfter"]["ravagerNarration"] = (e, item, data) => {
 // In case the player passes out for unrelated reasons
 if(!KDEventMapInventory["passout"]) KDEventMapInventory["passout"] = {}
 KDEventMapInventory["passout"]["ravagerRemove"] = (e, item, data) => {
+	RFTrace('[Ravager Framework][passout/ravagerRemove]: e: ', e, '; item: ', item, '; data: ', data, '; Calling ravagerFreeAndClearAllData')
 	ravagerFreeAndClearAllData()
 	// Keep panties gone as a souvenir
 	setTimeout(()=>
@@ -2847,17 +2947,22 @@ KDEventMapInventory["passout"]["ravagerRemove"] = (e, item, data) => {
 
 // If pin is broken: resets ravage, clears leash, and stuns ravagers
 KDEventMapInventory["remove"]["ravagerRemove"] = (e, item, data) => {
+	RFTrace('[Ravager Framework][remove/ravagerRemove]: e: ', e, '; item: ', item, '; data: ', data)
 	if(data.item.name == item.name) { // To make sure the item being removed is Pinned
+		RFTrace(`[Ravager Framework][remove/ravagerRemove]: data.item.name (${data.item.name}) == item.name (${item.name}). Calling ravagerFreeAndClearAllDataIfNoRavagers`)
 		ravagerFreeAndClearAllDataIfNoRavagers()
 	}
 }
 
 // Remove pin if this enemy was the last one ravaging on death
 KDEventMapEnemy["death"]["ravagerRemove"] = (e, enemy, data) => {
+	RFTrace('[Ravager Framework][death/ravagerRemove]: e: ', e, '; enemy: ', enemy, '; data: ', data)
 	if (enemy.hp > 0) {
+		RFTrace('[Ravager Framework][death/ravagerRemove]: Enemy NOT dead! GTFO (' + enemy.Enemy.name + ')')
 		return
 	}
 	if (enemy.ravage && KinkyDungeonPlayerEntity.ravage) {
+		RFTrace('[Ravager Framework][death/ravagerRemove]: enemy.ravage && KinkyDungeonPlayerEntity.ravage passed, calling ravagerFreeAndClearAllDataIfNoRavagers')
 		ravagerFreeAndClearAllDataIfNoRavagers()
 	}
 } 
@@ -2909,7 +3014,9 @@ function ravRandom(array) {
 
 // Verbose? Perhaps. Accurate? Yes...
 function ravagerFreeAndClearAllDataIfNoRavagers(showMessage = true) {
+	RFTrace('[Ravager Framework][ravagerFreeAndClearAllDataIfNoRavagers]: showMessage: ', showMessage)
 	let nearby = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 2)
+	RFTrace('[Ravager Framework][ravagerFreeAndClearAllDataIfNoRavagers]: nearby: ', nearby)
 	let cleared = false
 	nearby.forEach(enemy=>{
 		enemy.stun = 5

@@ -19,7 +19,7 @@ function slimegirlRavagerAllRange(entity, target) {
 	}
 }
 if (!RavagerAddCallback('slimegirlRavagerAllRangeCallback', slimegirlRavagerAllRange)) {
-	console.error('[Ravager Framework][Slimegirl Ravager] Failed to add slimegirlRavagerAllRangeCallback!')
+	RFError('[Ravager Framework][Slimegirl Ravager] Failed to add slimegirlRavagerAllRangeCallback!')
 }
 
 KDModelDresses['SlimegirlRavager'] = [{"Item":"FashionLatexMittens","Group":"Mittens","Filters":{"LatexLeft":{"gamma":1,"saturation":0,"contrast":1,"brightness":1,"red":1.6666666666666667,"green":0.3333333333333333,"blue":0.6274509803921569,"alpha":1},"Mitten":{"gamma":1,"saturation":0,"contrast":0.81,"brightness":1,"red":4.176470588235294,"green":0.9215686274509803,"blue":1.6470588235294117,"alpha":1}},"Properties":{"LatexLeft":{},"Zipper":{"Protected":"0","ExtraHidePoses":["Xray"],"XOffset":57.62,"YOffset":-153.68,"ExtraRequirePoses":["Xray"]},"Mitten":{}}}]

@@ -191,17 +191,17 @@ addTextKey('KinkyDungeonSummonSingleRavagerTendril', 'An eager tentacle bursts o
 // BEGIN Ravaging Tendril
 // Completion callback to kill tendril upon ravaging completion
 function pitTendrilCompletion(enemy, target, passedOut) {
-	console.log('[Ravager Framework][Ravager Tendril] Killing tendril')
+	RFDebug('[Ravager Framework][Ravager Tendril] Killing tendril')
 	enemy.hp = 0;
 }
 if (!RavagerAddCallback('pitTendrilCompletion', pitTendrilCompletion)) {
-	console.error('[Ravager Framework][Ravager Tendril] Failed to add pitTendrilCompletion!')
+	RFError('[Ravager Framework][Ravager Tendril] Failed to add pitTendrilCompletion!')
 }
 // Effect callback for groping before ravaging
 function pitTendrilEffect(enemy, target) {
 	if (enemy.ravage && enemy.ravage.progress == 1 && !enemy.ravage.finishedCarressing) {
 		if (Math.random() < enemy.Enemy.ravage.caressChance) {
-			console.log('[Ravager Framework][Ravager Tendril] Carressing player before ravaging')
+			RFDebug('[Ravager Framework][Ravager Tendril] Carressing player before ravaging')
 			let msg = ''
 			switch (enemy.ravage.slot) {
 			case 'ItemVulva':
@@ -221,14 +221,14 @@ function pitTendrilEffect(enemy, target) {
 			KinkyDungeonDealDamage({type: 'grope', damage: 0.4})
 			return true
 		} else {
-			console.log('[Ravager Framework][RavagerTendril] Finished caressing')
+			RFDebug('[Ravager Framework][RavagerTendril] Finished caressing')
 			enemy.ravage.finishedCarressing = true
 		}
 	}
 	return false
 }
 if (!RavagerAddCallback('pitTendrilEffectCallback', pitTendrilEffect)) {
-	console.error('[Ravager Framework][Ravager Tendril] Failed to add pitTendrilEffectCallback!')
+	RFError('[Ravager Framework][Ravager Tendril] Failed to add pitTendrilEffectCallback!')
 }
 // Tendril definition
 let tendril = {

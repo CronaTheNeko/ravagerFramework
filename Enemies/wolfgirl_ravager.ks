@@ -17,7 +17,7 @@ function wolfgirlRavagerAllRange(entity, target) {
 	}
 }
 if (!RavagerAddCallback('wolfgirlRavagerAllRangeCallback', wolfgirlRavagerAllRange)) {
-	console.error('[Ravager Framework][Wolfgirl Ravager] Failed to add wolfgirlRavagerAllRangeCallback!')
+	RFError('[Ravager Framework][Wolfgirl Ravager] Failed to add wolfgirlRavagerAllRangeCallback!')
 }
 // Increase submission chance if wearing shock module
 function wolfgirlSubmitChanceModifier(entity, target, baseSubmitChance) {
@@ -28,7 +28,7 @@ function wolfgirlSubmitChanceModifier(entity, target, baseSubmitChance) {
 	return baseSubmitChance
 }
 if (!RavagerAddCallback('wolfgirlSubmitChanceModifierCallback', wolfgirlSubmitChanceModifier)) {
-	console.error('[Ravager Framework][Wolfgirl Ravager] Failed to add wolfgirlSubmitChanceModifierCallback!')
+	RFError('[Ravager Framework][Wolfgirl Ravager] Failed to add wolfgirlSubmitChanceModifierCallback!')
 }
 // Workaround for not being able to get the spell working well with ravaging
 function wolfgirlRavagerEffect(entity, target) {
@@ -40,7 +40,7 @@ function wolfgirlRavagerEffect(entity, target) {
 	return false
 }
 if (!RavagerAddCallback('wolfgirlRavagerEffectCallback', wolfgirlRavagerEffect)) {
-	console.error('[Ravager Framework][Wolfgirl Ravager] Failed to add wolfgirlRavagerEffectCallback!')
+	RFError('[Ravager Framework][Wolfgirl Ravager] Failed to add wolfgirlRavagerEffectCallback!')
 }
 
 // Outfit declaration
