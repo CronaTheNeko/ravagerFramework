@@ -288,4 +288,4 @@ let keys = {
 	AttackEnemyNameDash: "The alpha yanks your body against her hard!",
 	KillEnemyName: "The alpha scrambles away, waiting for her next chance...",
 }
-RavagerFrameworkPushEnemiesWithStrongVariations(wolfRavager, 4, keys)
+RFPushEnemiesWithStrongVariations(wolfRavager, 4, keys)

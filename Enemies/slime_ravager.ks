@@ -246,4 +246,4 @@ let keys = {
 	KinkyDungeonRemindJailChaseSlimeAdvAlert: "", // Left empty because I'm not sure what to write here
 	KinkyDungeonRemindJailSlimeAdvBlockedMe: "I\'m too slippery for that~", // Only saw this when trying to debug bind her
 }
-RavagerFrameworkPushEnemiesWithStrongVariations(slimeRavager, 5, keys, false)
+RFPushEnemiesWithStrongVariations(slimeRavager, 5, keys, false)

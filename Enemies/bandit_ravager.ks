@@ -225,4 +225,4 @@ const keys = {
 	KillEnemyName: "The bandit scrambles away, waiting for her next chance..."
 }
 
-RavagerFrameworkPushEnemiesWithStrongVariations(banditRavager, 4, keys)
+RFPushEnemiesWithStrongVariations(banditRavager, 4, keys)
