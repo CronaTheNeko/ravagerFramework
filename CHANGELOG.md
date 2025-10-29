@@ -98,3 +98,20 @@ v6.2.0
 	+ To access, either enable debug mode on the title screen twice or headpat the character model twice in the pause menu while debug mode is enabled
 - Added multi-item drop behavior and related user-facing setting - Made for the Mimic Ravager, but can be used by any ravager
 - Updated stat change calls
+
+v6.2.1
+- Fixed abnormal hunting behavior of Mimic Ravager
+- Fixed spawn weights and tags for all current ravagers
+- Fixed issue of any nearby enemy dying causing you to break free from the "Pinned!" restraint
+- Added tougher enemy variations
+- Added descriptive hover messages to mod config
+- Removed extra messages coming from the game when being ravaged
+- Made heavy debugging mode persistent
+- Added debug log saving, so users can provide debug logs if needed to help find a bug
+- Added button in Ravager Control to revert function overrides incase a game update breaks my custom functions
+- Reorganized mod config definitions to be simpler to extend
+- Rebuilt ravager disabling code to make adding future enemies easier
+- Added description popups for mod config buttons
+- Added Ravager Control button to track Mimic Ravagers in the console, added because they had a major behavior bug
+- Added Ravager Control button to announce current ravagers to the console, added to assist in balancing spawn weights
+- Made `RavagerGetSetting` able to get settings directly from localStorage, used during framework initialization
