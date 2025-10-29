@@ -2006,7 +2006,7 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 			KDModConfigs['RavagerFramework'] = settingsarr
 		}
 		let settingsobject = (KDModSettings.hasOwnProperty('RavagerFramework') == false) ? {} : Object.assign({}, KDModSettings['RavagerFramework'])
-		// console.log('ModSettings state: ', KDModSettings['RavagerFramework'], settingsobject)
+		// RFDebug('ModSettings state: ', KDModSettings['RavagerFramework'], settingsobject)
 		for (var i of KDModConfigs['RavagerFramework']) {
 			if (settingsobject[i.refvar] == undefined) {
 				RFDebug('Setting default value for ' + i.refvar + ' ...')
@@ -3063,7 +3063,7 @@ KinkyDungeonAddRestraintText(
 // These all use the same descriptor, suggesting you fight Pinned instead.
 let slotsArr = ['Mouth', 'Vulva', 'Butt']
 for (var i in slotsArr) {
-	// KDModSettings['RavagerFramework'].ravagerDebug && console.log('RavagerOccupied' + slotsArr[i])
+	// RFDebug('RavagerOccupied' + slotsArr[i])
 	KinkyDungeonAddRestraintText('RavagerOccupied' + slotsArr[i], 'Occupied!', 'Someone or something is having their way with you...', 'Don\'t worry about this restraint. Instead, try to escape "Pinned!"');
 }
 KinkyDungeonAddRestraintText(
