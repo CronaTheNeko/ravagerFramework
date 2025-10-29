@@ -765,7 +765,7 @@ window.RavagerData = {
 			type: "boolean",
 			refvar: "ravagerHelpDebug",
 			default: false,
-			hoverDesc: "Turn on heavy debugging mode so that you can provide a log file to help CTN with tracking down bugs.",
+			hoverDesc: "Turn on heavy debugging mode so that you can provide a log file to help CTN with tracking down bugs. Turning this on will begin saving all of the framework's console messages to memory. To save the log to a file, return to this menu and disable this setting, or enter the Ravager Hacking menu and click End Debug Log.",
 			textKeyVal: "I want to help debug"
 		},
 	},
