@@ -218,10 +218,6 @@ window.RavagerAddCallback = (key, func) => {
 	return Boolean(KDEventMapEnemy['ravagerCallbacks'][key])
 }
 
-// Add our callbacks key
-if (! KDEventMapEnemy['ravagerCallbacks']) {
-	KDEventMapEnemy['ravagerCallbacks'] = {}
-}
 // Add our debug callbacks for the sake of the example ravager
 let debugCallbacks = {
 	'debugFallbackCallback': (enemy, target) => {
@@ -461,13 +457,14 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 	}
 	return true
 }
-// Hopeful fallback incase function signatures change
+// Hopeful fallback incase function signatures change -- I have no idea how this would interact with other mods that wind up overriding our overrides. Do they end up calling the original function or our leftover (possibly non-functional) override function?
 window.RavagerFrameworkRevertFunctions = function() {
 	const functions = [ 'DrawButtonKDEx', 'KinkyDungeonDrawEnemiesHP', 'KinkyDungeonDrawGame', 'KinkyDungeonRun', 'KinkyDungeonHandleClick', 'KDDropItems', 'DrawCheckboxKDEx', 'KinkyDungeonSendTextMessage' ]
 	for (let f of functions) {
 		RFDebug(`Reverting ${f} ...`)
 		window[f] = RavagerData.functions[f]
 	}
+	// Hopefully good enough to work around the weirdness that these variables were created to handle, but can't do the full 'for sure' method used before, as at this point we've already removed our custom KinkyDungeonRun. These variables are then garbage, but to recreate custom functions, the game and mod has to be reloaded
 	KinkyDungeonState = RavagerData.Variables.PrevState
 	KinkyDungeonState = RavagerData.Variables.PrevState
 	KinkyDungeonDrawState = RavagerData.Variables.PrevDrawState
@@ -1428,8 +1425,6 @@ DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, 
 					modPage: KDModPage
 				}
 			}
-		// } else if (["ravEnableUseCount", "ravUseCountOverride", "ravagerCustomDrop", "ravagerDebug", "ravagerDisableBandit", "ravagerDisableMimic", "ravagerDisableSlimegirl", "ravagerDisableTentaclePit", "ravagerDisableWolfgirl", "ravagerEnableSound", "ravagerSpicyTendril"].includes(name)) {
-
 		}
 	}
 	// Run and return the original DrawButtonKDEx
