@@ -5,516 +5,6 @@ window._RavagerFrameworkDebugEnabled = false;
 if (localStorage.hasOwnProperty('RavagerFrameworkTraceMessages')) {
 	_RavagerFrameworkDebugEnabled = localStorage.RavagerFrameworkTraceMessages
 }
-
-// Helper for pushing to debug log buffer
-window.RavagerFrameworkPushToLogBuffer = (msg, level = "INFO") => {
-	// Check if we actually want to add logs to a potential log file (assuming yes during initialization)
-	if (RavagerData.Variables.IWantToHelpDebug || _RavagerFrameworkInInit) {
-		// A structured log line, with extra info so we can know when it happened while reading a log after the events
-		let logLine = {
-			level: level,
-			gameState: {
-				currentTick: KinkyDungeonCurrentTick,
-				state: KinkyDungeonState, // State tracks things like Menu, NewGame, Wardrobe, Game
-				drawState: KinkyDungeonDrawState // DrawState tracks the state within Game
-			},
-			callStack: undefined,
-			msg: structuredClone(msg)
-		}
-		// Build a string to track the call stack
-		// - Start by getting call stack by creating an error
-		let stack_str_base = new Error().stack.replace("Error\n", "").replaceAll("    at ", "")
-		// - Will be our final call stack string
-		let stack_str = ""
-		// - Each function in the call stack is on its own line; trim each line to the function name and add to our final string
-		stack_str_base.split("\n").forEach(v => {
-			v = v.trim()
-			// Only add the current function call to the call stack if it's not one of the console message wrappers and not this function
-			if (!v.match(/window\.(RF(Error|Warn|Info|Debug|Trace)|RavagerFrameworkPushToLogBuffer)/))
-				stack_str += v.split(" ")[0] + " <= "
-		})
-		// - Save our call stack, but remove the trailing " <= " from it
-		logLine.callStack = stack_str.substr(0, stack_str.length - 4)
-		// Push this log line to our buffer
-		RavagerData.Variables.IWantToHelpDebugBuffer.push(logLine)
-	}
-}
-// Verbosity function for normal level debugging
-// This is just console.log wrapped in a function to see if we're debugging
-window.RFDebug = (...args) => {
-	RavagerFrameworkPushToLogBuffer(args)
-	RFDebugEnabled() && console.log(...args)
-}
-// Verbosity function for extreme level debugging
-// This is just console.log wrapped in a function to see if we're doing heavy debugging
-window.RFTrace = (...args) => {
-	RavagerFrameworkPushToLogBuffer(args, "TRACE")
-	_RavagerFrameworkDebugEnabled && console.log(...args)
-}
-// Wrapper around console.warn
-window.RFWarn = (...args) => {
-	RavagerFrameworkPushToLogBuffer(args, "WARN")
-	console.warn(...args)
-}
-// Wrapper around console.error
-window.RFError = (...args) => {
-	RavagerFrameworkPushToLogBuffer(args, "ERROR")
-	console.error(...args)
-}
-// Wrapper around console.log, but this one will always print the message
-window.RFInfo = (...args) => {
-	RavagerFrameworkPushToLogBuffer(args, "INFO")
-	console.log(...args)
-}
-
-// Verbose, but acturate name. Easy way to create stronger versions of enemies.
-/* Params:
-		- enemy : The enemy definition to use
-		- count : The number of variations to add, plus one for the original enemy. If you want your enemy and 3 additional variations, set this to 4
-		- textKeys : The dictionary of text values, key/value pairs being textKey/textValue
-		- higherLevelIncrease : Optional. Default true. Use faster enemy.minLevel increases. When false, minLevel is always increased by slowLevelIncreaseAmount
-		- slowLevelIncreaseAmount : Optional. Default 1. The number to increment minLevel by when higherLevelIncrease is false
-		- enemyDefinitionDictionary : Optional. Default RavagerData.Definitions.Enemies. Points to the dictionary where enemy definitions should be saved for your use (NOT for use by the game directly). This should be a dictionary where you can set a definition via `enemyDefinitionDictionary[enemy.name] = enemy`, as that's what this function does. If you do not use your enemy definitions after creation, or do not care where they get stored, you don't need to include this parameter
-		- options.skipTextKeyWarning : Optional. Default false. Skips the warning message about textKeys parameter being empty. If you're intending to handle the text keys yourself, set this to true
-		- options.skipEnemyDefinitionDictionaryWarning: Optional. Default false. If you don't want to set enemyDefinitionDictionary, but don't want the related warning message shown, set this to true.
-*/
-window.RFPushEnemiesWithStrongVariations = function(enemy, count, textKeys, higherLevelIncrease = true, slowLevelIncreaseAmount = 1, enemyDefinitionDictionary = RavagerData.Definitions.Enemies, options = { skipTextKeyWarning: false, skipEnemyDefinitionDictionaryWarning: false }) {
-	RFDebug('[Ravager Framework][RFPushEnemiesWithStrongVariations]: enemy: ', enemy, '; count: ', count, '; textKeys: ', textKeys, '; higherLevelIncrease: ', higherLevelIncrease, '; slowLevelIncreaseAmount: ', slowLevelIncreaseAmount, '; options: { skipTextKeyWarning: ', options?.skipTextKeyWarning, ', skipEnemyDefinitionDictionaryWarning: ', options?.skipEnemyDefinitionDictionaryWarning, ' }')
-	if (!enemy) {
-		RFError("[Ravager Framework][RFPushEnemiesWithStrongVariations]: 'enemy' parameter is undefined! Cannot continue. Whatever enemy this is supposed to be will not be in the game. If you're using an external ravager mod, report this to that author, otherwise report this to the Ravager Framework")
-		return false
-	}
-	if (count == undefined) {
-		RFWarn(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: 'count' parameter is undefined for enemy "${enemy.name}". Count will be defaulted to one, no stronger variations will be added. You should report this to the author of this ravager.`)
-		count = 1
-	}
-	if (count < 1) {
-		RFWarn(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: 'count' parameter is less than one for enemy "${enemy.name}". This enemy will not be added. You should report this to the author of this ravager.`)
-		return false
-	}
-	if (!textKeys && !options.skipTextKeyWarning) {
-		RFWarn(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: 'textKeys' parameter for enemy "${enemy.name}" has no text keys. This enemy will have no text keys added by this function.`)
-	}
-	if (enemyDefinitionDictionary == undefined) {
-		if (!(options.skipEnemyDefinitionDictionaryWarning || enemy.addedByMod == "RavagerFramework"))
-			RFWarn(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: enemyDefinitionDictionary was undefined for enemy "${enemy.name}". Definitions dictionary will be defaulted to RavagerData.Definitions.Enemies. You should report this to the author of this ravager.`)
-		enemyDefinitionDictionary = RavagerData.Definitions.Enemies
-	}
-	if (higherLevelIncrease == false && slowLevelIncreaseAmount == undefined) {
-		RFDebug(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: slowLevelIncreaseAmount is undefined for enemy "${enemy.name}" and this enemy will need to use this value to increase minLevel. This value will be defaulted to 1. You should report this to the author of this ravager.`)
-		slowLevelIncreaseAmount = 1
-	}
-	let prevEnemy = undefined
-	let currentEnemy = structuredClone(enemy)
-	for (let i = 0; i < count; i++) {
-		RFTrace(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: Starting loop #${i} for enemy ${enemy.name}`)
-		if (i > 0) {
-			prevEnemy = structuredClone(currentEnemy)
-			currentEnemy = structuredClone(enemy)
-			currentEnemy.name = currentEnemy.name + i.toString()
-			currentEnemy.maxhp = currentEnemy.maxhp * (1 + i)
-			currentEnemy.minLevel = prevEnemy.minLevel + (higherLevelIncrease ? i : slowLevelIncreaseAmount)
-			currentEnemy.armor = prevEnemy.armor + 0.5
-			KDModFiles[`Game/Enemies/${currentEnemy.name}.png`] = KDModFiles[`Game/Enemies/${enemy.name}.png`]
-		}
-		RFTrace(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: Pushing enemy ${currentEnemy.name}:`, currentEnemy)
-		KinkyDungeonEnemies.push(currentEnemy)
-		enemyDefinitionDictionary[currentEnemy.name] = structuredClone(currentEnemy)
-		RFTrace(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: Adding text keys for enemy ${currentEnemy.name}`)
-		for (let key in textKeys)
-			addTextKey(key.replace("EnemyName", currentEnemy.name), textKeys[key])
-	}
-	return true
-}
-
-/* 
-	RAVAGER FRAMEWORK 0.01
-	No enemies are added by this file. It's just the framework.
-	This mod adds a very dynamic playerEffect that lets enemies do the following in order of priority:
-
-	SELECTION ++ The enemy selects a player slot to use based on specified preferences. Currently just butt/vulva/mouth itemgroups.
-
-	STRIP/PIN ++ If target is player, has clothes in the way, or isn't pinned:
-		- Pick a blocking restraint to remove. Presently just immediately removes it. End turn.
-		- If no restraints in the way, pick an outfit/clothing item in the way, immediately removes it. End turn.
-
-	RAVAGE ++ If target is player, is pinned, and the slot of choice is unoccupied (OR occupied by the entity attacking)
-		- Marks the slot of choice as occupied by "this" enemy, so others pick different ones
-		- Steals the leash if the player is leashed, so that they don't get dragged away mid-ravage.
-		- If the enemy's ravage.progress value is within one of their specified ranges (this will make sense later), execute and end turn.
-			- Progresses through tiers of effects, defined in the enemy object. Typically outlines increasing intensity up to orgasm.
-			- Can damage SP, WP, Distraction, and also modify Submissiveness.
-			- Has enemy-specified narration and 'taunts'.
-			- ACTUALLY USES SUBMISSIVENESS - Player has up to an 70% chance to "Submit" (be stunned for a turn) based on a calculation of submissiveness, whether they're leashed, and whether their WP is 0.
-			- You can also specify a custom function to call for each individual range if you want.
-		
-		- If the enemy's ravage.progress value is higher than all of their ranges, assumes that they're done and executes the 'done' state.
-			- Player will pass out if SP and WP are low enough
-			- Otherwise, they'll stay awake and the enemy will just enter a cooldown refractory period where they can't ravage (but can fallback attack)
-			- Also, there's a callback for when an enemy's done, too. We love callbacks here. 
-
-	FALLBACK ++ If target is NOT player, OR target is an NPC, OR all slots are already occupied (unlikely but possible), OR in refractory mode
-		- Just deal some weak grope damage. End turn.
-		- You can also specify a function to call instead if you want to do something special.
-
-	An example enemy is defined below and appears prominently with other bandits, presently.
-	They're a little overpowered, so they'll probably be removed from regular spawning eventually (or restricted)
-	This way this mod can be more about providing the system to other modders.
-*/
-
-/* 
-	top priority next updates:
-		- GENERICIZE SLOTS
-			- We should have it be possible for any enemy to want to occupy any slot at all. Head, legs, anything. Not sure how anyone would use all of them (like, hands? arms? what?), but the point is being able to have the option.
-	
-		- RAVAGE INTERRUPTIONS
-			- maybe solved?
-
-		- STRIP
-			- Need to make stripping restraints in the way take a while. Maybe scale based on power.	
-				- not resolved - just have them removing for now. gotta come up with a good idea for this
-		
-		- TARGETING
-			- Prioritize 'easy' slots first. Should be done after stripping is handled.
-				- i.e., rank slots based on the power of everything in the way. go after the lowest
-	
-	interesting other leads:
-		see "PunishPlayer" event - possible event for struggling while pinned
-*/
-
-
-/**********************************************
- * BELOW THIS POINT ARE FUNCTIONS YOU DON'T REALLY NEED TO WORRY ABOUT
- * IF YOU'RE JUST MAKING SOME ENEMIES WHO USE RAVAGE, REFER TO Enemies/exampleEnemy.js !
- * 
- * PlayerEffect definition
- * Ravage is one big effect that encompasses all high-impact lewd activity
- * Ideally usable by any enemy, but it should be their "main thing" that they do, otherwise it gets weird/slow. You could play with ranges to make a mixed enemy work though.
- * Has three effects:
- 	* ATTACK: If non-player or otherwise ineligible for the main course, the target just takes DP damage.
-	* STRIP/PIN: If player and has clothing covering pelvis, or belted/vulva-plugged, remove. Lastly pins, preparing for the third phase.
-	* RAVAGE: If player and has exposed + unoccupied pelvis/vulva item groups, enter a sex state with increasing intensity
-*/
-// Function to add callbacks
-/**********************************************
- * Callback definition helper
- * This function is a simple helper the I would recommend using if you're going to add callbacks for your ravager.
- * Takes two parameters:
- * 	- The key which will be used to reference your callback. This is the value to use when setting a callback value inside your ravager's definition.
- * 	- The function to use as a callback. 
- * Note: If you decide to not use this function, there are two things you need to know:
- * 	- If RavagerFramework itself does not load before your enemy, KDEventMapEnemy['ravagerCallbacks'] will not exist yet. This will cause the game will show a crash if you try to add a callback entry into that map, and that will cause execution of your JS file to stop at that line, potentially causing your ravager to never be added to the game
- * 	- Your function should be the value of KDEventMapEnemy['ravagerCallbacks'][<callback name>]
-*/
-window.RavagerAddCallback = (key, func) => {
-	if (!KDEventMapEnemy['ravagerCallbacks']) {
-		KDEventMapEnemy['ravagerCallbacks'] = {}
-		if (!KDEventMapEnemy['ravagerCallbacks']) {
-			throw new Error('[Ravager Framework] Failed to initialize the ravager callbacks key! Something seems to have gone very wrong. Please report this to the Ravager Framework with as much info as you can provide.')
-		}
-	}
-	RFDebug('[Ravager Framework] Adding callback function with key: ', key)
-	KDEventMapEnemy['ravagerCallbacks'][key] = func
-	return Boolean(KDEventMapEnemy['ravagerCallbacks'][key])
-}
-
-// Add our debug callbacks for the sake of the example ravager
-let debugCallbacks = {
-	'debugFallbackCallback': (enemy, target) => {
-		console.log('[Ravager Framework] Debug fallback narration callback! Here\'s what you have available to you: enemy (Type: ', typeof enemy, '): ', enemy, '; target (Type: ', typeof target, '): ', target)
-	},
-	'debugCompletionCallback': (enemy, target, passedOut) => {
-		console.log('[Ravager Framework] Debug completion callback! Here\'s what you have available to you: enemy (Type: ', typeof enemy, '): ', enemy, '; target (Type: ', typeof target, '): ', target, '; passedOut (Type: ', typeof passedOut, '): ', passedOut)
-	},
-	'debugAllRangeCallback': (enemy, target, itemGroup) => {
-		console.log('[Ravager Framework] Debug all-range callback! Here\'s what you have available to you: enemy (Type: ', typeof enemy, '): ', enemy, '; target (Type: ', typeof target, '): ', target, '; itemGroup (Type: ', typeof itemGroup, '): ', itemGroup)
-		console.log('[Ravager Framework] Please note: This callback currently doesn\'t tell you what progress value or ravage range is triggering this call. This is something I may add soon, as I can think up a handful of uses for that info :)')
-		console.log('[Ravager Framework] Incase you need to know what range you\'re operating in, you can get the range data and the ravage progress via "enemy.Enemy.ravage.ranges" and "enemy.ravage.progress" respectively')
-	},
-	'debugSubmitChanceModifierCallback': (enemy, target, baseSubmitChance) => {
-		console.log('[Ravager Framework] Debug submit chance modifier callback! Here\'s what you have available to you: enemy (Type: ', typeof enemy, '): ', enemy, '; target (Type: ', typeof target, '): ', target, '; baseSubmitChance (Type: ', typeof baseSubmitChance, '): ', baseSubmitChance)
-		console.log('[Ravager Framework] Don\'t forget the submiteChanceModifierCallback needs to return a number between 0 and 100 for submission chance!')
-		return baseSubmitChance
-	},
-	'debugRangeX': (enemy, target, itemGroup) => {
-		console.log('[Ravager Framework] Debug range X callback! Here\'s what you have available: enemy (Type: ', typeof enemy, '): ', enemy, '; target (Type: ', typeof target, '): ', target, '; itemGroup (Type: ', typeof itemGroup, '): ', itemGroup)
-	},
-	'debugEffectCallback': (enemy, target) => {
-		console.log('[Ravager Framework] Debug effect callback! Here\'s what you have available: enemy (Type: ', typeof enemy, '): ', enemy, '; target (Type: ', typeof target, '): ', target)
-		return false
-	}
-}
-for (var key in debugCallbacks) {
-	if (!RavagerAddCallback(key, debugCallbacks[key]))
-		RFError('[Ravager Framework] Failed to add debug callback: ', key)
-}
-
-// Hidden option to enable way too many console messages
-window.RavagerFrameworkToggleDebug = function(enable = false) {
-	if (!_RavagerFrameworkDebugEnabled || enable) {
-		RFDebug('[Ravager Framework] Serious debug mode enabled. Hope you like lots of text and variables!')
-		_RavagerFrameworkDebugEnabled = true
-	} else {
-		RFDebug('[Ravager Framework] Serious debug mode disabled.')
-		_RavagerFrameworkDebugEnabled = false
-	}
-	localStorage.RavagerFrameworkTraceMessages = _RavagerFrameworkDebugEnabled
-}
-// Developer helper function to verify a ravager's EAM values - please don't have a bug ;-;
-window.RavagerFrameworkVerifyEAM = function(ravagerName) {
-	const ravager = KDEnemiesCache.get(ravagerName)
-	// Check that enemy exists
-	if (!ravager) {
-		RFError('[RavagerFrameworkVerifyEAM] Could not find an enemy by the name of ', ravagerName)
-		return false
-	}
-	// Check for ravager.ravage to make sure this is a ravager
-	if (!ravager.ravage) {
-		RFError('[RavagerFrameworkVerifyEAM] Enemy does not have a "ravage" property. Either you\'re checking the wrong enemy, or you\'ve defined your ravager wrong.')
-		return false
-	}
-	// Check that ravager has ranges
-	if (!ravager.ravage.ranges || ravager.ravage.ranges.length < 1) {
-		RFError('[RavagerFrameworkVerifyEAM] Ravager has no ranges. This ravager will be unable to ravage the player.')
-		return false
-	}
-	// Track failed ranges
-	let failedRanges = []
-	// Track ranges with invalid EAM properties
-	let eamFailedRanges = []
-	//
-	let hasEAMRanges = false
-	// Loop each range
-	for (var range of ravager.ravage.ranges) {
-		// Check for rangeData
-		if (range.length < 2 || !range[1]) {
-			RFError('[RavagerFrameworkVerifyEAM] Invalid range: ', range)
-			// return false
-			failedRanges.push(range)
-			continue
-		}
-		const rangeData = range[1]
-		// Log about use count
-		if (rangeData.hasOwnProperty('useCount')) {
-			let useCount = rangeData.useCount
-			if (typeof useCount == undefined) {
-				RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount defined, but it is set to undefined. Doing so is not well tested. If this is not your last range, the expected behavior is to block incrementing use count, but that is unnecessary, as that is the default bahvior. If this is in your last range, this will result in incrementing the use count by 1 regardless of slot. It is recommended you either remove this setting if it is not in your last range, or set useCount to 0 if this is in your last range and you wish to block incrementing use counts.')
-			} else if (typeof useCount == 'number') {
-				if (useCount == 0)
-					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to zero. If this is the last range, this will prevent incrementing use counts. If this is not the last range, this setting is unnecessary.')
-				else if (useCount < 0)
-					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to a negative value. This will result in DECREMENTING use counts instead of incrementing them.')
-				else if (useCount > 0)
-					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use counts by ', useCount, ' for every slot')
-				else
-					RFError('[RavagerFrameworkVerifyEAM] wtf just happened? (useCount = number)')
-			} else if (typeof useCount == 'object') {
-				let hasSlots = false
-				if (useCount.hasOwnProperty('ItemVulva')) {
-					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemVulva by ', useCount.ItemVulva)
-					hasSlots = true
-				}
-				if (useCount.hasOwnProperty('ItemMouth')) {
-					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemMouth by ', useCount.ItemMouth)
-					hasSlots = true
-				}
-				if (useCount.hasOwnProperty('ItemButt')) {
-					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemButt by ', useCount.ItemButt)
-					hasSlots = true
-				}
-				if (useCount.hasOwnProperty('ItemHead')) {
-					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemHead by ', useCount.ItemHead)
-					hasSlots = true
-				}
-				if (!hasSlots) {
-					RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' defines useCount as a dictionary, but has no slots. This will result in never incrementing use counts.')
-				}
-			} else {
-				RFError('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to an unknown type. This scenario is untested. If you beleive this is a mistake, please report the issue. Otherwise, it is recommended to fix your definition of useCount.')
-			}
-		}
-		// Track if this range has any EAM settings
-		let hasEAMProps = false
-		// Check for taunts
-		if (rangeData.hasOwnProperty('experiencedTaunts')) {
-			let tauntsValid = true
-			// Loop each taunt range
-			for (var count of rangeData.experiencedTaunts) {
-				// Check structure of taunt range
-				if (count.length < 2 || !count[1]) {
-					RFWarn('[RavagerFrameworkVerifyEAM] This range has an invalid EAM taunt definition: ', count)
-					if (!eamFailedRanges.includes(count))
-						eamFailedRanges.push(count)
-					continue
-				}
-				let countData = count[1]
-				// Track if this taunt range has any slots
-				let hasSlots = false
-				// Check for each slot
-				// const hasSlots = countData.hasOwnProperty('ItemVulva') || countData.hasOwnProperty('ItemButt') || countData.hasOwnProperty('ItemMouth') || countData.hasOwnProperty('ItemHead')
-				for (var slot of [ 'ItemVulva', 'ItemMouth', 'ItemButt', 'ItemHead' ]) {
-					// let slotValid = countData.hasOwnProperty(slot)
-					// let slotWasValid = slotValid
-					if (!countData.hasOwnProperty(slot))
-						continue
-					let stringsValid = Array.isArray(countData[slot])
-					if (!stringsValid) {
-						RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
-						continue
-					}
-					for (var string of countData[slot]) {
-						stringsValid = stringsValid && typeof string == 'string'
-					}
-					if (!stringsValid) {
-						RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains taunts which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
-					}
-					// hasSlots = hasSlots || stringsValid
-					hasSlots = true
-				}
-				// Warn if there's no slots
-				if (!hasSlots)
-					RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
-				tauntsValid = tauntsValid && hasSlots
-			}
-			if (!tauntsValid)
-				RFWarn('[RavagerFrameworkVerifyEAM] experiencedTaunts is defined for range ' + range[0] + '. Either experiencedTaunts is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
-			hasEAMProps = hasEAMProps || tauntsValid
-		}
-		// Check for narration
-		if (rangeData.hasOwnProperty('experiencedNarration')) {
-			let narrationValid = true
-			for (var count of rangeData.experiencedTaunts) {
-				if (count.length < 2 || !count[1]) {
-					RFWarn('[RavagerFrameworkVerifyEAM] This range has an invalid EAM narration definition: ', count)
-					if (!eamFailedRanges.includes(count))
-						eamFailedRanges.push(count)
-					continue
-				}
-				let countData = count[1]
-				let hasSlots = false
-				for (var slot of [ 'ItemVulva', 'ItemMouth', 'ItemButt', 'ItemHead' ]) {
-					if (!countData.hasOwnProperty(slot))
-						continue
-					let stringsValid = Array.isArray(countData[slot])
-					if (!stringsValid) {
-						RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
-						continue
-					}
-					for (var string of countData[slot]) {
-						stringsValid = stringsValid && typeof string == 'string'
-					}
-					if (!stringsValid) {
-						RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains narrations which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
-					}
-					hasSlots = true
-				}
-				if (!hasSlots)
-					RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
-				narrationValid = narrationValid && hasSlots
-			}
-			if (!narrationValid)
-				RFWarn('[RavagerFrameworkVerifyEAM] experiencedNarration is defined for range ' + range[0] + '. Either experiencedNarration is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
-			hasEAMProps = hasEAMProps || narrationValid
-		}
-		//
-		let hasChance = rangeData.hasOwnProperty('experiencedChance')
-		let hasAlways = rangeData.hasOwnProperty('experiencedAlways')
-		//
-		if (!hasEAMProps && (hasChance || hasAlways)) {
-			RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, 'defines EAM chance or always, but does not appear to have any valid taunts or narrations. Without taunts or narrations to use, EAM text will not be used, and the chance and always settings are pointless')
-		}
-		//
-		hasEAMProps = hasEAMProps || hasChance || hasAlways
-		//
-		if (hasChance && hasAlways && rangeData.experiencedAlways) {
-			RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' defines both experiencedChance and experiencedAlways. experiencedAlways overrides experiencedChance, so it\'s pointless to have them both declared at the same time.')
-			continue
-		}
-		// Check for chance
-		if (hasChance && rangeData.experiencedChance <= 0) {
-			RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' has experiencedChance set to or below 0. This setting will result in EAM text never being used unless the user overrides your ravager\'s preference.')
-		}
-		// Check for always
-		if (hasAlways && !rangeData.experiencedAlways) {
-			RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' has experiencedAlways set to false. Doing so is entirely unneeded, as this setting only has any effect when true.')
-		}
-		hasEAMRanges = hasEAMRanges || hasEAMProps
-	}
-	// Bail on failed ranges
-	if (failedRanges.length > 0) {
-		RFError('[RavagerFrameworkVerifyEAM] The following ranges are invalid and may cause crashes: ', failedRanges)
-		return false
-	}
-	// Bail of EAM failures in ranges
-	if (eamFailedRanges.length > 0) {
-		RFError('[RavagerFrameworkVerifyEAM] The following ranges have invalid EAM properties and may cause crashes: ', eamFailedRanges)
-		return false
-	}
-	//
-	if (!hasEAMRanges) {
-		RFError('[RavagerFrameworkVerifyEAM] Ravager doesn\'t appear to have any ranges with valid EAM properties.')
-		return false
-	}
-	return true
-}
-// Hopeful fallback incase function signatures change -- I have no idea how this would interact with other mods that wind up overriding our overrides. Do they end up calling the original function or our leftover (possibly non-functional) override function?
-window.RavagerFrameworkRevertFunctions = function() {
-	const functions = [ 'DrawButtonKDEx', 'KinkyDungeonDrawEnemiesHP', 'KinkyDungeonDrawGame', 'KinkyDungeonRun', 'KinkyDungeonHandleClick', 'KDDropItems', 'DrawCheckboxKDEx', 'KinkyDungeonSendTextMessage' ]
-	for (let f of functions) {
-		RFDebug(`Reverting ${f} ...`)
-		window[f] = RavagerData.functions[f]
-	}
-	// Hopefully good enough to work around the weirdness that these variables were created to handle, but can't do the full 'for sure' method used before, as at this point we've already removed our custom KinkyDungeonRun. These variables are then garbage, but to recreate custom functions, the game and mod has to be reloaded
-	KinkyDungeonState = RavagerData.Variables.PrevState
-	KinkyDungeonState = RavagerData.Variables.PrevState
-	KinkyDungeonDrawState = RavagerData.Variables.PrevDrawState
-	KinkyDungeonDrawState = RavagerData.Variables.PrevDrawState
-}
-// Function to get a mod setting value
-// If settings are undefined, it'll return the default value given to KDModConfigs
-// If there is not matching value given to KDModConfigs, it'll return undefined
-window.RavagerGetSetting = function(refvar) {
-	if (refvar == "ravagerDebug" && _RavagerFrameworkDebugEnabled)
-		return true
-	// Mod settings and default config objects
-	const settings = KDModSettings.RavagerFramework
-	var config = RavagerData.ModConfig[refvar]
-	// Helper for getting default value
-	function RFConfigDefault(refvar, config) {
-		// Check for missing default values; signals either a data structure change or (dev) failure to declare default values
-		if (config == undefined) {
-			RFError('[Ravager Framework]: RavagerGetSetting couldn\'t find ModConfig values for ' + refvar + ' !')
-			return undefined
-		}
-		return config.default
-	}
-	// Helper for checking localStorage, incase the user has set mod settings previously but we're currently in mod initialization, where mod settings aren't available
-	function RFConfigCheckLocalStorage(refvar, config) {
-		// Chain to get the previous setting for the refvar we're looking for
-		if (localStorage.hasOwnProperty('KDModSettings')) {
-			const savedSettings = JSON.parse(localStorage.KDModSettings)
-			if (savedSettings.hasOwnProperty('RavagerFramework') && savedSettings.RavagerFramework[refvar] != undefined) {
-				return savedSettings.RavagerFramework[refvar]
-			}
-		}
-		// Default to returning the default value in ModConfig
-		return RFConfigDefault(refvar, config)
-	}
-	// No settings, return default; probably should never happen, but I believe I've seen it in the past when there's no localData
-	if (!settings) {
-		if (!_RavagerFrameworkInInit)
-			RFWarn('[Ravager Framework]: RavagerGetSetting couldn\'t get current settings for the framework!')
-		return RFConfigCheckLocalStorage(refvar, config)
-	}
-	// Requested setting isn't set, return default
-	if (settings[refvar] == undefined) {
-		if (!_RavagerFrameworkInInit)
-			RFWarn('[Ravager Framework]: RavagerGetSetting couldn\'t get the current setting for ' + refvar)
-		return RFConfigCheckLocalStorage(refvar, config)
-	}
-	// Return setting
-	return settings[refvar]
-}
 window.RavagerData = {
 	// To be (maybe) added at KDEventMapGeneric
 	KDEventMapGeneric: {
@@ -1349,6 +839,520 @@ window.RavagerData = {
 		IWantToHelpDebugBuffer: []
 	}
 }
+// Function to get a mod setting value
+// If settings are undefined, it'll return the default value given to KDModConfigs
+// If there is not matching value given to KDModConfigs, it'll return undefined
+window.RavagerGetSetting = function(refvar) {
+	if (refvar == "ravagerDebug" && _RavagerFrameworkDebugEnabled)
+		return true
+	// Mod settings and default config objects
+	const settings = KDModSettings.RavagerFramework
+	var config = RavagerData.ModConfig[refvar]
+	// Helper for getting default value
+	function RFConfigDefault(refvar, config) {
+		// Check for missing default values; signals either a data structure change or (dev) failure to declare default values
+		if (config == undefined) {
+			RFError('[Ravager Framework]: RavagerGetSetting couldn\'t find ModConfig values for ' + refvar + ' !')
+			return undefined
+		}
+		return config.default
+	}
+	// Helper for checking localStorage, incase the user has set mod settings previously but we're currently in mod initialization, where mod settings aren't available
+	function RFConfigCheckLocalStorage(refvar, config) {
+		// Chain to get the previous setting for the refvar we're looking for
+		if (localStorage.hasOwnProperty('KDModSettings')) {
+			const savedSettings = JSON.parse(localStorage.KDModSettings)
+			if (savedSettings.hasOwnProperty('RavagerFramework') && savedSettings.RavagerFramework[refvar] != undefined) {
+				return savedSettings.RavagerFramework[refvar]
+			}
+		}
+		// Default to returning the default value in ModConfig
+		return RFConfigDefault(refvar, config)
+	}
+	// No settings, return default; probably should never happen, but I believe I've seen it in the past when there's no localData
+	if (!settings) {
+		if (!_RavagerFrameworkInInit)
+			RFWarn('[Ravager Framework]: RavagerGetSetting couldn\'t get current settings for the framework!')
+		return RFConfigCheckLocalStorage(refvar, config)
+	}
+	// Requested setting isn't set, return default
+	if (settings[refvar] == undefined) {
+		if (!_RavagerFrameworkInInit)
+			RFWarn('[Ravager Framework]: RavagerGetSetting couldn\'t get the current setting for ' + refvar)
+		return RFConfigCheckLocalStorage(refvar, config)
+	}
+	// Return setting
+	return settings[refvar]
+}
+// Shortcut to getting ravager debug
+window.RFDebugEnabled = function() {
+	return RavagerGetSetting('ravagerDebug')
+}
+
+// Helper for pushing to debug log buffer
+window.RavagerFrameworkPushToLogBuffer = (msg, level = "INFO") => {
+	// Check if we actually want to add logs to a potential log file (assuming yes during initialization)
+	if (RavagerData.Variables.IWantToHelpDebug || _RavagerFrameworkInInit) {
+		// A structured log line, with extra info so we can know when it happened while reading a log after the events
+		let logLine = {
+			level: level,
+			gameState: {
+				currentTick: KinkyDungeonCurrentTick,
+				state: KinkyDungeonState, // State tracks things like Menu, NewGame, Wardrobe, Game
+				drawState: KinkyDungeonDrawState // DrawState tracks the state within Game
+			},
+			callStack: undefined,
+			msg: structuredClone(msg)
+		}
+		// Build a string to track the call stack
+		// - Start by getting call stack by creating an error
+		let stack_str_base = new Error().stack.replace("Error\n", "").replaceAll("    at ", "")
+		// - Will be our final call stack string
+		let stack_str = ""
+		// - Each function in the call stack is on its own line; trim each line to the function name and add to our final string
+		stack_str_base.split("\n").forEach(v => {
+			v = v.trim()
+			// Only add the current function call to the call stack if it's not one of the console message wrappers and not this function
+			if (!v.match(/window\.(RF(Error|Warn|Info|Debug|Trace)|RavagerFrameworkPushToLogBuffer)/))
+				stack_str += v.split(" ")[0] + " <= "
+		})
+		// - Save our call stack, but remove the trailing " <= " from it
+		logLine.callStack = stack_str.substr(0, stack_str.length - 4)
+		// Push this log line to our buffer
+		RavagerData.Variables.IWantToHelpDebugBuffer.push(logLine)
+	}
+}
+// Verbosity function for normal level debugging
+// This is just console.log wrapped in a function to see if we're debugging
+window.RFDebug = (...args) => {
+	RavagerFrameworkPushToLogBuffer(args)
+	RFDebugEnabled() && console.log(...args)
+}
+// Verbosity function for extreme level debugging
+// This is just console.log wrapped in a function to see if we're doing heavy debugging
+window.RFTrace = (...args) => {
+	RavagerFrameworkPushToLogBuffer(args, "TRACE")
+	_RavagerFrameworkDebugEnabled && console.log(...args)
+}
+// Wrapper around console.warn
+window.RFWarn = (...args) => {
+	RavagerFrameworkPushToLogBuffer(args, "WARN")
+	console.warn(...args)
+}
+// Wrapper around console.error
+window.RFError = (...args) => {
+	RavagerFrameworkPushToLogBuffer(args, "ERROR")
+	console.error(...args)
+}
+// Wrapper around console.log, but this one will always print the message
+window.RFInfo = (...args) => {
+	RavagerFrameworkPushToLogBuffer(args, "INFO")
+	console.log(...args)
+}
+
+// Verbose, but acturate name. Easy way to create stronger versions of enemies.
+/* Params:
+		- enemy : The enemy definition to use
+		- count : The number of variations to add, plus one for the original enemy. If you want your enemy and 3 additional variations, set this to 4
+		- textKeys : The dictionary of text values, key/value pairs being textKey/textValue
+		- higherLevelIncrease : Optional. Default true. Use faster enemy.minLevel increases. When false, minLevel is always increased by slowLevelIncreaseAmount
+		- slowLevelIncreaseAmount : Optional. Default 1. The number to increment minLevel by when higherLevelIncrease is false
+		- enemyDefinitionDictionary : Optional. Default RavagerData.Definitions.Enemies. Points to the dictionary where enemy definitions should be saved for your use (NOT for use by the game directly). This should be a dictionary where you can set a definition via `enemyDefinitionDictionary[enemy.name] = enemy`, as that's what this function does. If you do not use your enemy definitions after creation, or do not care where they get stored, you don't need to include this parameter
+		- options.skipTextKeyWarning : Optional. Default false. Skips the warning message about textKeys parameter being empty. If you're intending to handle the text keys yourself, set this to true
+		- options.skipEnemyDefinitionDictionaryWarning: Optional. Default false. If you don't want to set enemyDefinitionDictionary, but don't want the related warning message shown, set this to true.
+*/
+window.RFPushEnemiesWithStrongVariations = function(enemy, count, textKeys, higherLevelIncrease = true, slowLevelIncreaseAmount = 1, enemyDefinitionDictionary = RavagerData.Definitions.Enemies, options = { skipTextKeyWarning: false, skipEnemyDefinitionDictionaryWarning: false }) {
+	RFDebug('[Ravager Framework][RFPushEnemiesWithStrongVariations]: enemy: ', enemy, '; count: ', count, '; textKeys: ', textKeys, '; higherLevelIncrease: ', higherLevelIncrease, '; slowLevelIncreaseAmount: ', slowLevelIncreaseAmount, '; options: { skipTextKeyWarning: ', options?.skipTextKeyWarning, ', skipEnemyDefinitionDictionaryWarning: ', options?.skipEnemyDefinitionDictionaryWarning, ' }')
+	if (!enemy) {
+		RFError("[Ravager Framework][RFPushEnemiesWithStrongVariations]: 'enemy' parameter is undefined! Cannot continue. Whatever enemy this is supposed to be will not be in the game. If you're using an external ravager mod, report this to that author, otherwise report this to the Ravager Framework")
+		return false
+	}
+	if (count == undefined) {
+		RFWarn(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: 'count' parameter is undefined for enemy "${enemy.name}". Count will be defaulted to one, no stronger variations will be added. You should report this to the author of this ravager.`)
+		count = 1
+	}
+	if (count < 1) {
+		RFWarn(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: 'count' parameter is less than one for enemy "${enemy.name}". This enemy will not be added. You should report this to the author of this ravager.`)
+		return false
+	}
+	if (!textKeys && !options.skipTextKeyWarning) {
+		RFWarn(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: 'textKeys' parameter for enemy "${enemy.name}" has no text keys. This enemy will have no text keys added by this function.`)
+	}
+	if (enemyDefinitionDictionary == undefined) {
+		if (!(options.skipEnemyDefinitionDictionaryWarning || enemy.addedByMod == "RavagerFramework"))
+			RFWarn(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: enemyDefinitionDictionary was undefined for enemy "${enemy.name}". Definitions dictionary will be defaulted to RavagerData.Definitions.Enemies. You should report this to the author of this ravager.`)
+		enemyDefinitionDictionary = RavagerData.Definitions.Enemies
+	}
+	if (higherLevelIncrease == false && slowLevelIncreaseAmount == undefined) {
+		RFDebug(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: slowLevelIncreaseAmount is undefined for enemy "${enemy.name}" and this enemy will need to use this value to increase minLevel. This value will be defaulted to 1. You should report this to the author of this ravager.`)
+		slowLevelIncreaseAmount = 1
+	}
+	let prevEnemy = undefined
+	let currentEnemy = structuredClone(enemy)
+	for (let i = 0; i < count; i++) {
+		RFTrace(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: Starting loop #${i} for enemy ${enemy.name}`)
+		if (i > 0) {
+			prevEnemy = structuredClone(currentEnemy)
+			currentEnemy = structuredClone(enemy)
+			currentEnemy.name = currentEnemy.name + i.toString()
+			currentEnemy.maxhp = currentEnemy.maxhp * (1 + i)
+			currentEnemy.minLevel = prevEnemy.minLevel + (higherLevelIncrease ? i : slowLevelIncreaseAmount)
+			currentEnemy.armor = prevEnemy.armor + 0.5
+			KDModFiles[`Game/Enemies/${currentEnemy.name}.png`] = KDModFiles[`Game/Enemies/${enemy.name}.png`]
+		}
+		RFTrace(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: Pushing enemy ${currentEnemy.name}:`, currentEnemy)
+		KinkyDungeonEnemies.push(currentEnemy)
+		enemyDefinitionDictionary[currentEnemy.name] = structuredClone(currentEnemy)
+		RFTrace(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: Adding text keys for enemy ${currentEnemy.name}`)
+		for (let key in textKeys)
+			addTextKey(key.replace("EnemyName", currentEnemy.name), textKeys[key])
+	}
+	return true
+}
+
+/* 
+	RAVAGER FRAMEWORK 0.01
+	No enemies are added by this file. It's just the framework.
+	This mod adds a very dynamic playerEffect that lets enemies do the following in order of priority:
+
+	SELECTION ++ The enemy selects a player slot to use based on specified preferences. Currently just butt/vulva/mouth itemgroups.
+
+	STRIP/PIN ++ If target is player, has clothes in the way, or isn't pinned:
+		- Pick a blocking restraint to remove. Presently just immediately removes it. End turn.
+		- If no restraints in the way, pick an outfit/clothing item in the way, immediately removes it. End turn.
+
+	RAVAGE ++ If target is player, is pinned, and the slot of choice is unoccupied (OR occupied by the entity attacking)
+		- Marks the slot of choice as occupied by "this" enemy, so others pick different ones
+		- Steals the leash if the player is leashed, so that they don't get dragged away mid-ravage.
+		- If the enemy's ravage.progress value is within one of their specified ranges (this will make sense later), execute and end turn.
+			- Progresses through tiers of effects, defined in the enemy object. Typically outlines increasing intensity up to orgasm.
+			- Can damage SP, WP, Distraction, and also modify Submissiveness.
+			- Has enemy-specified narration and 'taunts'.
+			- ACTUALLY USES SUBMISSIVENESS - Player has up to an 70% chance to "Submit" (be stunned for a turn) based on a calculation of submissiveness, whether they're leashed, and whether their WP is 0.
+			- You can also specify a custom function to call for each individual range if you want.
+		
+		- If the enemy's ravage.progress value is higher than all of their ranges, assumes that they're done and executes the 'done' state.
+			- Player will pass out if SP and WP are low enough
+			- Otherwise, they'll stay awake and the enemy will just enter a cooldown refractory period where they can't ravage (but can fallback attack)
+			- Also, there's a callback for when an enemy's done, too. We love callbacks here. 
+
+	FALLBACK ++ If target is NOT player, OR target is an NPC, OR all slots are already occupied (unlikely but possible), OR in refractory mode
+		- Just deal some weak grope damage. End turn.
+		- You can also specify a function to call instead if you want to do something special.
+
+	An example enemy is defined below and appears prominently with other bandits, presently.
+	They're a little overpowered, so they'll probably be removed from regular spawning eventually (or restricted)
+	This way this mod can be more about providing the system to other modders.
+*/
+
+/* 
+	top priority next updates:
+		- GENERICIZE SLOTS
+			- We should have it be possible for any enemy to want to occupy any slot at all. Head, legs, anything. Not sure how anyone would use all of them (like, hands? arms? what?), but the point is being able to have the option.
+	
+		- RAVAGE INTERRUPTIONS
+			- maybe solved?
+
+		- STRIP
+			- Need to make stripping restraints in the way take a while. Maybe scale based on power.	
+				- not resolved - just have them removing for now. gotta come up with a good idea for this
+		
+		- TARGETING
+			- Prioritize 'easy' slots first. Should be done after stripping is handled.
+				- i.e., rank slots based on the power of everything in the way. go after the lowest
+	
+	interesting other leads:
+		see "PunishPlayer" event - possible event for struggling while pinned
+*/
+
+
+/**********************************************
+ * BELOW THIS POINT ARE FUNCTIONS YOU DON'T REALLY NEED TO WORRY ABOUT
+ * IF YOU'RE JUST MAKING SOME ENEMIES WHO USE RAVAGE, REFER TO Enemies/exampleEnemy.js !
+ * 
+ * PlayerEffect definition
+ * Ravage is one big effect that encompasses all high-impact lewd activity
+ * Ideally usable by any enemy, but it should be their "main thing" that they do, otherwise it gets weird/slow. You could play with ranges to make a mixed enemy work though.
+ * Has three effects:
+ 	* ATTACK: If non-player or otherwise ineligible for the main course, the target just takes DP damage.
+	* STRIP/PIN: If player and has clothing covering pelvis, or belted/vulva-plugged, remove. Lastly pins, preparing for the third phase.
+	* RAVAGE: If player and has exposed + unoccupied pelvis/vulva item groups, enter a sex state with increasing intensity
+*/
+// Function to add callbacks
+/**********************************************
+ * Callback definition helper
+ * This function is a simple helper the I would recommend using if you're going to add callbacks for your ravager.
+ * Takes two parameters:
+ * 	- The key which will be used to reference your callback. This is the value to use when setting a callback value inside your ravager's definition.
+ * 	- The function to use as a callback. 
+ * Note: If you decide to not use this function, there are two things you need to know:
+ * 	- If RavagerFramework itself does not load before your enemy, KDEventMapEnemy['ravagerCallbacks'] will not exist yet. This will cause the game will show a crash if you try to add a callback entry into that map, and that will cause execution of your JS file to stop at that line, potentially causing your ravager to never be added to the game
+ * 	- Your function should be the value of KDEventMapEnemy['ravagerCallbacks'][<callback name>]
+*/
+window.RavagerAddCallback = (key, func) => {
+	if (!KDEventMapEnemy['ravagerCallbacks']) {
+		KDEventMapEnemy['ravagerCallbacks'] = {}
+		if (!KDEventMapEnemy['ravagerCallbacks']) {
+			throw new Error('[Ravager Framework] Failed to initialize the ravager callbacks key! Something seems to have gone very wrong. Please report this to the Ravager Framework with as much info as you can provide.')
+		}
+	}
+	RFDebug('[Ravager Framework] Adding callback function with key: ', key)
+	KDEventMapEnemy['ravagerCallbacks'][key] = func
+	return Boolean(KDEventMapEnemy['ravagerCallbacks'][key])
+}
+
+// Add our debug callbacks for the sake of the example ravager
+let debugCallbacks = {
+	'debugFallbackCallback': (enemy, target) => {
+		console.log('[Ravager Framework] Debug fallback narration callback! Here\'s what you have available to you: enemy (Type: ', typeof enemy, '): ', enemy, '; target (Type: ', typeof target, '): ', target)
+	},
+	'debugCompletionCallback': (enemy, target, passedOut) => {
+		console.log('[Ravager Framework] Debug completion callback! Here\'s what you have available to you: enemy (Type: ', typeof enemy, '): ', enemy, '; target (Type: ', typeof target, '): ', target, '; passedOut (Type: ', typeof passedOut, '): ', passedOut)
+	},
+	'debugAllRangeCallback': (enemy, target, itemGroup) => {
+		console.log('[Ravager Framework] Debug all-range callback! Here\'s what you have available to you: enemy (Type: ', typeof enemy, '): ', enemy, '; target (Type: ', typeof target, '): ', target, '; itemGroup (Type: ', typeof itemGroup, '): ', itemGroup)
+		console.log('[Ravager Framework] Please note: This callback currently doesn\'t tell you what progress value or ravage range is triggering this call. This is something I may add soon, as I can think up a handful of uses for that info :)')
+		console.log('[Ravager Framework] Incase you need to know what range you\'re operating in, you can get the range data and the ravage progress via "enemy.Enemy.ravage.ranges" and "enemy.ravage.progress" respectively')
+	},
+	'debugSubmitChanceModifierCallback': (enemy, target, baseSubmitChance) => {
+		console.log('[Ravager Framework] Debug submit chance modifier callback! Here\'s what you have available to you: enemy (Type: ', typeof enemy, '): ', enemy, '; target (Type: ', typeof target, '): ', target, '; baseSubmitChance (Type: ', typeof baseSubmitChance, '): ', baseSubmitChance)
+		console.log('[Ravager Framework] Don\'t forget the submiteChanceModifierCallback needs to return a number between 0 and 100 for submission chance!')
+		return baseSubmitChance
+	},
+	'debugRangeX': (enemy, target, itemGroup) => {
+		console.log('[Ravager Framework] Debug range X callback! Here\'s what you have available: enemy (Type: ', typeof enemy, '): ', enemy, '; target (Type: ', typeof target, '): ', target, '; itemGroup (Type: ', typeof itemGroup, '): ', itemGroup)
+	},
+	'debugEffectCallback': (enemy, target) => {
+		console.log('[Ravager Framework] Debug effect callback! Here\'s what you have available: enemy (Type: ', typeof enemy, '): ', enemy, '; target (Type: ', typeof target, '): ', target)
+		return false
+	}
+}
+for (var key in debugCallbacks) {
+	if (!RavagerAddCallback(key, debugCallbacks[key]))
+		RFError('[Ravager Framework] Failed to add debug callback: ', key)
+}
+
+// Hidden option to enable way too many console messages
+window.RavagerFrameworkToggleDebug = function(enable = false) {
+	if (!_RavagerFrameworkDebugEnabled || enable) {
+		RFDebug('[Ravager Framework] Serious debug mode enabled. Hope you like lots of text and variables!')
+		_RavagerFrameworkDebugEnabled = true
+	} else {
+		RFDebug('[Ravager Framework] Serious debug mode disabled.')
+		_RavagerFrameworkDebugEnabled = false
+	}
+	localStorage.RavagerFrameworkTraceMessages = _RavagerFrameworkDebugEnabled
+}
+// Developer helper function to verify a ravager's EAM values - please don't have a bug ;-;
+window.RavagerFrameworkVerifyEAM = function(ravagerName) {
+	const ravager = KDEnemiesCache.get(ravagerName)
+	// Check that enemy exists
+	if (!ravager) {
+		RFError('[RavagerFrameworkVerifyEAM] Could not find an enemy by the name of ', ravagerName)
+		return false
+	}
+	// Check for ravager.ravage to make sure this is a ravager
+	if (!ravager.ravage) {
+		RFError('[RavagerFrameworkVerifyEAM] Enemy does not have a "ravage" property. Either you\'re checking the wrong enemy, or you\'ve defined your ravager wrong.')
+		return false
+	}
+	// Check that ravager has ranges
+	if (!ravager.ravage.ranges || ravager.ravage.ranges.length < 1) {
+		RFError('[RavagerFrameworkVerifyEAM] Ravager has no ranges. This ravager will be unable to ravage the player.')
+		return false
+	}
+	// Track failed ranges
+	let failedRanges = []
+	// Track ranges with invalid EAM properties
+	let eamFailedRanges = []
+	//
+	let hasEAMRanges = false
+	// Loop each range
+	for (var range of ravager.ravage.ranges) {
+		// Check for rangeData
+		if (range.length < 2 || !range[1]) {
+			RFError('[RavagerFrameworkVerifyEAM] Invalid range: ', range)
+			// return false
+			failedRanges.push(range)
+			continue
+		}
+		const rangeData = range[1]
+		// Log about use count
+		if (rangeData.hasOwnProperty('useCount')) {
+			let useCount = rangeData.useCount
+			if (typeof useCount == undefined) {
+				RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount defined, but it is set to undefined. Doing so is not well tested. If this is not your last range, the expected behavior is to block incrementing use count, but that is unnecessary, as that is the default bahvior. If this is in your last range, this will result in incrementing the use count by 1 regardless of slot. It is recommended you either remove this setting if it is not in your last range, or set useCount to 0 if this is in your last range and you wish to block incrementing use counts.')
+			} else if (typeof useCount == 'number') {
+				if (useCount == 0)
+					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to zero. If this is the last range, this will prevent incrementing use counts. If this is not the last range, this setting is unnecessary.')
+				else if (useCount < 0)
+					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to a negative value. This will result in DECREMENTING use counts instead of incrementing them.')
+				else if (useCount > 0)
+					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use counts by ', useCount, ' for every slot')
+				else
+					RFError('[RavagerFrameworkVerifyEAM] wtf just happened? (useCount = number)')
+			} else if (typeof useCount == 'object') {
+				let hasSlots = false
+				if (useCount.hasOwnProperty('ItemVulva')) {
+					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemVulva by ', useCount.ItemVulva)
+					hasSlots = true
+				}
+				if (useCount.hasOwnProperty('ItemMouth')) {
+					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemMouth by ', useCount.ItemMouth)
+					hasSlots = true
+				}
+				if (useCount.hasOwnProperty('ItemButt')) {
+					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemButt by ', useCount.ItemButt)
+					hasSlots = true
+				}
+				if (useCount.hasOwnProperty('ItemHead')) {
+					RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemHead by ', useCount.ItemHead)
+					hasSlots = true
+				}
+				if (!hasSlots) {
+					RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' defines useCount as a dictionary, but has no slots. This will result in never incrementing use counts.')
+				}
+			} else {
+				RFError('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to an unknown type. This scenario is untested. If you beleive this is a mistake, please report the issue. Otherwise, it is recommended to fix your definition of useCount.')
+			}
+		}
+		// Track if this range has any EAM settings
+		let hasEAMProps = false
+		// Check for taunts
+		if (rangeData.hasOwnProperty('experiencedTaunts')) {
+			let tauntsValid = true
+			// Loop each taunt range
+			for (var count of rangeData.experiencedTaunts) {
+				// Check structure of taunt range
+				if (count.length < 2 || !count[1]) {
+					RFWarn('[RavagerFrameworkVerifyEAM] This range has an invalid EAM taunt definition: ', count)
+					if (!eamFailedRanges.includes(count))
+						eamFailedRanges.push(count)
+					continue
+				}
+				let countData = count[1]
+				// Track if this taunt range has any slots
+				let hasSlots = false
+				// Check for each slot
+				// const hasSlots = countData.hasOwnProperty('ItemVulva') || countData.hasOwnProperty('ItemButt') || countData.hasOwnProperty('ItemMouth') || countData.hasOwnProperty('ItemHead')
+				for (var slot of [ 'ItemVulva', 'ItemMouth', 'ItemButt', 'ItemHead' ]) {
+					// let slotValid = countData.hasOwnProperty(slot)
+					// let slotWasValid = slotValid
+					if (!countData.hasOwnProperty(slot))
+						continue
+					let stringsValid = Array.isArray(countData[slot])
+					if (!stringsValid) {
+						RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
+						continue
+					}
+					for (var string of countData[slot]) {
+						stringsValid = stringsValid && typeof string == 'string'
+					}
+					if (!stringsValid) {
+						RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains taunts which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
+					}
+					// hasSlots = hasSlots || stringsValid
+					hasSlots = true
+				}
+				// Warn if there's no slots
+				if (!hasSlots)
+					RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
+				tauntsValid = tauntsValid && hasSlots
+			}
+			if (!tauntsValid)
+				RFWarn('[RavagerFrameworkVerifyEAM] experiencedTaunts is defined for range ' + range[0] + '. Either experiencedTaunts is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
+			hasEAMProps = hasEAMProps || tauntsValid
+		}
+		// Check for narration
+		if (rangeData.hasOwnProperty('experiencedNarration')) {
+			let narrationValid = true
+			for (var count of rangeData.experiencedTaunts) {
+				if (count.length < 2 || !count[1]) {
+					RFWarn('[RavagerFrameworkVerifyEAM] This range has an invalid EAM narration definition: ', count)
+					if (!eamFailedRanges.includes(count))
+						eamFailedRanges.push(count)
+					continue
+				}
+				let countData = count[1]
+				let hasSlots = false
+				for (var slot of [ 'ItemVulva', 'ItemMouth', 'ItemButt', 'ItemHead' ]) {
+					if (!countData.hasOwnProperty(slot))
+						continue
+					let stringsValid = Array.isArray(countData[slot])
+					if (!stringsValid) {
+						RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
+						continue
+					}
+					for (var string of countData[slot]) {
+						stringsValid = stringsValid && typeof string == 'string'
+					}
+					if (!stringsValid) {
+						RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains narrations which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
+					}
+					hasSlots = true
+				}
+				if (!hasSlots)
+					RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
+				narrationValid = narrationValid && hasSlots
+			}
+			if (!narrationValid)
+				RFWarn('[RavagerFrameworkVerifyEAM] experiencedNarration is defined for range ' + range[0] + '. Either experiencedNarration is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
+			hasEAMProps = hasEAMProps || narrationValid
+		}
+		//
+		let hasChance = rangeData.hasOwnProperty('experiencedChance')
+		let hasAlways = rangeData.hasOwnProperty('experiencedAlways')
+		//
+		if (!hasEAMProps && (hasChance || hasAlways)) {
+			RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, 'defines EAM chance or always, but does not appear to have any valid taunts or narrations. Without taunts or narrations to use, EAM text will not be used, and the chance and always settings are pointless')
+		}
+		//
+		hasEAMProps = hasEAMProps || hasChance || hasAlways
+		//
+		if (hasChance && hasAlways && rangeData.experiencedAlways) {
+			RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' defines both experiencedChance and experiencedAlways. experiencedAlways overrides experiencedChance, so it\'s pointless to have them both declared at the same time.')
+			continue
+		}
+		// Check for chance
+		if (hasChance && rangeData.experiencedChance <= 0) {
+			RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' has experiencedChance set to or below 0. This setting will result in EAM text never being used unless the user overrides your ravager\'s preference.')
+		}
+		// Check for always
+		if (hasAlways && !rangeData.experiencedAlways) {
+			RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' has experiencedAlways set to false. Doing so is entirely unneeded, as this setting only has any effect when true.')
+		}
+		hasEAMRanges = hasEAMRanges || hasEAMProps
+	}
+	// Bail on failed ranges
+	if (failedRanges.length > 0) {
+		RFError('[RavagerFrameworkVerifyEAM] The following ranges are invalid and may cause crashes: ', failedRanges)
+		return false
+	}
+	// Bail of EAM failures in ranges
+	if (eamFailedRanges.length > 0) {
+		RFError('[RavagerFrameworkVerifyEAM] The following ranges have invalid EAM properties and may cause crashes: ', eamFailedRanges)
+		return false
+	}
+	//
+	if (!hasEAMRanges) {
+		RFError('[RavagerFrameworkVerifyEAM] Ravager doesn\'t appear to have any ranges with valid EAM properties.')
+		return false
+	}
+	return true
+}
+// Hopeful fallback incase function signatures change -- I have no idea how this would interact with other mods that wind up overriding our overrides. Do they end up calling the original function or our leftover (possibly non-functional) override function?
+window.RavagerFrameworkRevertFunctions = function() {
+	const functions = [ 'DrawButtonKDEx', 'KinkyDungeonDrawEnemiesHP', 'KinkyDungeonDrawGame', 'KinkyDungeonRun', 'KinkyDungeonHandleClick', 'KDDropItems', 'DrawCheckboxKDEx', 'KinkyDungeonSendTextMessage' ]
+	for (let f of functions) {
+		RFDebug(`Reverting ${f} ...`)
+		window[f] = RavagerData.functions[f]
+	}
+	// Hopefully good enough to work around the weirdness that these variables were created to handle, but can't do the full 'for sure' method used before, as at this point we've already removed our custom KinkyDungeonRun. These variables are then garbage, but to recreate custom functions, the game and mod has to be reloaded
+	KinkyDungeonState = RavagerData.Variables.PrevState
+	KinkyDungeonState = RavagerData.Variables.PrevState
+	KinkyDungeonDrawState = RavagerData.Variables.PrevDrawState
+	KinkyDungeonDrawState = RavagerData.Variables.PrevDrawState
+}
 // Shortcut to custom GetRestraint
 window.RFGetRestraint = RavagerData.functions.GetRandomRestraint
 // Here so I can remove the messages from Attack{EnemyName}* during the ravage event (those messages are all the same and always end with "(no damage)", and they interupt my narration)
@@ -1685,10 +1689,6 @@ window.RFPlayerCanSeeEnemy = function(entity) {
 	}
 	const visiblilty = KinkyDungeonVisionGet(entity.x, entity.y)
 	return canSee && (visiblilty > 0)
-}
-// Shortcut to getting ravager debug
-window.RFDebugEnabled = function() {
-	return RavagerGetSetting('ravagerDebug')
 }
 // Currently just used for the mimic spoiler, but there's other ideas of how this can be used, so I've attempted to generalize it
 KinkyDungeonDrawEnemiesHP = function(delta, canvasOffsetX, canvasOffsetY, CamX, CamY, _CamXoffset, _CamYoffset) {
