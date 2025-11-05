@@ -1534,6 +1534,11 @@ KinkyDungeonRun = function() {
 			KinkyDungeonState = RavagerData.Variables.State
 	// Run the original KinkyDungeonRun
 	const ret = RavagerData.functions.KinkyDungeonRun()
+	// Turn off the in-init flag when the player interacts with anything other than mod config
+	// The reason not to unset it when opening mod config is because the "I want to help debug" config is not persistent and may be turned on by the user as the first thing they do, which means we still want to capture the log lines produced during the entirety of a settings refresh
+	// KDEventMapGeneric['afterModConfig']['RavagerFramework'] (called after the user exits mod config) will unset the init flag AFTER calling ravagerSettingsRefresh
+	if (_RavagerFrameworkInInit && !(KinkyDungeonState == "Menu" || KinkyDungeonState == "ModConfig"))
+		_RavagerFrameworkInInit = false
 	// Draw ravager control button on title screen; only when debug mode has been enabled, disabled, enabled again, and is currently enabled
 	if (
 		KinkyDungeonState == "Menu" &&
@@ -1987,7 +1992,6 @@ function refreshRavagerDataVariables(reason) {
 addTextKey('KDModButtonRavagerFramework', 'Ravager Framework')
 if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 	KDEventMapGeneric['afterModSettingsLoad']['RavagerFramework'] = (e, data) => {
-		_RavagerFrameworkInInit = false
 		if (KDModSettings == null) {
 			KDModSettings = {}
 			RFDebug('[Ravager Framework] KDModSettings was null.')
@@ -2023,6 +2027,7 @@ if (KDEventMapGeneric['afterModConfig'] != undefined) {
 		// ravagerFrameworkRefreshEnemies('config')
 		// ravagerFrameworkApplySpicyTendril('config')
 		ravagerSettingsRefresh('refresh')
+		_RavagerFrameworkInInit = false
 	}
 }
 //
