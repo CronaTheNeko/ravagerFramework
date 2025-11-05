@@ -10,11 +10,11 @@ window.RavagerData = {
 	KDEventMapGeneric: {
 		// Sets flag for playing a sound
 		beforeDamage: {
-			RavagerSoundHit: (e, item, data) => { RavagerSoundGotHit = true }
+			RavagerSoundHit: (e, item, data) => { if (!window.HasSoundMod) RavagerSoundGotHit = true }
 		},
 		// Sets flag for playing a sound
 		tick: {
-			RavagerSoundTick: (e, item, data) => { RavagerSoundGotHit = false }
+			RavagerSoundTick: (e, item, data) => { if (!window.HasSoundMod) RavagerSoundGotHit = false }
 		}
 	},
 	// To be (maybe) added at KDExpressions
@@ -1857,7 +1857,6 @@ function ravagerSettingsRefresh(reason) {
 	// ravagerFrameworkApplySpicyTendril(reason)
 	ravagerFrameworkApplySomeSpice(reason)
 	ravagerFrameworkApplySlimeRestrictChance(reason)
-	ravagerFrameworkSetupSound(reason)
 	refreshRavagerDataVariables(reason)
 	RavagerFrameworkRefreshFonts(reason)
 	RavagerFrameworkIWantToHelpDebug(reason)
@@ -1957,25 +1956,22 @@ function ravagerFrameworkRefreshEnemies(reason) {
 	KinkyDungeonRefreshEnemiesCache()
 }
 
-function ravagerFrameworkSetupSound(reason) {
-	var settings = KDModSettings['RavagerFramework'];
-	RFDebug('[Ravager Framework] ravagerFrameworkSetupSound(' + reason + ')')
-	var otherSoundFound = KDAllModFiles.filter((val) => { if (val.filename.toLowerCase().includes('girlsound.ks')) return true; }).length > 0
-	if (settings.ravagerEnableSound && !otherSoundFound) {
-		RFDebug('[Ravager Framework] Enabling sound effects ...')
-		window.RavagerSoundGotHit = false
-		KDEventMapGeneric.beforeDamage.RavagerSoundHit = RavagerData.KDEventMapGeneric.beforeDamage.RavagerSoundHit
-		KDEventMapGeneric.tick.RavagerSoundTick = RavagerData.KDEventMapGeneric.tick.RavagerSoundTick
-		KDExpressions.RavagerSoundHit = RavagerData.KDExpressions.RavagerSoundHit
-		KDExpressions.RavagerSoundOrgasm = RavagerData.KDExpressions.RavagerSoundOrgasm
-	} else {
-		RFDebug('[Ravager Framework] Disabling sound effects ...')
-		delete window.RavagerSoundGotHit
-		delete KDEventMapGeneric.beforeDamage.RavagerSoundHit
-		delete KDEventMapGeneric.tick.RavagerSoundTick
-		delete KDExpressions.RavagerSoundHit
-		delete KDExpressions.RavagerSoundOrgasm
-	}
+function ravagerFrameworkSetupSound() {
+	// I'm using this as a flag that another mod can set to explicitly tell me they're a sound mod
+	// If you're a developer, the Ravager Framework plays sounds on the player getting hit and orgasming. If those conflict with your mod's sounds and the below check is not enough to notice your mod as a sound mod, you can set `window.HasSoundMod = true` to solve that conflict without waiting for this framework to update.
+	if (!window.HasSoundMod)
+		// Check if we can find another sound mod active
+		window.HasSoundMod = KDAllModFiles.filter((val) => { if (val.filename.toLowerCase().includes('girlsound.ks')) return true; }).length > 0
+	// Debug message that'll be helpful incase there's another sound mod loaded that slipped the above check
+	RFDebug("[Ravager Framework][ravagerFrameworkSetupSound] Enabling sound effects. " + (window.HasSoundMod ? "We found another sound mod, so our sound effects won't actually be used." : "No other sound mod detected. If this is incorrect, please post either your mod list or a debug log to the Ravager Framework."))
+	RFTrace("[Ravager Framework][ravagerFrameworkSetupSound] Mod list: ", Object.keys(KDMods), "; Mod file list: ", KDAllModFiles.map(v => v.filename))
+	// Setup sound functions
+	window.RavagerSoundGotHit = false
+	KDEventMapGeneric.beforeDamage.RavagerSoundHit = RavagerData.KDEventMapGeneric.beforeDamage.RavagerSoundHit
+	KDEventMapGeneric.tick.RavagerSoundTick = RavagerData.KDEventMapGeneric.tick.RavagerSoundTick
+	KDExpressions.RavagerSoundHit = RavagerData.KDExpressions.RavagerSoundHit
+	KDExpressions.RavagerSoundOrgasm = RavagerData.KDExpressions.RavagerSoundOrgasm
+
 }
 
 function refreshRavagerDataVariables(reason) {
@@ -2019,6 +2015,7 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 		// ravagerFrameworkRefreshEnemies('load')
 		// ravagerFrameworkApplySpicyTendril('load')
 		ravagerSettingsRefresh('load')
+		ravagerFrameworkSetupSound()
 	}
 }
 
