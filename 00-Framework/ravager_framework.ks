@@ -90,8 +90,8 @@ window.RavagerData = {
 		KDDropItems: KDDropItems,
 		DrawCheckboxKDEx: DrawCheckboxKDEx,
 		KinkyDungeonSendTextMessage: KinkyDungeonSendTextMessage,
-		// Format strings used throughout the framework. Handles enemy, restraint, and clothing names, as well as damage strings
-		// Most, if not all, of my narration strings pass through this. We could simplify making varying dialogue by adding a 'choose a random option for this section of the string' functionality. Example: "EnemyName does (option1|option2) to you", where (option1|option2) is two options that will be randomly chosen from. See MimicRavager's ravaging narration for example of dialogue that could be greatly simplified by this addition. --- GOT IT! Fuck that was annoying; handles recursive choices fine (example: "{s{T{R|r}E|tre}tching|swelling}" to be one of "swelling", "stretching", "sTREtching", or "sTrEtching"), and seemingly handles a "|" outside of curly brackets
+		// Format strings used throughout the framework. Handles enemy, restraint, and clothing names, damage strings, and runtime string variations
+		// Runtime string variations could be made faster in the case of nested variations, as this code is depth first, and having nested variations will lead to all deeper levels being decided and later thrown away. It'd likely be faster if I trimmed the tree of choices as soon as I could, but that would be significantly more effort :) -- Possibly pretty easy to do by deciding on the top level variation and recursing back into inStringRandom with the chosen section of the input string.
 		NameFormat: function(string, entity, restraint, clothing, damage, skipCapitalize) {
 			function RFNFTrace(...args) {
 				RavagerData.Variables.RFControl.NameFormatDebug && RFDebug(...args)
@@ -108,22 +108,22 @@ window.RavagerData = {
 				string = string.replace("EnemyCNameBare", KDEnemyName(entity))
 				// Possible custom entity name (w/ formatting)
 				string = string.replace("EnemyCName", entity.CustomName || KDGetName(entity.id) || "the " + TextGet("Name" + entity.Enemy.name))
-			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+				RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
 			}
 			// Restraint name
 			if (restraint) {
 				string = string.replace("RestraintName", TextGet('Restraint' + restraint.name))
-			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+				RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
 			}
 			// Clothing name
 			if (clothing) {
 				string = string.replace("ClothingName", TextGet("m_" + clothing.Item).includes("[NotFound]") ? clothing.Item : TextGet("m_" + clothing.Item))
-			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+				RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
 			}
 			// Damage string
 			if (damage) {
 				string = string.replace("DamageTaken", damage.string)
-			RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+				RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
 			}
 			// In-string randomization
 			function inStringRandom(input) {
