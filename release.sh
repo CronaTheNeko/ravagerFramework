@@ -18,6 +18,6 @@ cd $(dirname $0)
 [ -e "${filename}" ] && rm "${filename}"
 [ -e "${filename_core}" ] && rm "${filename_core}"
 # Zip full version of mod
-zip -qr "${filename}" * -x "*.sh" -x "Enemies/outfit-notes/*"
+zip -qr "${filename}" * -x "*.sh" -x "Enemies/outfit-notes/*" -x "*.py"
 # Zip core version of mod
-zip -qr "${filename_core}" * -x "Enemies/*" -x "*.sh"
+zip -qr "${filename_core}" * -x "Enemies/*" -x "*.sh" -x "*.py"

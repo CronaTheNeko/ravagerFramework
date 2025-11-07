@@ -581,6 +581,143 @@ window.RavagerData = {
 			}
 			// RFWarn('[Ravager Framework][RFGetRestraint] End RFGetRestraint')
 			RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Looks like there's no restraints left to return. End of RFGetRestraint.")
+		},
+		// Check if we're missing any functions
+		CheckAllFunctions: function() {
+			var missingFunctions = ""
+			// Loop the functions we use to find any that are missing
+			for (var func of RavagerData.FunctionsThatMightBeMissing) {
+				var type = eval('typeof ' + func);
+				if (type != 'function' && type != 'object')
+					missingFunctions += func + ", "
+			}
+			// Exit now if there's no functions missing
+			if (missingFunctions.length == 0)
+				return true
+			missingFunctions = missingFunctions.slice(0, missingFunctions.length - 2)
+			RavagerData.Variables.MissingFunctions = missingFunctions.split(", ")
+			// Helper to make the header images
+			function ErrorImage(src, path = "Enemies") {
+				const img = document.createElement("img")
+				img.src = KDModFiles[`Game/${path}/${src}.png`]
+				Object.assign(img.style, {
+					maxWidth: "10vw",
+				})
+				return img
+			}
+			// Creating the popup box
+			// The whole popup box
+			const backdrop = document.createElement("div")
+			backdrop.id = "ravager-framework-missing-functions-popup"
+			Object.assign(backdrop.style, {
+				position: "fixed",
+				inset: 0,
+				backgroundColor: "#000000a0",
+				fontFamily: "'Arial', sans-serif",
+				fontSize: "1.8vmin",
+				lineHeight: 1.6
+			})
+			// The main body
+			const modal = document.createElement("div")
+			Object.assign(modal.style, {
+				position: "absolute",
+				display: "flex",
+				flexFlow: "column nowrap",
+				width: "90vw",
+				maxWidth: "1440px",
+				maxHeight: "90vh",
+				overflow: "hidden",
+				backgroundColor: "#282828",
+				color: "#fafafa",
+				left: "50%",
+				top: "50%",
+				transform: "translate(-50%, -50%)",
+				padding: "1rem",
+				borderRadius: "2px",
+				boxShadow: "1px 1px 40px -8px #ffffff80"
+			})
+			backdrop.appendChild(modal)
+			// The heading with ravager images
+			const heading = document.createElement("h1")
+			Object.assign(heading.style, {
+				display: "flex",
+				flexFlow: "row nowrap",
+				alignItems: "center",
+				justifyContent: "space-around",
+				textAlign: "center"
+			})
+			heading.appendChild(ErrorImage("BanditRavager"))
+			heading.appendChild(ErrorImage("Hearts", "Conditions/RavBubble"))
+			heading.appendChild(ErrorImage("WolfgirlRavager"))
+			heading.appendChild(ErrorImage("Hearts", "Conditions/RavBubble"))
+			heading.appendChild(ErrorImage("SlimeRavager"))
+			heading.appendChild(document.createTextNode("Ravager Alert"))
+			heading.appendChild(ErrorImage("SlimeRavager"))
+			heading.appendChild(ErrorImage("Hearts", "Conditions/RavBubble"))
+			heading.appendChild(ErrorImage("WolfgirlRavager"))
+			heading.appendChild(ErrorImage("Hearts", "Conditions/RavBubble"))
+			heading.appendChild(ErrorImage("BanditRavager"))
+			modal.appendChild(heading)
+			// Horizontal line
+			const hr = document.createElement("hr")
+			Object.assign(hr.style, {
+				border: "1px solid #f6f",
+				margin: "0 0 1.5em"
+			})
+			modal.appendChild(hr)
+			// Plain text explaining the popup
+			modal.appendChild(KinkyDungeonErrorPreamble([
+				"It appears that your game is missing a few functions that the Ravager Framework uses to function.",
+				"This is most likely caused by the game updating and renaming / removing some functions."
+			]))
+			modal.appendChild(KinkyDungeonErrorPreamble([
+				"These functions not being present may result in issues.",
+				"The severity of these issues can't be known by this message, but can range anywhere between unexpected behavior and full game crashes."
+			]))
+
+			modal.appendChild(KinkyDungeonErrorPreamble([
+				"While it would be best to report these missing functions as an issue, it may be possible to resolve the issue by enabling Kinky Dungeon's \"Mod Compat Mode\" option."
+			]))
+			// The code-style info box
+			const pre = document.createElement("pre")
+			Object.assign(pre.style, {
+				flex: 1,
+				backgroundColor: "#1a1a1a",
+				border: "1px solid #ffffff40",
+				fontSize: "1.1em",
+				padding: "1em",
+				userSelect: "all",
+				overflowWrap: "anywhere",
+				overflowX: "hidden",
+				overflowY: "auto",
+				color: "#fbf",
+				whiteSpace: "pre-wrap"
+			})
+			// The list of missing functions
+			pre.textContent = "Missing functions: " + missingFunctions
+			modal.appendChild(pre)
+			// Close button
+			const closeButton = document.createElement("button")
+			closeButton.textContent = "Close"
+			Object.assign(closeButton.style, {
+				fontSize: "1.25em",
+		    padding: "0.5em 1em",
+		    backgroundColor: KDButtonColor,
+		    border: "2px solid #f6f",
+		    color: KDBaseWhite,
+		    cursor: "pointer"
+			})
+			closeButton.addEventListener("click", () => { backdrop.remove() })
+			Object.assign(closeButton.style, {
+				display: "flex",
+				flexFlow: "row wrap",
+				justifyContent: "space-around",
+				gap: "1em"
+			})
+			modal.appendChild(closeButton)
+			// Show the popup
+			document.body.appendChild(backdrop)
+			return false
 		}
 	},
 	// Currently just used for the MimicRavager spoiler
@@ -769,6 +906,63 @@ window.RavagerData = {
 			textKeyVal: "I want to help debug"
 		},
 	},
+	// TODO: Try to keep this up to date over time
+	// List of all the game functions the framework relies on
+	FunctionsThatMightBeMissing: [
+		"KDistChebyshev", // Used by RFPlayerCanSeeEnemy
+		"AudioPlayInstantSoundKD", // This and below were found via find-functions.py. Some may be missing
+		"GetModelLayers",
+		"KDAdvanceSlime",
+		"KDBreakTether",
+		"KDCanAddRestraint",
+		"KDCanSeeEnemy",
+		"KDChangeDistraction",
+		"KDCurrIndex",
+		"KDDraw",
+		"KDGetDressList",
+		"KDGetEffLevel",
+		"KDGetFontMult",
+		"KDGetJailRestraints",
+		"KDGetRestraintsEligible",
+		"KDMapInit",
+		"KDNearbyEnemies",
+		"KDRandom",
+		"KDRemoveEntity",
+		"KDRestraint",
+		"KDStunTurns",
+		"KinkyDungeonAddRestraintIfWeaker",
+		"KinkyDungeonAddRestraintText",
+		"KinkyDungeonApplyBuffToEntity",
+		"KinkyDungeonCastSpell",
+		"KinkyDungeonDealDamage",
+		"KinkyDungeonDoTryOrgasm",
+		"KinkyDungeonDressPlayer",
+		"KinkyDungeonGetRestraint",
+		"KinkyDungeonGetRestraintByName",
+		"KinkyDungeonGetRestraintItem",
+		"KinkyDungeonInterruptSleep",
+		"KinkyDungeonItemDrop",
+		"KinkyDungeonMakeNoise",
+		"KinkyDungeonPassOut",
+		"KinkyDungeonRefreshEnemiesCache",
+		"KinkyDungeonRemoveRestraint",
+		"KinkyDungeonRemoveRestraintSpecific",
+		"KinkyDungeonRemoveRestraintsWithName",
+		"KinkyDungeonSendActionMessage",
+		"KinkyDungeonSendDialogue",
+		"KinkyDungeonSendFloater",
+		"KinkyDungeonSendTextMessage",
+		"KinkyDungeonSetDress",
+		"KinkyDungeonSetFlag",
+		"KinkyDungeonVisionGet",
+		"KinkyDungeonWordWrap",
+		"MouseIn",
+		"PIXI.Texture.fromURL",
+		"TextGet",
+		"TextGetKD",
+		"ToLayerMap",
+		"addTextKey"
+	],
 	// Stores enemy definitions
 	Definitions: {
 		Enemies: {},
@@ -2016,6 +2210,9 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 		// ravagerFrameworkApplySpicyTendril('load')
 		ravagerSettingsRefresh('load')
 		ravagerFrameworkSetupSound()
+		// Check for any missing functions
+		if (!RavagerData.functions.CheckAllFunctions())
+			RFError("Found missing functions!", RavagerData.Variables.MissingFunctions)
 	}
 }
 
