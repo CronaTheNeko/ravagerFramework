@@ -6,6 +6,7 @@ if (localStorage.hasOwnProperty('RavagerFrameworkTraceMessages')) {
 	_RavagerFrameworkDebugEnabled = localStorage.RavagerFrameworkTraceMessages
 }
 window.RavagerData = {
+	Version: "6.2.1",
 	// To be (maybe) added at KDEventMapGeneric
 	KDEventMapGeneric: {
 		// Sets flag for playing a sound
@@ -239,6 +240,26 @@ window.RavagerData = {
 					Width: 300,
 					Height: 64,
 					Label: "End Debug Log"
+				},
+				{
+					name: "RFControlSaveFunctionOverrides",
+					func: () => { RavagerData.functions.SaveFunctionOverrides(); },
+					enabled: true,
+					Left: 1100,
+					Top: 200,
+					Width: 300,
+					Height: 64,
+					Label: "Save Overridden Functions"
+				},
+				{
+					name: "RFControlCheckFunctionOverrides",
+					func: () => { RavagerData.functions.CheckFunctionOverrides(); },
+					enabled: true,
+					Left: 1100,
+					Top: 274,
+					Width: 300,
+					Height: 64,
+					Label: "Check Overridden Functions"
 				}
 			]
 			// All the checkboxes we'll draw
@@ -718,7 +739,73 @@ window.RavagerData = {
 			// Show the popup
 			document.body.appendChild(backdrop)
 			return false
-		}
+		},
+		GetFunctionOverrides: function() {
+			let funcs = {}
+			for (let key of Object.keys(RavagerData.functions))
+				if (key.match(/(KinkyDungeo.*|.*KD.*)/))
+					funcs[key] = LZString.compressToBase64(RavagerData.functions[key].toString())
+			return funcs
+		},
+		SaveFunctionOverrides: function() {
+			let funcs = RavagerData.functions.GetFunctionOverrides()
+			const element = document.createElement("a")
+			element.setAttribute("href", `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(funcs, undefined, '  '))}`)
+			element.setAttribute("download", `RavagerFramework_FunctionOverrides_KD${TextGetKD("KDVersionStr")}_RF${RavagerData.Version}.json`)
+			element.click()
+		},
+		CheckFunctionOverrides: function() {
+			let input = document.createElement("input")
+			input.type = "file"
+			input.accept = ".json"
+			input.onchange = async function(event) {
+				const file = event.target.files[0]
+				if (file) {
+					try {
+						const fileContent = await file.text()
+						const savedData = JSON.parse(fileContent)
+						// console.log(jsonData)
+						const currData = RavagerData.functions.GetFunctionOverrides()
+						//
+						const skeys = Object.keys(savedData)
+						const ckeys = Object.keys(currData)
+						const keys = new Set([ ...skeys, ...ckeys ])
+						let mismatches = {
+							savedKeys: [], // In saved, not in current
+							currentKeys: [], // In current, not in saved
+							savedFuncs: {}, // Saved version of changed functions
+							currentFuncs: {} // Current version of changed functions
+						}
+						//
+						for (let key of keys) {
+							if (!skeys.includes(key)) {
+								mismatches.savedKeys.push(key)
+								// continue
+							}
+							if (!ckeys.includes(key)) {
+								mismatches.currentKeys.push(key)
+								// continue
+							}
+							//
+							if (savedData[key] != currData[key]) {
+								mismatches.savedFuncs[key] = savedData[key]
+								mismatches.currentFuncs[key] = currData[key]
+							}
+						}
+						//
+						if (mismatches.savedKeys.length || mismatches.currentKeys.length || Object.keys(mismatches.savedFuncs).length || Object.keys(mismatches.currentFuncs).length) {
+							const element = document.createElement("a")
+							element.setAttribute("href", `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(mismatches, undefined, '  '))}`)
+							element.setAttribute("download", "RavagerFramework_FunctionOverrides_Report.json")
+							element.click()
+						}
+					} catch (error) {
+						console.error("Error reading or parsing JSON file:", error)
+					}
+				}
+			}
+			input.click()
+		},
 	},
 	// Currently just used for the MimicRavager spoiler
 	conditions: {
