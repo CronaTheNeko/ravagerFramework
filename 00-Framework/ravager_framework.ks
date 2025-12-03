@@ -234,7 +234,7 @@ window.RavagerData = {
 				{
 					name: "RFControlEndIWantToHelpDebugMode",
 					func: () => { KDModSettings.RavagerFramework.ravagerHelpDebug = false; RavagerFrameworkIWantToHelpDebug('Finish') },
-					enabled: true,
+					enabled: KDModSettings?.RavagerFramework?.ravagerHelpDebug,
 					Left: 550,
 					Top: 792,
 					Width: 300,
@@ -388,10 +388,10 @@ window.RavagerData = {
 					btn?.Width,
 					btn?.Height,
 					btn?.Label,
-					btn?.Color ? btn.Color : KDBaseWhite,
+					(btn?.enabled ? (btn?.Color ? btn.Color : KDBaseWhite) : "#757575"),
 					btn?.Image,
 					btn?.HoveringText,
-					btn?.Disabled,
+					!btn?.enabled,
 					btn?.NoBorder,
 					btn?.FillColor,
 					btn?.FontSize,
@@ -1717,51 +1717,16 @@ DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, 
 }
 // Just here so I can have custom checkbox images in mod config
 DrawCheckboxKDEx = function(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, _CheckImage, options) {
-	// Detect my settings buttons
-	if (KinkyDungeonState == "ModConfig" && KDModToggleTab == "RavagerFramework") {
-		// Call my custom checkbox function for now, as the _CheckImage fix hasn't landed in a release yet
-		DrawCheckboxRFEx(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, "UI/HeartChecked.png", options)
-	} else {
-		// Call original function for all other checkboxes
-		RavagerData.functions.DrawCheckboxKDEx(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, _CheckImage, options)
-	}
+	if (KinkyDungeonState == "ModConfig" && KDModToggleTab == "RavagerFramework")
+		_CheckImage = "UI/HeartChecked.png"
+	return RavagerData.functions.DrawCheckboxKDEx(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, _CheckImage, options)
 }
 // My own implementation of DrawCheckboxKDEx, as it has (at the time of writing) a bug that makes it impossible to set a custom checked image (https://discord.com/channels/938203644023685181/975621489632116767/1384060387003207721)(Fixed https://github.com/Ada18980/KinkiestDungeon/commit/b7ca59774566aeb123e3320bf0a27a13c9c0b0c7 -- still keeping this as it'll let me set custom defaults)
-window.DrawCheckboxRFEx = function(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, _CheckImage, options) {
+window.DrawCheckboxRFEx = function(name, func, enabled, Left, Top, Width = 64, Height = 64, Text, IsChecked, Disabled, TextColor, _CheckImage, options) {
 	// Ensure valid checked image; default to mine
 	if (!_CheckImage)
 		_CheckImage = "UI/HeartChecked.png"
-	DrawTextFitKD(
-		Text,
-		Left + 10 + (Width || 64),
-		Top + (Height || 64)/2+1,
-		options?.maxWidth || 1000,
-		// TextColor ? TextColor : KDBaseWhite,
-		enabled ? (TextColor ? TextColor : KDBaseWhite) : "#757575",
-		"#333333",
-		options?.fontSize,
-		"left"
-	)
-	DrawButtonKDEx(
-		name,
-		func,
-		enabled,
-		Left,
-		Top,
-		Width || 64,
-		Height || 64,
-		"",
-		Disabled ? "#ebebe4" : KDBaseWhite,
-		IsChecked ? (KinkyDungeonRootDirectory + _CheckImage) : "",
-		// null,
-		options?.HoveringText,
-		Disabled,
-		undefined,
-		undefined,
-		undefined,
-		undefined,
-		options
-	)
+	return DrawCheckboxKDEx(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, (enabled ? (TextColor ? TextColor : KDBaseWhite) : "#757575"), _CheckImage, options)
 }
 // Override so I can draw a custom button on the in-game pause menu
 KinkyDungeonDrawGame = function() {
@@ -1847,9 +1812,6 @@ KinkyDungeonRun = function() {
 			false,
 			'#303'
 		)
-	} else if (KinkyDungeonState == "RavagerControl") {
-		// In the ravager control menu, functionality moved to external function because it feels better to me
-		RavagerData.functions.RFControlRun()
 	} else if (KinkyDungeonState == "ModConfig" && KDModToggleTab == "RavagerFramework") {
 		let modConfig = RavagerData.Variables.ModConfig
 		for (let data in modConfig.BoxData) {
@@ -3431,3 +3393,7 @@ addTextKey('KinkyDungeonStruggleRemoveNeedEdgeWrongEdgeRavagerOccupiedAroused', 
 // addTextKey("KinkyDungeonStruggleStruggleImpossibleRavagerOccupiedAroused","You need to get them off you first! (Struggle against 'Pinned!')")
 // addTextKey("KinkyDungeonStruggleStruggleImpossibleBoundRavagerOccupied","You need to get them off you first! (Struggle against 'Pinned!')")
 // addTextKey("KinkyDungeonStruggleStruggleImpossibleBoundRavagerOccupiedAroused","You need to get them off you first! (Struggle against 'Pinned!')")
+
+// Add Ravager Control to the game's custom screen list
+// The game will look in KDRender for a key matching the value of KinkyDungeonState, and run the function in that key as the draw function
+KDRender.RavagerControl = RavagerData.functions.RFControlRun
