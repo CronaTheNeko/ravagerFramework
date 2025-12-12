@@ -6,7 +6,6 @@ if (localStorage.hasOwnProperty('RavagerFrameworkTraceMessages')) {
 	_RavagerFrameworkDebugEnabled = localStorage.RavagerFrameworkTraceMessages
 }
 window.RavagerData = {
-	Version: "6.2.1",
 	// To be (maybe) added at KDEventMapGeneric
 	KDEventMapGeneric: {
 		// Sets flag for playing a sound
@@ -743,7 +742,7 @@ window.RavagerData = {
 			let funcs = RavagerData.functions.GetFunctionOverrides()
 			const element = document.createElement("a")
 			element.setAttribute("href", `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(funcs, undefined, '  '))}`)
-			element.setAttribute("download", `RavagerFramework_FunctionOverrides_KD${TextGetKD("KDVersionStr")}_RF${RavagerData.Version}.json`)
+			element.setAttribute("download", `RavagerFramework_FunctionOverrides_KD${TextGetKD("KDVersionStr")}_RF${RavagerData.ModInfo.modbuild}.json`)
 			element.click()
 		},
 		CheckFunctionOverrides: function() {
@@ -789,7 +788,7 @@ window.RavagerData = {
 						if (mismatches.savedKeys.length || mismatches.currentKeys.length || Object.keys(mismatches.savedFuncs).length || Object.keys(mismatches.currentFuncs).length) {
 							const element = document.createElement("a")
 							element.setAttribute("href", `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(mismatches, undefined, '  '))}`)
-							element.setAttribute("download", "RavagerFramework_FunctionOverrides_Report.json")
+							element.setAttribute("download", `RavagerFramework_FunctionOverrides_Report_KD${TextGetKD("KDVersionStr")}_RF${RavagerData.ModInfo.modbuild}.json`)
 							element.click()
 						}
 					} catch (error) {
@@ -953,6 +952,19 @@ window.RavagerData = {
 			textKeyVal: "I want to help debug"
 		},
 	},
+	// Copy of mod info; default values incase reading reading mod.json fails
+	ModInfo: {
+		author: "UNKNOWN",
+		fileorder: [],
+		gamemajor: -1,
+		gameminor: -1,
+		gamepatch_max: -1,
+		gamepatch_min: -1,
+		modbuild: "UNKNOWN",
+		moddesc: "UNKNOWN",
+		modname: "UNKNOWN",
+		priority: -1
+	},
 	// TODO: Try to keep this up to date over time
 	// List of all the game functions the framework relies on
 	FunctionsThatMightBeMissing: [
@@ -1080,6 +1092,16 @@ window.RavagerData = {
 		IWantToHelpDebugBuffer: []
 	}
 }
+// Keep track of our own mod.json
+fetch(KDModFiles['Game/mod.json']).then(response => response.blob()).then(blob => {
+	const reader = new FileReader();
+	reader.onload = () => {
+		window.RavagerData.ModInfo = JSON.parse(reader.result);
+	};
+	reader.readAsText(blob);
+}).catch(error => {
+	console.error("[Ravager Framework] Caught error while reading mod.json", error);
+})
 // Function to get a mod setting value
 // If settings are undefined, it'll return the default value given to KDModConfigs
 // If there is not matching value given to KDModConfigs, it'll return undefined
@@ -1945,6 +1967,13 @@ function RavagerFrameworkIWantToHelpDebug(reason) {
 		// Disable help debugging mode in variable
 		RFDebug("[Ravager Framework][RavagerFrameworkIWantToHelpDebug]: Disabling debug logging and saving the log")
 		RavagerData.Variables.IWantToHelpDebug = false
+		// Save version info log
+		let logLine = {
+			level: "VER",
+			KD: TextGet("KDVersionStr"),
+			RF: RavagerData.ModInfo.modbuild
+		}
+		RavagerData.Variables.IWantToHelpDebugBuffer = [ logLine, ...RavagerData.Variables.IWantToHelpDebugBuffer ]
 		// Save the buffer to a file
 		const element = document.createElement("a");
 		const now = new Date()
