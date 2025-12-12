@@ -2386,7 +2386,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 		) {
 			RFDebug('[Ravager Framework]: validSlots: ', validSlots, '; entity.ravage.slot: ', entity.ravage.slot, '; entity not in desired player slot: ', KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity, '; desired player slot: ', KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot])
 			if (validSlots.length)
-				entity.ravage.slot = ravRandom(validSlots)
+				entity.ravage.slot = RFArrayRand(validSlots)
 			else
 				canRavage = false
 		}
@@ -2636,26 +2636,26 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				if (checkPreviousUseCount(slotOfChoice) && rangeData.experiencedNarration) {
 					let eNarr = rangeData.experiencedNarration.findLast((range) => { if (range[0] <= target.ravagedCounts[slotOfChoice]) return true; })
 					if (decideToDoExperiencedText(eNarr, slotOfChoice, rangeData)) {
-						pRav.narrationBuffer.push(RavagerData.functions.NameFormat(ravRandom(eNarr[1][slotOfChoice]), entity))
+						pRav.narrationBuffer.push(RavagerData.functions.NameFormat(RFArrayRand(eNarr[1][slotOfChoice]), entity))
 						didExperiencedNarration = true
 					}
 				}
 				if (rangeData.narration && !didExperiencedNarration)
-					pRav.narrationBuffer.push(RavagerData.functions.NameFormat(ravRandom(rangeData.narration[slotOfChoice]), entity))
+					pRav.narrationBuffer.push(RavagerData.functions.NameFormat(RFArrayRand(rangeData.narration[slotOfChoice]), entity))
 				// Use count based taunts
 				let didExperiencedTaunt = false
 				if (checkPreviousUseCount(slotOfChoice) && rangeData.experiencedTaunts) {
 					let eTaunt = rangeData.experiencedTaunts.findLast((range) => { if (range[0] <= target.ravagedCounts[slotOfChoice]) return true; })
 					if (decideToDoExperiencedText(eTaunt, slotOfChoice, rangeData)) {
-						KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(ravRandom(eTaunt[1][slotOfChoice]), entity), KDGetColor(entity), 6, 6)
+						KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(RFArrayRand(eTaunt[1][slotOfChoice]), entity), KDGetColor(entity), 6, 6)
 						didExperiencedTaunt = true
 					}
 				}
 				if (rangeData.taunts && !didExperiencedNarration)
-					KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(ravRandom(rangeData.taunts), entity), KDGetColor(entity), 6, 6)
+					KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(RFArrayRand(rangeData.taunts), entity), KDGetColor(entity), 6, 6)
 				if(rangeData.dp) { // Only do floaty sound effects if DP is being applied, since that means action is happening
 					if(enemy.ravage.onomatopoeia)
-						KinkyDungeonSendFloater(entity, ravRandom(enemy.ravage.onomatopoeia), "#ff00ff", 2);
+						KinkyDungeonSendFloater(entity, RFArrayRand(enemy.ravage.onomatopoeia), "#ff00ff", 2);
 				}
 				// Status effect application/precautions
 				KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, KDRavaged) // Blinds player
@@ -2715,7 +2715,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				RFDebug('[Ravager Framework]: Attempting to increment slot use count at end of session...')
 				increasePlayerRavagedCount(getPreviousRange(range, enemy), slotOfChoice, target, enemy, !(enemy.ravage.ranges.filter(v => v[1].useCount).length > 0))
 				if (enemy.ravage.doneTaunts)
-					KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(ravRandom(enemy.ravage.doneTaunts), entity), KDGetColor(entity), 6, 6)
+					KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(RFArrayRand(enemy.ravage.doneTaunts), entity), KDGetColor(entity), 6, 6)
 				if (
 					typeof enemy.ravage.completionCallback == 'string' &&
 					KDEventMapEnemy['ravagerCallbacks'] &&
@@ -2832,7 +2832,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					let dmg = KinkyDungeonDealDamage({damage: 1, type: "grope"});
 					if (!enemy.ravage.noFallbackNarration) {
 						if (enemy.ravage.fallbackNarration) {
-							KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(ravRandom(enemy.ravage.fallbackNarration), entity, undefined, undefined, dmg), "#f0f", 4)
+							KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RFArrayRand(enemy.ravage.fallbackNarration), entity, undefined, undefined, dmg), "#f0f", 4)
 						} else {
 							KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.fallbackNarration, entity, undefined, undefined, dmg), "#f0f", 4)
 						}
@@ -3164,17 +3164,11 @@ let KDRavaged = { // To focus the player in on what's happening
 }
 ////////////////
 // Utils
-// Util to just randomly select an array (annoyed at writing long lines)
-function ravRandom(array) {
-	if (array.length === 0) {
-	  return undefined; 
-	}
-	if (array.length === 1)
-		array[0]
-	const randomIndex = Math.floor(Math.random() * array.length);
-	return array[randomIndex];
+// Util to just randomly select an array element
+// Returns undefined for an empty array or undefined, random element from the given array for arrays with item(s) to choose from
+window.RFArrayRand = function (array) {
+	return ((array && array.length) ? array[Math.floor(Math.random() * array.length)] : undefined);
 }
-
 // Verbose? Perhaps. Accurate? Yes...
 // TODO: This'll need to be changed if we're going to make ravaging able to happen to npcs
 function ravagerFreeAndClearAllDataIfNoRavagers(showMessage = true) {
