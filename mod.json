@@ -7,5 +7,8 @@
 	"gameminor": 4,
 	"gamepatch_min": 78,
 	"gamepatch_max": -1,
-	"priority": 90
+	"priority": 90,
+	"fileorder": [
+		"mod.json"
+	]
 }
