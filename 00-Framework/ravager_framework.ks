@@ -1948,12 +1948,9 @@ function RavagerFrameworkIWantToHelpDebug(reason) {
 		// Save the buffer to a file
 		const element = document.createElement("a");
 		const now = new Date()
-	  element.setAttribute("href", `data:text/plain;charset=utf-8,${encodeURIComponent(LZString.compressToBase64(JSON.stringify(RavagerData.Variables.IWantToHelpDebugBuffer/*, undefined, "  "*/)))}`);
-	  element.setAttribute("download", `RavagerDebug_${now.getFullYear()}_${String(now.getMonth()).padStart(2, "0")}_${String(now.getDate()).padStart(2, "0")}-${Intl.DateTimeFormat("en-US", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(now)}.txt`); // Disgusting chain
-	  element.style.display = "none"; // Hide the element
-	  document.body.appendChild(element);
-	  element.click();
-	  document.body.removeChild(element);
+	  element.setAttribute("href", window.URL.createObjectURL(new Blob([LZString.compressToBase64(JSON.stringify(RavagerData.Variables.IWantToHelpDebugBuffer))], { type: "text/plain" })))
+	  element.setAttribute("download", `RavagerDebug_${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, "0")}_${String(now.getDate()).padStart(2, "0")}-${Intl.DateTimeFormat("en-US", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(now)}.txt`); // Disgusting chain
+	  element.click()
 	}
 }
 // Load or unload custom font
