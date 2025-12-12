@@ -67,7 +67,3 @@ AddModel({
 	},
 	Layers: ToLayerMap([])
 });
-
-
-// This didn't fix the delayed loading either
-// KinkyDungeonRefreshEnemiesCache()

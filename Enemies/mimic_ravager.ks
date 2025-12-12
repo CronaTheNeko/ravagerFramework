@@ -172,7 +172,7 @@ let mimicRavager = {
       weight: 0.7
     },
     {
-      name: "PotionCollar", // might not fit in -- Idea to make a modified version of this collar that either 1) increases distraction when using potions, or 2) is tight enough that choking will increase miscast and accuracy
+      name: "PotionCollar", // Might not fit in -- Idea to make a modified version of this collar that either 1) increases distraction when using potions, or 2) is tight enough that choking will increase miscast and accuracy
       weight: 0.5
     },
     {
@@ -396,7 +396,6 @@ let mimicRavager = {
             "The mimic {pushes|presses} a {{slimy|wet} |}{tendril|tentacle} against your lips...",
             "{A|The mimic's} {{slimy|wet} |}{tendril|tentacle} {{pushes|presses} against your lips|hovers above your face, dripping fluids}..."
           ],
-          // ItemHead: [ 'ItemHead 1 1', 'ItemHead 1 2' ],
         }
       } ],
       [ 5, {
@@ -413,7 +412,6 @@ let mimicRavager = {
             "The mimic {pushes|wiggles} its {tendril|tentacle} past your lips and {into|down} your throat...",
             "You gag as the {mimic's |}{tendril|tentacle} {wiggles between|pushes past} your lips and {into|down} your throat..."
           ],
-          // ItemHead: [ 'ItemHead 5 1', 'ItemHead 5 2' ],
           SpicyItemVulva: [
             "The {mimic's |}{thick |}{tendril|tentacle} {shoves|pushes|thrusts} itself into you{r {tight |}pussy|}...",
             "Your pussy stretches around the {mimic's |}{thick |}{tendril|tentacle} {thrusting|pushing|plunging} into you{r {tight |}pussy}...",
@@ -439,7 +437,6 @@ let mimicRavager = {
       [ 12, {
         taunts: [ "*Rough thrusting*", "*Slow pulsating*" ],
         narration: {
-          // ItemVulva: [ "The tendril begins thrusting deeper and harder into your pussy..." ], // Make this one spicy? // Spicy be multiple tendrils?
           ItemVulva: [
             "The mimic {grips|holds} your legs {firmly|tightly} with more {tendrils|tentacles}...",
             "The mimic uses its {tendrils|tentacles} to {grip|hold} your legs{ {firmly|tightly}|}...",
@@ -454,7 +451,6 @@ let mimicRavager = {
             "The mimic {cradles|holds} your head with another {tendril|tentacle} {while|as} your throat is used...",
             "Another {tendril|tentacle} {{cradles|holds} your head {while|as} your throat is used|emerges to {cradle|hold} your head{ and wrap around your neck|}}..."
           ],
-          // ItemHead: [ 'ItemHead 12 1', 'ItemHead 12 2' ],
         },
         sp: -0.15,
         dp: 1.5,
@@ -474,7 +470,6 @@ let mimicRavager = {
           TameItemMouth: [
             "You{r body grows| feel} weak{, choking| as you choke} on the {thick |}{tendril|tentacle} {filling|invading} your throat!"
           ],
-          // ItemHead: [ 'ItemHead 16 1', 'ItemHead 16 2' ],
           SpicyItemVulva: [
             "You {cry out|whimper pathetically} {as the {mimic's |}{thick |}{tendril|tentacle} {invades|abuses} your womb with {every|each} thrust|with {each|every} thrust of the {mimic's |}{thick |}{tendril|tentacle} {invading|abusing} your womb}!"
           ],
@@ -501,7 +496,6 @@ let mimicRavager = {
           TameItemMouth: [
             "You gag and choke as the {mimic's |}{tendril|tentacle} {pushes|thrusts} deep {into|down} your throat, it's about to--!!"
           ],
-          // ItemHead: [ 'ItemHead 17 1', 'ItemHead 17 2' ],
           SpicyItemVulva: [
             "With {strong|deeply penatrating} final thrusts{ into your womb|}, the {tendril|tentacle} {begins |}pulsating{ quickly|}, it's about to--!!"
           ],
@@ -528,7 +522,6 @@ let mimicRavager = {
           TameItemMouth: [
             "You helplessly swallow {wave after wave|copious amounts} of the {mimic|tendril|tentacle}'s {cum|seed}...!"
           ],
-          // ItemHead: [ 'ItemHead 20 1', 'ItemHead 20 2' ],
           SpicyItemVulva: [
             "You {moan loudly|cry out}, your womb {stretching|swelling} as you're {filled with|pumped full of} the {mimic|tendril|tentacle}'s {cum|seed}...!"
           ],
@@ -656,7 +649,7 @@ const playerEffect = (_target, damage, playerEffect, spell, faction, bullet, _en
           undefined,
           undefined,
           undefined,
-          spell?.faction, // Faction -- might not be useful, but we still want Deep, so might as well
+          spell?.faction, // Faction -- might not be useful
           KinkyDungeonStatsChoice.has("MagicHands") ? true : undefined, // Deep
           undefined,
           undefined,

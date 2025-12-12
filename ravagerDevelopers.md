@@ -484,6 +484,11 @@ For security, the callback functions cannot be declared directly in the enemy de
 
 To add a callback, define your function and add it via the [RavagerAddCallback helper](#ravageraddcallback-helper) function, and set the corresponding callback property in your ravager to the callback name you gave to `RavagerAddCallback`.
 
+Note: The parameters given to each callback are not set in stone. Incase of any changes to the parameter list, I will attempt to ensure the following:
+1) Do not remove any parameters without notice in some form.
+2) If a value provided as a parameter is no longer in use/available to the framework, provide an empty/default value of the same type, which will hopefully avoid breakages
+3) Any new parameters added will be added to the end of the parameter list
+
 #### RavagerAddCallback helper
 When adding callbacks, it is recommended to use the function `RavagerAddCallback`. This function is globally available, so you simply need to call it with the required parameters for your callback to be added in the way the framework expects it to be.
 
@@ -534,7 +539,7 @@ Note: This callback is effectively the first step in the ravaging function. If y
 #### All range callback
 Property path: `enemy.ravage.allRangeCallback`
 
-When is this called: Whenever the ravager takes a ravaging action involving the ranges of progression. Different from `effectCallback`, as this callback does not get called during the strip and pin phases, only during the occupied phase.
+When is this called: Whenever the ravager takes a ravaging action involving the ranges of progression. Different from `effectCallback`, as this callback does not get called during the strip, pin, or fallback phases, only during the occupied phase.
 
 Parameters:
 - `enemy` - The enemy entity taking the action

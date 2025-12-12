@@ -6,7 +6,7 @@ name_core_p1="${name_p1}Core"
 name_p2=".zip"
 # Check for argument
 if [[ -z $1 ]]; then
-	>&2 echo "Version (such as V123) required!"
+	>&2 echo "Version (such as v1.2.3) required!"
 	exit 1
 fi
 # Put together the file name

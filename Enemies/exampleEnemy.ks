@@ -278,7 +278,6 @@ let exampleEnemy = {
 
 // After defining, this enemy can be added to the game by uncommenting the following line
 // KinkyDungeonEnemies.push(exampleEnemy)
-
 // Additionally, some example textkeys
 // For each of these example text keys, wherever 'BanditRavager' appears in the first string, that will need to match whatever exampleEnemy.name is set to.
 // For example, for an enemy where name is set to 'CustomRavager', you'll need the text keys 'NameCustomRavager', 'AttackCustomRavagerDash', 'AttackCustomRavagerBlind', 'KillCustomRavager'
@@ -290,4 +289,15 @@ let exampleEnemy = {
 	addTextKey('AttackBanditRavagerDash','The ravager charges and captures you in a powerful hug!')
 	addTextKey('AttackBanditRavagerBlind','The ravager pins you against her soft body effortlessly!')
 	addTextKey("KillBanditRavager", "The ravager scrambles away, waiting for her next chance...")
+*/
+// Alternatively, you can choose to add the enemy, stronger variations of it, and text keys with the function RFPushEnemiesWithStrongVariations
+// In the text keys below, you'll see the key having "BanditRavager" replaced with "EnemyName". This is so the function can add text keys for the stronger variations of them as well, since their names will have a number added onto the end (such as "BanditRavager1", "BanditRavager2", etc.)
+/*
+const textkeys = {
+	NameEnemyName: "Bandit Ravager",
+	AttackEnemyNameDash: "The bandit charges and captures you in a powerful hug!",
+	AttackEnemyNameBlind: "~~{RavagerFrameworkNoMessageDisplay}~~",
+	KillEnemyName: "The bandit scrambles away, waiting for her next chance..."
+}
+RFPushEnemiesWithStrongVariations(exampleEnemy, 4, textkeys)
 */

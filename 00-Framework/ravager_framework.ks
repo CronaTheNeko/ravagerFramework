@@ -364,7 +364,7 @@ window.RavagerData = {
 			]
 			// All the rectangles we'll draw
 			const rects = [
-				// { // Doesn't fit with new background
+				// { // Doesn't fit with new background, but still here bc I like the idea
 				// 	Container: kdcanvas,
 				// 	Map: kdpixisprites,
 				// 	id: "RFControlTitleHR",
@@ -442,7 +442,6 @@ window.RavagerData = {
 				)
 		},
 		// Sets whether the mimic spoiler is guaranteed
-		// Wanna rework this to keep the bubble chance within RavagerData.Variables
 		MimicExposure: function(exposed) {
 			// Save the setting
 			RavagerData.Variables.ExposeMimics = exposed
@@ -562,45 +561,37 @@ window.RavagerData = {
 			let restraintWeights = [];
 			// Get restraints
 			let Restraints = KDGetRestraintsEligible(enemy, Level, Index, Bypass, Lock, RequireWill, LeashingOnly, NoStack, extraTags, agnostic, filter, securityEnemy, curse, undefined, undefined, useAugmented, augmentedInventory, options);
-			// RFWarn('[Ravager Framework][RFGetRestraint] Restraints: ', Restraints)
 			RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Eligible restraints: ", Restraints)
 			for (let rest of Restraints) {
 				let restraint = rest.restraint;
 				RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Processing restraint ${restraint.name}: `, rest)
 				// Skip restraints in exclude
 				if (exclude && exclude.includes(restraint.name)) {
-					// RFWarn('is in excludes: ', restraint.name)
 					RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Skipping excluded restraint")
 					continue
 				}
-				// RFDebug('did not continue: ', restraint.name)
+				// Base weight
 				let weight = rest.weight;
 				RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Base weight: ", weight)
+				// Modify weight if this restraint has a modifier in weightMods
 				if (weightMods && Object.keys(weightMods).includes(restraint.name) && typeof weightMods[restraint.name] == "number") {
-					// RFWarn('changing modifier for ' + restraint.name + ': ' + weight + ' X' + weightMods[restraint.name])
 					weight = weight * weightMods[restraint.name]
 					RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Modifying weight of ${restraint.name} (X${weightMods[restraint.name]}); New weight: ${weight}`)
-					// RFWarn('new weight: ' + weight)
 				}
+				// Push the weight and update weight total
 				restraintWeights.push({restraint: restraint, weight: restraintWeightTotal, inventoryVariant: rest.inventoryVariant});
-				// weight += rest.weight;
 				restraintWeightTotal += Math.max(0, weight);
 			}
-			// RFWarn(`[Ravager Framework][RFGetRestraint] restraintWeightTotal: ${restraintWeightTotal}; restraintWeights: `, restraintWeights)
-
+			// Decide a random number within the range of weights
 			let selection = KDRandom() * restraintWeightTotal;
 			RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Restraint weight total: ${restraintWeightTotal}; Restraints: `, restraintWeights, `; Selection: ${selection}`)
-
-			// RFWarn('[Ravager Framework][RFGetRestraint] Selection: ', selection)
-
+			// Pick the first restraint whose weight is less then the number in `selection`
 			for (let L = restraintWeights.length - 1; L >= 0; L--) {
 				if (selection > restraintWeights[L].weight) {
-					// RFWarn(`[Ravager Framework][RFGetRestraint]: Decided restraint; L: ${L}; Returning: `, restraintWeights[L])
 					RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Decided restraint. L: ${L}; `, restraintWeights[L])
 					return restraintWeights[L].restraint;
 				}
 			}
-			// RFWarn('[Ravager Framework][RFGetRestraint] End RFGetRestraint')
 			RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Looks like there's no restraints left to return. End of RFGetRestraint.")
 		},
 		// Check if we're missing any functions
@@ -615,6 +606,7 @@ window.RavagerData = {
 			// Exit now if there's no functions missing
 			if (missingFunctions.length == 0)
 				return true
+			// Trim the trailing comma
 			missingFunctions = missingFunctions.slice(0, missingFunctions.length - 2)
 			RavagerData.Variables.MissingFunctions = missingFunctions.split(", ")
 			// Helper to make the header images
@@ -755,18 +747,19 @@ window.RavagerData = {
 			element.click()
 		},
 		CheckFunctionOverrides: function() {
+			// Setup a file open dialog to read in a file of saved function overrides
 			let input = document.createElement("input")
 			input.type = "file"
 			input.accept = ".json"
+			// onchange is called when the user selects a file
 			input.onchange = async function(event) {
 				const file = event.target.files[0]
 				if (file) {
 					try {
 						const fileContent = await file.text()
 						const savedData = JSON.parse(fileContent)
-						// console.log(jsonData)
 						const currData = RavagerData.functions.GetFunctionOverrides()
-						//
+						// Parsing
 						const skeys = Object.keys(savedData)
 						const ckeys = Object.keys(currData)
 						const keys = new Set([ ...skeys, ...ckeys ])
@@ -776,23 +769,23 @@ window.RavagerData = {
 							savedFuncs: {}, // Saved version of changed functions
 							currentFuncs: {} // Current version of changed functions
 						}
-						//
+						// Loop each function
 						for (let key of keys) {
+							// Current function not in saved functions. Will trigger when adding new function override
 							if (!skeys.includes(key)) {
-								mismatches.savedKeys.push(key)
-								// continue
-							}
-							if (!ckeys.includes(key)) {
 								mismatches.currentKeys.push(key)
-								// continue
 							}
-							//
+							// Current function not in currently available functions. Will trigger when removing a function override
+							if (!ckeys.includes(key)) {
+								mismatches.savedKeys.push(key)
+							}
+							// Current function has changed since being saved. Might be entirely inconsequential, but I don't have a better way to check if function parameters have changed
 							if (savedData[key] != currData[key]) {
 								mismatches.savedFuncs[key] = savedData[key]
 								mismatches.currentFuncs[key] = currData[key]
 							}
 						}
-						//
+						// Found mismatches (either mismatching key lists, or mismatching function content); save a report file
 						if (mismatches.savedKeys.length || mismatches.currentKeys.length || Object.keys(mismatches.savedFuncs).length || Object.keys(mismatches.currentFuncs).length) {
 							const element = document.createElement("a")
 							element.setAttribute("href", `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(mismatches, undefined, '  '))}`)
@@ -804,6 +797,7 @@ window.RavagerData = {
 					}
 				}
 			}
+			// Trigger the file open dialog
 			input.click()
 		},
 	},
@@ -827,56 +821,37 @@ window.RavagerData = {
 		ravagerDebug: {
 			type: 'boolean',
 			refvar: 'ravagerDebug',
-			default: false,
-			block: undefined,
 			hoverDesc: "Print verbose messages to the browser console",
 			textKeyVal: "Enable Debug Messages"
 		},
 		ravagerDisableBandit: {
-			// name: 'Disable Bandit Ravager',
 			type: 'boolean',
 			refvar: 'ravagerDisableBandit',
-			default: false,
-			block: undefined,
 			textKeyVal: "Disable Bandit Ravager"
 		},
 		ravagerDisableWolfgirl: {
-			// name: 'Disable Wolfgirl Ravager',
 			type: 'boolean',
 			refvar: 'ravagerDisableWolfgirl',
-			default: false,
-			block: undefined,
 			textKeyVal: "Disable Wolfgirl Ravager"
 		},
 		ravagerDisableSlimegirl: {
-			// name: 'Disable Slimegirl Ravager',
 			type: 'boolean',
 			refvar: 'ravagerDisableSlimegirl',
-			default: false,
-			block: undefined,
 			textKeyVal: "Disable Silmegirl Ravager"
 		},
 		ravagerDisableTentaclePit: {
-			// name: 'Disable Tentacle Pit',
 			type: 'boolean',
 			refvar: 'ravagerDisableTentaclePit',
-			default: false,
-			block: undefined,
 			textKeyVal: "Disable Tentacle Pit"
 		},
 		ravagerDisableMimic: {
 			type: 'boolean',
 			refvar: 'ravagerDisableMimic',
-			default: false,
-			block: undefined,
 			textKeyVal: "Disable Mimic Ravager"
 		},
 		ravagerSpicyTendril: {
-			// name: 'Spicy Ravager Tendril Dialogue',
 			type: 'boolean',
 			refvar: 'ravagerSpicyTendril',
-			default: false,
-			block: undefined,
 			hoverDesc: "Enables some more questionable dialogue for the ravagers that may not be for everyone",
 			textKeyVal: "Spicy Ravager Dialogue"
 		},
@@ -888,7 +863,6 @@ window.RavagerData = {
 			rangelow: 0,
 			rangehigh: 1,
 			stepcount: 0.01,
-			block: undefined,
 			hoverDesc: "The chance of the slime girl to add slime to you. Setting this too high would cause significant difficulty, as this chance is rolled on every attack, including during ravaging.",
 			textKeyVal: "Slimegirl Restrict Chance"
 		},
@@ -896,7 +870,6 @@ window.RavagerData = {
 			type: 'boolean',
 			refvar: 'ravagerEnableSound',
 			default: true,
-			block: undefined,
 			hoverDesc: "Enable moans when getting hit and orgasming. Note: This will have no effect if the Girl Sound mod is loaded.",
 			textKeyVal: "Enable Sounds"
 		},
@@ -908,7 +881,6 @@ window.RavagerData = {
 			rangelow: 0,
 			rangehigh: 1,
 			stepcount: 0.05,
-			block: undefined,
 			hoverDesc: "The chance to moan when getting hit.",
 			textKeyVal: "Moan Chance"
 		},
@@ -916,11 +888,9 @@ window.RavagerData = {
 			type: 'range',
 			name: 'ravagerSoundVolume', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
 			refvar: 'ravagerSoundVolume',
-			default: 1,
 			rangelow: 0,
 			rangehigh: 2,
 			stepcount: 0.05,
-			block: undefined,
 			hoverDesc: "The volume of moans",
 			textKeyVal: "Moan Volume"
 		},
@@ -928,7 +898,6 @@ window.RavagerData = {
 			type: 'boolean',
 			refvar: 'ravEnableUseCount',
 			default: true,
-			block: undefined,
 			hoverDesc: "Enable special dialogue based on how many times you've been ravaged before.",
 			textKeyVal: "Enable Experience Aware Mode"
 		},
@@ -938,7 +907,6 @@ window.RavagerData = {
 			refvar: 'ravUseCountMode',
 			options: [ 'Any', 'Sometimes', 'Always' ],
 			default: 'Any',
-			block: undefined,
 			hoverDesc: "Should experience aware dialogue be used sometimes, always, or do you not have a preference? Can be overridden by a ravager wanting a specific mode.",
 			textKeyVal: "Exp Aware Mode"
 		},
@@ -950,15 +918,12 @@ window.RavagerData = {
 			rangelow: 0,
 			rangehigh: 1,
 			stepcount: 0.05,
-			block: undefined,
 			hoverDesc: "Chance to use experience aware dialogue.",
 			textKeyVal: "Exp Aware Chance"
 		},
 		ravUseCountOverride: {
 			type: 'boolean',
 			refvar: 'ravUseCountOverride',
-			default: false,
-			block: undefined,
 			hoverDesc: "Overrides ravagers wanting a specific experience aware mode. With this enabled, all ravagers will follow your Exp Aware Mode setting. Note: None of the framework's ravagers prefer one mode or the other, so this setting only matters if you're using an external ravager mod that has ravagers that do have a preference.",
 			textKeyVal: "Override Exp Aware Mode"
 		},
@@ -966,29 +931,24 @@ window.RavagerData = {
 			type: "boolean",
 			refvar: "ravagerCustomDrop",
 			default: true,
-			block: undefined,
 			hoverDesc: "Allow ravagers to use custom item drop behaviors, which enables dropping random quantaties of multiple items. If enemies stop dropping items, try disabling this, as it may have broken due to a game update.",
 			textKeyVal: "Enable Multi-item Drops"
 		},
 		ravagerEnableNudeOutfit: {
 			type: "boolean",
 			refvar: "ravagerEnableNudeOutfit",
-			default: false,
-			block: undefined,
 			hoverDesc: 'Allow ravagers to fully strip you when passing out, instead of leaving you minimally clothed.',
 			textKeyVal: "Enable Full Nude"
 		},
 		ravagerFancyFont: {
 			type: "boolean",
 			refvar: "ravagerFancyFont",
-			default: false,
 			hoverDesc: "Who doesn't like a fancy font in their help messages?",
 			textKeyVal: "Custom font for help"
 		},
 		ravagerHelpDebug: {
 			type: "boolean",
 			refvar: "ravagerHelpDebug",
-			default: false,
 			hoverDesc: "Turn on heavy debugging mode so that you can provide a log file to help CTN with tracking down bugs. Turning this on will begin saving all of the framework's console messages to memory. To save the log to a file, return to this menu and disable this setting, or enter the Ravager Hacking menu and click End Debug Log.",
 			textKeyVal: "I want to help debug"
 		},
@@ -1242,7 +1202,7 @@ window.RFInfo = (...args) => {
 		- options.skipTextKeyWarning : Optional. Default false. Skips the warning message about textKeys parameter being empty. If you're intending to handle the text keys yourself, set this to true
 		- options.skipEnemyDefinitionDictionaryWarning: Optional. Default false. If you don't want to set enemyDefinitionDictionary, but don't want the related warning message shown, set this to true.
 */
-window.RFPushEnemiesWithStrongVariations = function(enemy, count, textKeys, higherLevelIncrease = true, slowLevelIncreaseAmount = 1, enemyDefinitionDictionary = RavagerData.Definitions.Enemies, options = { skipTextKeyWarning: false, skipEnemyDefinitionDictionaryWarning: false }) {
+window.RFPushEnemiesWithStrongVariations = function(enemy, count, textKeys, higherLevelIncrease = true, slowLevelIncreaseAmount = 1, enemyDefinitionDictionary, options = { skipTextKeyWarning: false, skipEnemyDefinitionDictionaryWarning: false }) {
 	RFDebug('[Ravager Framework][RFPushEnemiesWithStrongVariations]: enemy: ', enemy, '; count: ', count, '; textKeys: ', textKeys, '; higherLevelIncrease: ', higherLevelIncrease, '; slowLevelIncreaseAmount: ', slowLevelIncreaseAmount, '; options: { skipTextKeyWarning: ', options?.skipTextKeyWarning, ', skipEnemyDefinitionDictionaryWarning: ', options?.skipEnemyDefinitionDictionaryWarning, ' }')
 	if (!enemy) {
 		RFError("[Ravager Framework][RFPushEnemiesWithStrongVariations]: 'enemy' parameter is undefined! Cannot continue. Whatever enemy this is supposed to be will not be in the game. If you're using an external ravager mod, report this to that author, otherwise report this to the Ravager Framework")
@@ -1290,75 +1250,6 @@ window.RFPushEnemiesWithStrongVariations = function(enemy, count, textKeys, high
 	}
 	return true
 }
-
-/* 
-	RAVAGER FRAMEWORK 0.01
-	No enemies are added by this file. It's just the framework.
-	This mod adds a very dynamic playerEffect that lets enemies do the following in order of priority:
-
-	SELECTION ++ The enemy selects a player slot to use based on specified preferences. Currently just butt/vulva/mouth itemgroups.
-
-	STRIP/PIN ++ If target is player, has clothes in the way, or isn't pinned:
-		- Pick a blocking restraint to remove. Presently just immediately removes it. End turn.
-		- If no restraints in the way, pick an outfit/clothing item in the way, immediately removes it. End turn.
-
-	RAVAGE ++ If target is player, is pinned, and the slot of choice is unoccupied (OR occupied by the entity attacking)
-		- Marks the slot of choice as occupied by "this" enemy, so others pick different ones
-		- Steals the leash if the player is leashed, so that they don't get dragged away mid-ravage.
-		- If the enemy's ravage.progress value is within one of their specified ranges (this will make sense later), execute and end turn.
-			- Progresses through tiers of effects, defined in the enemy object. Typically outlines increasing intensity up to orgasm.
-			- Can damage SP, WP, Distraction, and also modify Submissiveness.
-			- Has enemy-specified narration and 'taunts'.
-			- ACTUALLY USES SUBMISSIVENESS - Player has up to an 70% chance to "Submit" (be stunned for a turn) based on a calculation of submissiveness, whether they're leashed, and whether their WP is 0.
-			- You can also specify a custom function to call for each individual range if you want.
-		
-		- If the enemy's ravage.progress value is higher than all of their ranges, assumes that they're done and executes the 'done' state.
-			- Player will pass out if SP and WP are low enough
-			- Otherwise, they'll stay awake and the enemy will just enter a cooldown refractory period where they can't ravage (but can fallback attack)
-			- Also, there's a callback for when an enemy's done, too. We love callbacks here. 
-
-	FALLBACK ++ If target is NOT player, OR target is an NPC, OR all slots are already occupied (unlikely but possible), OR in refractory mode
-		- Just deal some weak grope damage. End turn.
-		- You can also specify a function to call instead if you want to do something special.
-
-	An example enemy is defined below and appears prominently with other bandits, presently.
-	They're a little overpowered, so they'll probably be removed from regular spawning eventually (or restricted)
-	This way this mod can be more about providing the system to other modders.
-*/
-
-/* 
-	top priority next updates:
-		- GENERICIZE SLOTS
-			- We should have it be possible for any enemy to want to occupy any slot at all. Head, legs, anything. Not sure how anyone would use all of them (like, hands? arms? what?), but the point is being able to have the option.
-	
-		- RAVAGE INTERRUPTIONS
-			- maybe solved?
-
-		- STRIP
-			- Need to make stripping restraints in the way take a while. Maybe scale based on power.	
-				- not resolved - just have them removing for now. gotta come up with a good idea for this
-		
-		- TARGETING
-			- Prioritize 'easy' slots first. Should be done after stripping is handled.
-				- i.e., rank slots based on the power of everything in the way. go after the lowest
-	
-	interesting other leads:
-		see "PunishPlayer" event - possible event for struggling while pinned
-*/
-
-
-/**********************************************
- * BELOW THIS POINT ARE FUNCTIONS YOU DON'T REALLY NEED TO WORRY ABOUT
- * IF YOU'RE JUST MAKING SOME ENEMIES WHO USE RAVAGE, REFER TO Enemies/exampleEnemy.js !
- * 
- * PlayerEffect definition
- * Ravage is one big effect that encompasses all high-impact lewd activity
- * Ideally usable by any enemy, but it should be their "main thing" that they do, otherwise it gets weird/slow. You could play with ranges to make a mixed enemy work though.
- * Has three effects:
- 	* ATTACK: If non-player or otherwise ineligible for the main course, the target just takes DP damage.
-	* STRIP/PIN: If player and has clothing covering pelvis, or belted/vulva-plugged, remove. Lastly pins, preparing for the third phase.
-	* RAVAGE: If player and has exposed + unoccupied pelvis/vulva item groups, enter a sex state with increasing intensity
-*/
 // Function to add callbacks
 /**********************************************
  * Callback definition helper
@@ -1367,8 +1258,8 @@ window.RFPushEnemiesWithStrongVariations = function(enemy, count, textKeys, high
  * 	- The key which will be used to reference your callback. This is the value to use when setting a callback value inside your ravager's definition.
  * 	- The function to use as a callback. 
  * Note: If you decide to not use this function, there are two things you need to know:
- * 	- If RavagerFramework itself does not load before your enemy, KDEventMapEnemy['ravagerCallbacks'] will not exist yet. This will cause the game will show a crash if you try to add a callback entry into that map, and that will cause execution of your JS file to stop at that line, potentially causing your ravager to never be added to the game
- * 	- Your function should be the value of KDEventMapEnemy['ravagerCallbacks'][<callback name>]
+ * 	- If RavagerFramework itself does not load before your enemy, KDEventMapEnemy['ravagerCallbacks'] will not exist yet. This will cause the game to crash if you try to add a callback entry into that map, and that will cause execution of your JS file to stop at that line, likely causing your ravager to never be added to the game
+ *  - The relavant callback setting in your should be the same value as the key parameter in order to use the callback
 */
 window.RavagerAddCallback = (key, func) => {
 	if (!KDEventMapEnemy['ravagerCallbacks']) {
@@ -1515,10 +1406,7 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 				// Track if this taunt range has any slots
 				let hasSlots = false
 				// Check for each slot
-				// const hasSlots = countData.hasOwnProperty('ItemVulva') || countData.hasOwnProperty('ItemButt') || countData.hasOwnProperty('ItemMouth') || countData.hasOwnProperty('ItemHead')
 				for (var slot of [ 'ItemVulva', 'ItemMouth', 'ItemButt', 'ItemHead' ]) {
-					// let slotValid = countData.hasOwnProperty(slot)
-					// let slotWasValid = slotValid
 					if (!countData.hasOwnProperty(slot))
 						continue
 					let stringsValid = Array.isArray(countData[slot])
@@ -1532,7 +1420,6 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 					if (!stringsValid) {
 						RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains taunts which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
 					}
-					// hasSlots = hasSlots || stringsValid
 					hasSlots = true
 				}
 				// Warn if there's no slots
@@ -1623,12 +1510,12 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
 }
 // Hopeful fallback incase function signatures change -- I have no idea how this would interact with other mods that wind up overriding our overrides. Do they end up calling the original function or our leftover (possibly non-functional) override function?
 window.RavagerFrameworkRevertFunctions = function() {
-	const functions = [ 'DrawButtonKDEx', 'KinkyDungeonDrawEnemiesHP', 'KinkyDungeonDrawGame', 'KinkyDungeonRun', 'KinkyDungeonHandleClick', 'KDDropItems', 'DrawCheckboxKDEx', 'KinkyDungeonSendTextMessage' ]
+	const functions = Object.keys(RavagerData.functions).filter(s => s.match(/(KinkyDungeo.*|.*KD.*)/))
 	for (let f of functions) {
 		RFDebug(`Reverting ${f} ...`)
 		window[f] = RavagerData.functions[f]
 	}
-	// Hopefully good enough to work around the weirdness that these variables were created to handle, but can't do the full 'for sure' method used before, as at this point we've already removed our custom KinkyDungeonRun. These variables are then garbage, but to recreate custom functions, the game and mod has to be reloaded
+	// Hopefully good enough to work around the weirdness that these variables were created to handle, but can't do the full 'for sure' method used before, as at this point we've already removed our custom KinkyDungeonRun. These variables are then garbage, but the game would have to be reloaded before they're ever used again
 	KinkyDungeonState = RavagerData.Variables.PrevState
 	KinkyDungeonState = RavagerData.Variables.PrevState
 	KinkyDungeonDrawState = RavagerData.Variables.PrevDrawState
@@ -1682,21 +1569,21 @@ KDDropItems = function(enemy, mapData) {
 			}
 			RFTrace(`[Ravager Framework][DBG][KDDropItems]: All items dropped for enemy ${enemy.Enemy.name}(${enemy.x}, ${enemy.y}): `, dropped)
 			// The call we need to change in order to get multiple items
-			//
 			enemy.droppedItems = enemy.droppedItems || Boolean(dropped.length)
 			RFTrace(`[Ravager Framework][DBG][KDDropItems]: Has enemy ${enemy.Enemy.name}(${enemy.x}, ${enemy.y}) dropped items? ` + enemy.droppedItems)
 		}
 	}
 	return RavagerData.functions.KDDropItems(enemy, mapData)
 }
-// Just here so I can have a cool custom colored button in mod config
+// Here so I can have a colored button in mod config and description popups for my mod configs
 DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options) {
-	// Change the color of my mod config button
 	if (KinkyDungeonState == "ModConfig") {
 		if (name == "Ravager Framework") {
+			// Change the color of my mod config button
 			Color = "#ff66ff"
 			FillColor = "#330033"
 		} else if (KDModToggleTab == "RavagerFramework") {
+			// Setup description popups
 			let possibleNewName = name.replace(/ModRangeButton[L|R]?/, "")
 			if (RavagerData.ModConfig[possibleNewName] && RavagerData.ModConfig[possibleNewName].hoverDesc && !RavagerData.Variables.ModConfig.BoxData[possibleNewName]) {
 				RavagerData.Variables.ModConfig.BoxData[possibleNewName] = {
@@ -1721,7 +1608,7 @@ DrawCheckboxKDEx = function(name, func, enabled, Left, Top, Width, Height, Text,
 		_CheckImage = "UI/HeartChecked.png"
 	return RavagerData.functions.DrawCheckboxKDEx(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, _CheckImage, options)
 }
-// My own implementation of DrawCheckboxKDEx, as it has (at the time of writing) a bug that makes it impossible to set a custom checked image (https://discord.com/channels/938203644023685181/975621489632116767/1384060387003207721)(Fixed https://github.com/Ada18980/KinkiestDungeon/commit/b7ca59774566aeb123e3320bf0a27a13c9c0b0c7 -- still keeping this as it'll let me set custom defaults)
+// A variation of DrawCheckboxKDEx so I can default to a custom check image
 window.DrawCheckboxRFEx = function(name, func, enabled, Left, Top, Width = 64, Height = 64, Text, IsChecked, Disabled, TextColor, _CheckImage, options) {
 	// Ensure valid checked image; default to mine
 	if (!_CheckImage)
@@ -1730,7 +1617,7 @@ window.DrawCheckboxRFEx = function(name, func, enabled, Left, Top, Width = 64, H
 }
 // Override so I can draw a custom button on the in-game pause menu
 KinkyDungeonDrawGame = function() {
-	// Avoid weirdness with custom draw states -- Leaving RavagerControl (via `KinkyDungeonDrawState = "Restart"`) was putting the game in the Perks2 state
+	// Avoid weirdness with custom draw states -- Leaving RavagerControl (via `KinkyDungeonDrawState = "Restart"`) was putting the game in the Perks2 state -- Likely caused by the fact that pressing the Return button was also clicking on whatever button is in that spot on the screen you're returning to. This is also causing the main menu version to possibly end up in the credits and patrons screens, depending where you click, so this nonsense will be sticking around
 	if (typeof RavagerData.Variables.DrawState == "string")
 		if (RavagerData.Variables.DrawState == KinkyDungeonDrawState)
 			delete RavagerData.Variables.DrawState
@@ -1813,6 +1700,7 @@ KinkyDungeonRun = function() {
 			'#303'
 		)
 	} else if (KinkyDungeonState == "ModConfig" && KDModToggleTab == "RavagerFramework") {
+		// Drawing the description popup when hovering an option that has one
 		let modConfig = RavagerData.Variables.ModConfig
 		for (let data in modConfig.BoxData) {
 			let o = modConfig.BoxData[data]
@@ -2055,8 +1943,8 @@ function RavagerFrameworkIWantToHelpDebug(reason) {
 		localStorage.KDModSettings = JSON.stringify(j)
 	} else if (RavagerData.Variables.IWantToHelpDebug) {
 		// Disable help debugging mode in variable
-		RavagerData.Variables.IWantToHelpDebug = false
 		RFDebug("[Ravager Framework][RavagerFrameworkIWantToHelpDebug]: Disabling debug logging and saving the log")
+		RavagerData.Variables.IWantToHelpDebug = false
 		// Save the buffer to a file
 		const element = document.createElement("a");
 		const now = new Date()
@@ -2097,7 +1985,6 @@ function RavagerFrameworkRefreshFonts(reason) {
 function ravagerSettingsRefresh(reason) {
 	RFInfo('[Ravager Framework] Running settings functions for reason: ' + reason)
 	ravagerFrameworkRefreshEnemies(reason)
-	// ravagerFrameworkApplySpicyTendril(reason)
 	ravagerFrameworkApplySomeSpice(reason)
 	ravagerFrameworkApplySlimeRestrictChance(reason)
 	refreshRavagerDataVariables(reason)
@@ -2143,13 +2030,12 @@ function ravagerFrameworkApplySomeSpice(reason) {
 			)
 		)
 	)
-	RFTrace('[Ravager Framework][DBG][applySpice] Spiceable enemies: ', spiceable)
-	// Loop each of the possibly spicy ravager and give it to applySpice
+	RFTrace('[Ravager Framework][DBG][ravagerFrameworkApplySomeSpice] Spiceable enemies: ', spiceable)
+	// Loop each of the possibly spicy ravager
 	spiceable.forEach(enemy => {
-		RFDebug('[Ravager Framework][applySpice] Enemy ranges before refresh: ', enemy.ravage.ranges)
-		// applySpice(e)
+		RFDebug('[Ravager Framework][ravagerFrameworkApplySomeSpice] Enemy ranges before refresh: ', enemy.ravage.ranges)
 		if (spice) {
-			RFDebug('[Ravager Framework][applySpice] Enabling spice for ' + enemy.name)
+			RFDebug('[Ravager Framework][ravagerFrameworkApplySomeSpice] Enabling spice for ' + enemy.name)
 			// For each ravaging range and slot, apply spicy dialogue if it exists
 			enemy.ravage.ranges.forEach(range => {
 				enemy.ravage.targets.forEach(slot => {
@@ -2158,7 +2044,7 @@ function ravagerFrameworkApplySomeSpice(reason) {
 				})
 			})
 		} else {
-			RFDebug('[Ravager Framework][applySpice] Disabling spice for ' + enemy.name)
+			RFDebug('[Ravager Framework][ravagerFrameworkApplySomeSpice] Disabling spice for ' + enemy.name)
 			// For each ravaging range and slot, apply tame dialogue if it exists
 			enemy.ravage.ranges.forEach(range => {
 				enemy.ravage.targets.forEach(slot => {
@@ -2167,7 +2053,7 @@ function ravagerFrameworkApplySomeSpice(reason) {
 				})
 			})
 		}
-		RFDebug('[Ravager Framework][applySpice] Enemy ranges after refresh: ', enemy.ravage.ranges)
+		RFDebug('[Ravager Framework][ravagerFrameworkApplySomeSpice] Enemy ranges after refresh: ', enemy.ravage.ranges)
 	})
 	// Refresh enemies cache
 	KinkyDungeonRefreshEnemiesCache()
@@ -2236,7 +2122,6 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 			RFDebug('[Ravager Framework] KDModSettings was null.')
 		}
 		if (KDModConfigs != undefined) {
-			// KDModConfigs['RavagerFramework'] = RavagerData.ModConfig
 			let settingsarr = []
 			for (let conf in RavagerData.ModConfig) {
 				settingsarr.push(Object.assign({}, RavagerData.ModConfig[conf]))
@@ -2244,7 +2129,6 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 			KDModConfigs['RavagerFramework'] = settingsarr
 		}
 		let settingsobject = (KDModSettings.hasOwnProperty('RavagerFramework') == false) ? {} : Object.assign({}, KDModSettings['RavagerFramework'])
-		// RFDebug('ModSettings state: ', KDModSettings['RavagerFramework'], settingsobject)
 		for (var i of KDModConfigs['RavagerFramework']) {
 			if (settingsobject[i.refvar] == undefined) {
 				RFDebug('Setting default value for ' + i.refvar + ' ...')
@@ -2255,8 +2139,6 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 				addTextKey(`KDModButton${i.refvar}`, i.textKeyVal)
 		}
 		KDModSettings['RavagerFramework'] = settingsobject
-		// ravagerFrameworkRefreshEnemies('load')
-		// ravagerFrameworkApplySpicyTendril('load')
 		ravagerSettingsRefresh('load')
 		ravagerFrameworkSetupSound()
 		// Check for any missing functions
@@ -2267,17 +2149,13 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
 
 if (KDEventMapGeneric['afterModConfig'] != undefined) {
 	KDEventMapGeneric['afterModConfig']['RavagerFramework'] = (e, data) => {
-		// ravagerFrameworkRefreshEnemies('config')
-		// ravagerFrameworkApplySpicyTendril('config')
 		ravagerSettingsRefresh('refresh')
 		_RavagerFrameworkInInit = false
 	}
 }
-//
 
-
-
-//things, in order, to remove for a given slot goal
+// Slots that need to be stripped to occupy a given slot; slots to clear are in order
+// TODO: Move this to RavagerData, to allow external ravager mods to define another slot if they wish
 let ravageEquipmentSlotTargets = {
 	ItemButt: ["ItemPelvis", "ItemButt"],
 	ItemVulva: ["ItemPelvis", "ItemVulva"],
@@ -2285,61 +2163,80 @@ let ravageEquipmentSlotTargets = {
 	ItemHead: ["ItemHead"]
 }
 
+// This whole nightmare references KinkyDungeonPlayerEntity all over the place, instead of just using target. Changing this would need testing to make sure nothing goes wrong, but could allow ravagers to go after other entities, or stay player targetted (with an early exit if target != KinkyDungeonPlayerEntity) while being easier to read
 KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bullet, entity) => {
 	RFDebug('[Ravager Framework]: Effect: Ravage; Ravaging entity is', entity, 'target is', target)
 	RFTrace('[Ravager Framework DBG]: Ravager PlayerEffect; target: ', target, '; damage: ', damage, '; playerEffect: ', playerEffect, '; spell: ', spell, '; faction: ', faction, '; bullet: ', bullet, '; entity: ', entity)
 	let enemy = entity.Enemy
-	if(!enemy.ravage) throw 'Ravaging enemies need to have ravage settings!'
+	if(!enemy.ravage)
+		throw 'Ravaging enemies need to have ravage settings!'
 
 	////////////////////////////////////////////////////////////////////////
 	/* STATUS DETERMINATION SECTION 
 	 * determine the strip/restraint state of the player - what to rip away before ravaging
 	 * for each option, each given slot must be unoccupied by restraints, and clothing, removed in that order
 	*/
-	// Status callback, I added this the wolfgirl's spell work without screwing up the ravaging actions. If this callback function returns anything equal to true, the ravager will NOT take any ravaging actions
+	////////////////////////////////////////////////////////////////////////
+
+	// Status callback, I added this for the wolfgirl's spell work without screwing up the ravaging actions. If this callback function returns anything equal to true, the ravager will NOT take any ravaging actions
 	// If you're going to use this, my current intent for it is to do some thing before the ravaging begins. It's probably best to do your actions, then set a flag in the ravager entity which will be used to quickly exit your callback.
 	// Do NOT try to put this flag in `entity.ravage`, as that dictionary does not exist the first time your callback will be called
 	// Currently, it is used to make the wolfgirl throw restraints at the player before closing in on her
 	let skipEverything = false
-	if (typeof enemy.ravage.effectCallback == 'string' &&
+	if (
+		typeof enemy.ravage.effectCallback == 'string' &&
 		KDEventMapEnemy['ravagerCallbacks'] &&
-		typeof KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.effectCallback] == 'function') {
+		typeof KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.effectCallback] == 'function'
+	) {
 		RFDebug('[Ravager Framework] Running effectCallback with enemy: ', entity, '; target: ', target)
 		skipEverything = KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.effectCallback](entity, target)
 	}
 	RFDebug('[Ravager Framework]: skipEverything: ', skipEverything)
 	if (!skipEverything) {
-		//clothing targts
+		// Clothing targts
 		let clothingTargetsPelvis = KDGetDressList()[KinkyDungeonCurrentDress].filter(article=> {
-				if (["InnocentDesireSuit", "NightCatSuit", "MikosSuitLV1", "MikosSuitLV2", "MikosSuitLV3", "Nake", "EtherMageSuit"].some(str => KinkyDungeonCurrentDress == str)) return false // Working around a function override for PureWind'sTools outfits
-				if (enemy.ravage.bypassAll) return false // Seems to not be called before stripping; but it's working as it is now, so I'll come back to this later
-				if(article.Lost) return false
-				//if(article.Skirt) return true // Disabled because trying to remove the skirt would always fail, resulting in ravagers being unable to progress
-				if(article.Group == "Uniform") return true // Sorry, uniforms get torn off in their entirety
-				if(["Shorts", "Bikini", "Panties", "Leotard", "Swimsuit"].some(str => article.Item.includes(str))) {
-					return true
-			}
+			// Working around a function override for PureWind'sTools outfits
+			if (["InnocentDesireSuit", "NightCatSuit", "MikosSuitLV1", "MikosSuitLV2", "MikosSuitLV3", "Nake", "EtherMageSuit"].some(str => KinkyDungeonCurrentDress == str))
+				return false
+			// Seems to not be called before stripping; but it's working as it is now, so I'll come back to this later
+			if (enemy.ravage.bypassAll)
+				return false
+			// Clothing with Lost = true are not visible on the player, aka already removed
+			if(article.Lost)
+				return false
+			// Sorry, uniforms get torn off in their entirety
+			if(article.Group == "Uniform")
+				return true
+			if(["Shorts", "Bikini", "Panties", "Leotard", "Swimsuit"].some(str => article.Item.includes(str)))
+				return true
 		})
 		RFTrace('[Ravager Framework DBG]: PlayerEffect clothingTargetsPelvis: ', clothingTargetsPelvis)
-
 		let clothingTargetsMouth = KDGetDressList()[KinkyDungeonCurrentDress].filter(article=> {
-				if (["InnocentDesireSuit", "NightCatSuit", "MikosSuitLV1", "MikosSuitLV2", "MikosSuitLV3", "Nake", "EtherMageSuit"].some(str => KinkyDungeonCurrentDress == str)) return false // Working around a function override for PureWind'sTools outfits
-				if (enemy.ravage.bypassAll) return false // Seems to not be called before stripping; but it's working as it is now, so I'll come back to this later
-				if(article.Lost) return false
-				if(["Mask", "Visor", "Gag"].some(str => article.Item.includes(str))) {
-					return true
-			}
+			// Working around a function override for PureWind'sTools outfits
+			if (["InnocentDesireSuit", "NightCatSuit", "MikosSuitLV1", "MikosSuitLV2", "MikosSuitLV3", "Nake", "EtherMageSuit"].some(str => KinkyDungeonCurrentDress == str))
+				return false
+			// Seems to not be called before stripping; but it's working as it is now, so I'll come back to this later
+			if (enemy.ravage.bypassAll)
+				return false
+			// Clothing with Lost = true are not visible on the player, aka already removed
+			if(article.Lost)
+				return false
+			if(["Mask", "Visor", "Gag"].some(str => article.Item.includes(str)))
+				return true
 		})
-
 		let clothingTargetsHead = KDGetDressList()[KinkyDungeonCurrentDress].filter(article=> {
-				if (["InnocentDesireSuit", "NightCatSuit", "MikosSuitLV1", "MikosSuitLV2", "MikosSuitLV3", "Nake", "EtherMageSuit"].some(str => KinkyDungeonCurrentDress == str)) return false // Working around a function override for PureWind'sTools outfits
-				if (enemy.ravage.bypassAll) return false // Seems to not be called before stripping; but it's working as it is now, so I'll come back to this later
-				if(article.Lost) return false
-				if(["Hat"].some(str => article.Item.includes(str))) {
-					return true
-			}
+			// Working around a function override for PureWind'sTools outfits
+			if (["InnocentDesireSuit", "NightCatSuit", "MikosSuitLV1", "MikosSuitLV2", "MikosSuitLV3", "Nake", "EtherMageSuit"].some(str => KinkyDungeonCurrentDress == str))
+				return false
+			// Seems to not be called before stripping; but it's working as it is now, so I'll come back to this later
+			if (enemy.ravage.bypassAll)
+				return false
+			// Clothing with Lost = true are not visible on the player, aka already removed
+			if(article.Lost)
+				return false
+			if(["Hat"].some(str => article.Item.includes(str)))
+				return true
 		})
-
 		RFDebug('[Ravager Framework]: Clothing targets: Pelvis: ', clothingTargetsPelvis, '; Mouth: ', clothingTargetsMouth, '; Head: ', clothingTargetsHead)
 
 		// Equipment/clothing targets object
@@ -2351,7 +2248,6 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				ItemMouth: [],
 				ItemHead: []
 			},
-
 			clothing: {
 				ItemButt: clothingTargetsPelvis,
 				ItemVulva: clothingTargetsPelvis,
@@ -2359,11 +2255,11 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				ItemHead: clothingTargetsHead
 			}
 		}	
-
 		// Returns true on a given restraint unless it is bypassed
 		function bypassed(restraint) {
 			let restraintIsBypassed = false
-			if(enemy.ravage.bypassSpecial) restraintIsBypassed = enemy.ravage.bypassSpecial.some(str => restraint?.name.includes(str))
+			if(enemy.ravage.bypassSpecial)
+				restraintIsBypassed = enemy.ravage.bypassSpecial.some(str => restraint?.name.includes(str))
 			if( 
 				( // Leave blindfolds on unless specified
 					(restraint.name.includes("Blindfold") && !enemy.ravage.needsEyes) 
@@ -2372,8 +2268,10 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				( // Possible to bypass completely if specified
 					enemy.ravage.bypassAll
 				)
-			) return true
-			else return false
+			)
+				return true
+			else
+				return false
 		}
 
 		// Collect an array of equipment that needs to be removed
@@ -2388,9 +2286,9 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					!restraintInSlot.name.includes("RavagerOccupied") &&
 					!bypassed(restraintInSlot) &&
 					!enemy.ravage.bypassAll // Allows a ravager to not remove clothing
-				) stripOptions.equipment[slot].push(groupName) // Since easiest removal is via group name
+				)
+					stripOptions.equipment[slot].push(groupName) // Since easiest removal is via group name
 			})
-
 			// Special check for mouth since collars can also affect this
 			for (let inv of KinkyDungeonAllRestraint()) {
 				if (
@@ -2398,19 +2296,16 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					!KDRestraint(inv).name.includes("RavagerOccupied") &&
 					!bypassed(inv) &&
 					!enemy.ravage.bypassAll // Allows a ravager to not remove clothing
-				) {
+				)
 					stripOptions.equipment.ItemMouth.push(inv)
-				}
 			}
 		}
-
 		// Easy eligibility detection; just make sure there's nothing else to remove in desired slot
 		let uncovered = {
 			ItemButt: stripOptions.equipment.ItemButt.length == 0 && stripOptions.clothing.ItemButt.length == 0,
 			ItemVulva: stripOptions.equipment.ItemVulva.length == 0 && stripOptions.clothing.ItemVulva.length == 0,
 			ItemMouth: stripOptions.equipment.ItemMouth.length == 0 && stripOptions.clothing.ItemMouth.length == 0
 		}
-
 		RFDebug('[Ravager Framework]: Slot state: stripOptions: ', stripOptions, '; uncovered: ', uncovered)
 
 		////////////////////////////////////////////////////////////////////////
@@ -2419,23 +2314,23 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				- other ravagers can have same goal and help strip, but only one gets it - they'll pick another eventually
 				- if they can't, they default to fallback behavior
 		*/
-
+		////////////////////////////////////////////////////////////////////////
 		// Define player/entity state if not already there
-		if(!entity.ravage) entity.ravage = { progress: 0 }
-		if(target == KinkyDungeonPlayerEntity && !KinkyDungeonPlayerEntity.ravage) KinkyDungeonPlayerEntity.ravage = {
-			slots: {
-				ItemVulva: false,
-				ItemMouth: false,
-				ItemButt: false
-			},
-
-			narrationBuffer: [], // We store narration to be done in here and do it after tick, so it's all together
-			submissionLevel: 0,
-			submissionReason: false,
-			submitting: false,
-			showedSubmissionMessage: false,
-		}
-
+		if(!entity.ravage)
+			entity.ravage = { progress: 0 }
+		if(target == KinkyDungeonPlayerEntity && !KinkyDungeonPlayerEntity.ravage)
+			KinkyDungeonPlayerEntity.ravage = {
+				slots: {
+					ItemVulva: false,
+					ItemMouth: false,
+					ItemButt: false
+				},
+				narrationBuffer: [], // We store narration to be done in here and do it after tick, so it's all together
+				submissionLevel: 0,
+				submissionReason: false,
+				submitting: false,
+				showedSubmissionMessage: false,
+			}
 		// Define entity state and determine slot of choice
 		let validSlots = []
 		let slotsOccupied = 0
@@ -2450,17 +2345,24 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				slotsOccupied++
 			}
 		}
-
 		// Determine a new slot if new usage, or it was taken before they got the chance
 		// If all slots are taken, gotta fallback
-		// TODO!!! prioritize oral if target is belted
+		// TODO: Prioritize oral if target is belted
 		let canRavage = true
-		RFTrace('[Ravager Framework DBG]: PlayerEffect validSlots; needs to choose slot: ', !entity.ravage.slot, 'slot ocuppier type = object: ', typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object", '; entity not in desired slot: ', (typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object" && KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity), '; Total: ', !entity.ravage.slot || (typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object" && KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity))
+		RFTrace('[Ravager Framework DBG]: PlayerEffect validSlots; needs to choose slot: ', !entity.ravage.slot, '; slot ocuppier type = object: ', typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object", '; entity not in desired slot: ', (typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object" && KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity), '; Total: ', !entity.ravage.slot || (typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object" && KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity))
 		RFTrace('[Ravager Framework DBG]: PlayerEffect validSlots; validSlots.length: ', validSlots.length)
-		if(!entity.ravage.slot || (typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object" && KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity)) {
+		if(
+			!entity.ravage.slot ||
+			(
+				typeof KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == "object" &&
+				KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity
+			)
+		) {
 			RFDebug('[Ravager Framework]: validSlots: ', validSlots, '; entity.ravage.slot: ', entity.ravage.slot, '; entity not in desired player slot: ', KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] != entity, '; desired player slot: ', KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot])
-			if(validSlots.length) entity.ravage.slot = ravRandom(validSlots)
-			else canRavage = false
+			if (validSlots.length)
+				entity.ravage.slot = ravRandom(validSlots)
+			else
+				canRavage = false
 		}
 		RFTrace('[Ravager Framework DBG]: PlayerEffect validSlots; entity slot: ', entity.ravage.slot, '; canRavage: ', canRavage)
 
@@ -2476,14 +2378,14 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 		) {
 			// Mark this spot as properly claimed
 			let slotOfChoice = entity.ravage.slot
-			let pRav = KinkyDungeonPlayerEntity.ravage //Shortcut for readability
+			let pRav = KinkyDungeonPlayerEntity.ravage // Shortcut for readability
 			pRav.slots[entity.ravage.slot] = entity
 			entity.ravage.isRavaging = true
-
 			// Also, ensure entity doesn't stop "playing" until done, if they are playing
-			if(entity.playWithPlayer) entity.playWithPlayer++
-
+			if (entity.playWithPlayer)
+				entity.playWithPlayer++
 			// Transfer leash to this caster
+			// TODO: Check if this is causing the issues between ravagers and leashes
 			let leash = KinkyDungeonGetRestraintItem("ItemNeckRestraints");
 			if (leash && KDRestraint(leash).tether) {
 				leash.tetherEntity = entity.id;
@@ -2491,20 +2393,17 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				leash.tetherLength = 1;
 			}
 			KinkyDungeonSetFlag("overrideleashprotection", 2);
-
 			// Add occupied binding
-			KinkyDungeonAddRestraintIfWeaker(`${entity.ravage.slot.replace("Item", "RavagerOccupied")}`)
-
+			KinkyDungeonAddRestraintIfWeaker(entity.ravage.slot.replace("Item", "RavagerOccupied"))
 			// If player waited, SP and WP damage is halved - counts as "submitting"
 			// They can also unwillingly submit
 			pRav.submitting = KinkyDungeonLastTurnAction == "Wait"
 			pRav.submissionReason = KinkyDungeonFlags.get("playerStun") ? "You're too stunned to resist..." : "You moan softly as you let it happen..."
 			pRav.submissionLevel = 0
-
+			// Get submit chance
 			let submitRoll = Math.random() * 100
 			let baseSubmitChance = KinkyDungeonGoddessRep["Ghost"] + 30 // Starts at -50, this gives it some offset
-			RFDebug('[Ravager Framework] Enemy: ', enemy)
-			// if(enemy.ravage.submitChanceModifierCallback) baseSubmitChance = enemy.ravage.submitChanceModifierCallback(entity, target, baseSubmitChance)
+			RFTrace('[Ravager Framework] Enemy: ', enemy)
 			RFDebug('[Ravager Framework]: Checking for submitChanceModifierCallback ...')
 			if (
 				typeof enemy.ravage.submitChanceModifierCallback == 'string' &&
@@ -2515,45 +2414,59 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				let tmp_baseSubmitChance = KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.submitChanceModifierCallback](entity, target, baseSubmitChance)
 				switch (typeof tmp_baseSubmitChance) {
 				case 'undefined':
-					RFWarn('[Ravager Framework] WARNING: Ravager ', entity.Enemy.name, '(', TextGet('name' + entity.Enemy.name), ') used a submitChanceModifierCallback which returned no value! This result will be ignored. Please report this issue to the author of this ravager!')
+					RFWarn(`[Ravager Framework] WARNING: Ravager ${enemy.name} (${TextGet('name' + enemy.name)}) used a submitChanceModifierCallback which returned no value! This result will be ignored. Please report this issue to the author of this ravager!`)
 					break
 				case 'number':
 					baseSubmitChance = tmp_baseSubmitChance
-					RFDebug('[Ravager Framework] Base submit chance changed to ', baseSubmitChance)
+					RFDebug(`[Ravager Framework] Base submit chance changed to ${baseSubmitChance}`)
 					break
 				default:
-					RFWarn('[Ravager Framework] WARNING: Ravager ', entity.Enemy.name, '(', TextGet('name' + entity.Enemy.name), ') used a submitChanceModifierCallback which returned a non-number value (', tmp_baseSubmitChance, ')! This result will be ignored. Please report this issue to the author of this ravager!')
+					RFWarn(`[Ravager Framework] WARNING: Ravager ${enemy.name} (${TextGet('name' + enemy.name)}) used a submitChanceModifierCallback which returned a non-number value (${tmp_baseSubmitChance})! This result will be ignored. Please report this issue to the author of this ravager!`)
 					break
 				}
 			}
+			// "Stronger" kinds of submission; submitting because of your leash is less likely than normal submission; submitting because of a lack of willpower is less likely than leash submission
 			let leashSubmitChance = baseSubmitChance + 10
 			let wpSubmitChance = leashSubmitChance + 10
-
-			// Since this is shown once per whole turn rather than each enemy, we pick the highest descriptive one
-			if(pRav.submissionLevel < 3 && KinkyDungeonStatWill == 0 && (submitRoll < wpSubmitChance && submitRoll > leashSubmitChance)) {
+			// While the submit chance is being rolled once per enemy, we want to pick the strongest submission reason for the whole turn. Lack of willpower submission overrides leash submission, leash submission overrides base submission
+			if (
+				pRav.submissionLevel < 3 &&
+				KinkyDungeonStatWill == 0 &&
+				(
+					submitRoll < wpSubmitChance &&
+					submitRoll > leashSubmitChance
+				)
+			) {
 				pRav.submissionReason = "(STUN) You can't will yourself to resist..."
 				pRav.submitting = "forced"
 				pRav.submissionLevel = 3
-			} else if(pRav.submissionLevel < 2 && leash && (submitRoll < leashSubmitChance && submitRoll > baseSubmitChance)) {
+			} else if (
+				pRav.submissionLevel < 2 &&
+				leash &&
+				(
+					submitRoll < leashSubmitChance &&
+					submitRoll > baseSubmitChance
+				)
+			) {
 				pRav.submissionReason = "(STUN) With a tug of your leash, you're put in your place..."
 				pRav.submitting = "forced"
 				pRav.submissionLevel = 2
-			} else if(pRav.submissionLevel < 1 && submitRoll < baseSubmitChance) {
+			} else if (
+				pRav.submissionLevel < 1 &&
+				submitRoll < baseSubmitChance
+			) {
 				pRav.submissionReason = "(STUN) Your submissiveness gets the better of you..."
 				pRav.submitting = "forced"
 				pRav.submissionLevel = 1
 			}
-
 			/* Determine string and severity of ravaging 
 				Every ravaging enemy should have a range that contains all damage, etc.
 				The first range with a number higher than the enemy's ravaging progress is selected, and its effects used.
 			*/
-			let range = enemy.ravage.ranges.find(range => {
-				if(range[0] > entity.ravage.progress) return true
-			})
-
+			let range = enemy.ravage.ranges.find(range => range[0] > entity.ravage.progress)
 			// Helper to get what the previous range was for the sake of increase player ravaged counts 
 			function getPreviousRange(currRange, enemy) {
+				// TODO: Possibly clean this up by replacing findIndex with a check against entity.progress (possibly `enemy.ravage.ranges.findLast(range => range[0] <= entity.progress)`)
 				return currRange ? enemy.ravage.ranges[enemy.ravage.ranges.findIndex((v) => { if (v == currRange) return true; }) - 1] : enemy.ravage.ranges.at(-1)
 			}
 			// Helper to increase player ravaged counts
@@ -2600,19 +2513,21 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					} else if (Number.isNaN(Number(incCount))) {
 						incCount = 0
 					} else {
+						// Cast to Number to handle Boolean meaning increment by one
 						incCount = Number(incCount)
 					}
 					RFDebug('[Ravager Framework][increasePlayerRavagedCount]: Normalized incCount: ', incCount)
 					// Check if specified slot's use count is undefined
 					if (target.ravagedCounts[slot] == undefined || target.ravagedCounts[slot] < 0) {
-						// Set use count to range's increment count (Cast to Number to handle Boolean meaning increment by one)
+						// Set use count to range's increment count
 						target.ravagedCounts[slot] = incCount
 						RFDebug('[Ravager Framework][increasePlayerRavagedCount]: Set slot\'s count to ', incCount)
 					} else {
-						// Increment use count by range's increment count (cast to Number to handle Boolean meaning increment)
+						// Increment use count by range's increment count
 						target.ravagedCounts[slot] += incCount
 						RFDebug('[Ravager Framework][increasePlayerRavagedCount]: Incremented slot\'s count by ', incCount)
 					}
+					// TODO: Make sure this plays well with multiple ravagers incrementing multiple times mid-ravage
 					target.ravagedCounts.lastIncremented[slot] = range[0]
 					RFDebug('[Ravager Framework][increasePlayerRavagedCount]: Set slot\'s last incremented to ', range[0])
 					return true
@@ -2621,21 +2536,22 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					return false
 				}
 			}
-
 			// If rangeData is null, the encounter is over, and doneDialogue should be used.
 			if(range) {
 				let rangeData = range[1]
-
 				// Handle stat changes
-				if(rangeData.sp) KDChangeStamina(undefined, undefined, undefined, pRav.submitting ? rangeData.sp * 0.25 : rangeData.sp)
-				if(rangeData.wp) KDChangeWill(undefined, undefined, undefined, rangeData.wp)
-				if(rangeData.sub) KinkyDungeonChangeRep("Ghost", rangeData.sub); // "Ghost" is submissiveness for some reason
-					else if(pRav.submitting) KinkyDungeonChangeRep("Ghost", 0.25)
+				if(rangeData.sp)
+					KDChangeStamina(undefined, undefined, undefined, pRav.submitting ? rangeData.sp * 0.25 : rangeData.sp)
+				if(rangeData.wp)
+					KDChangeWill(undefined, undefined, undefined, rangeData.wp)
+				if(rangeData.sub)
+					KinkyDungeonChangeRep("Ghost", rangeData.sub); // "Ghost" is submissiveness for some reason
+				else if (pRav.submitting)
+					KinkyDungeonChangeRep("Ghost", 0.25)
 				if(rangeData.dp) { // We only try orgasm if DP is affected
 					KDChangeDistraction(undefined, undefined, undefined, rangeData.dp)
 					KinkyDungeonDoTryOrgasm((rangeData.orgasmBonus || 0) + slotsOccupied, 1)
 				}
-
 				// Helpers for use count based text
 				function checkPreviousUseCount(slot) {
 					return target.ravagedCounts && typeof target.ravagedCounts[slotOfChoice] == "number" && target.ravagedCounts[slot] > 0
@@ -2688,19 +2604,16 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					// Return
 					return result
 				}
-
 				// Next, handle dialogue/narration
 				// Use count based narration
 				let didExperiencedNarration = false
 				if (checkPreviousUseCount(slotOfChoice) && rangeData.experiencedNarration) {
 					let eNarr = rangeData.experiencedNarration.findLast((range) => { if (range[0] <= target.ravagedCounts[slotOfChoice]) return true; })
 					if (decideToDoExperiencedText(eNarr, slotOfChoice, rangeData)) {
-						// pRav.narrationBuffer.push(ravRandom(eNarr[1][slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)));
 						pRav.narrationBuffer.push(RavagerData.functions.NameFormat(ravRandom(eNarr[1][slotOfChoice]), entity))
 						didExperiencedNarration = true
 					}
 				}
-				// if(rangeData.narration && !didExperiencedNarration) pRav.narrationBuffer.push(ravRandom(rangeData.narration[slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)));
 				if (rangeData.narration && !didExperiencedNarration)
 					pRav.narrationBuffer.push(RavagerData.functions.NameFormat(ravRandom(rangeData.narration[slotOfChoice]), entity))
 				// Use count based taunts
@@ -2708,25 +2621,25 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				if (checkPreviousUseCount(slotOfChoice) && rangeData.experiencedTaunts) {
 					let eTaunt = rangeData.experiencedTaunts.findLast((range) => { if (range[0] <= target.ravagedCounts[slotOfChoice]) return true; })
 					if (decideToDoExperiencedText(eTaunt, slotOfChoice, rangeData)) {
-						// KinkyDungeonSendDialogue(entity, ravRandom(eTaunt[1][slotOfChoice]).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6)
 						KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(ravRandom(eTaunt[1][slotOfChoice]), entity), KDGetColor(entity), 6, 6)
 						didExperiencedTaunt = true
 					}
 				}
-				// if(rangeData.taunts && !didExperiencedTaunt) KinkyDungeonSendDialogue(entity, ravRandom(rangeData.taunts).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6);
 				if (rangeData.taunts && !didExperiencedNarration)
 					KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(ravRandom(rangeData.taunts), entity), KDGetColor(entity), 6, 6)
 				if(rangeData.dp) { // Only do floaty sound effects if DP is being applied, since that means action is happening
-					if(enemy.ravage.onomatopoeia) KinkyDungeonSendFloater(entity, ravRandom(enemy.ravage.onomatopoeia), "#ff00ff", 2);
+					if(enemy.ravage.onomatopoeia)
+						KinkyDungeonSendFloater(entity, ravRandom(enemy.ravage.onomatopoeia), "#ff00ff", 2);
 				}
-
 				// Status effect application/precautions
 				KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, KDRavaged) // Blinds player
 				KinkyDungeonApplyBuffToEntity(entity, KDRavaging) // Keeps enemy in one place
-				if (!entity.Enemy.ravage.bypassAll) KinkyDungeonAddRestraintIfWeaker("Stripped") // Stay stripped
+				if (!entity.Enemy.ravage.bypassAll)
+					KinkyDungeonAddRestraintIfWeaker("Stripped") // Stay stripped
 
 				if(pRav.submitting) { // When submitting, offset the "self-play" cost associated with doTryOrgasm
-					if(KinkyDungeonStatStamina > 3) KDChangeStamina(undefined, undefined, undefined, KinkyDungeonEdgeCost * -1) // --- Haven't figured out yet, but this seems to be meant to reduce stamina loss when submitting, but it makes no difference and in fact results in not draining stamina
+					if(KinkyDungeonStatStamina > 3)
+						KDChangeStamina(undefined, undefined, undefined, KinkyDungeonEdgeCost * -1) // TODO: --- Haven't figured out yet, but this seems to be meant to reduce stamina loss when submitting, but it makes no difference and in fact results in not draining stamina
 					KinkyDungeonSendActionMessage(20, pRav.submissionReason + ` (Reduced SP loss)`, "#dd00dd", 1, false, true);
 				}
 				if(pRav.submitting == "forced") {
@@ -2734,14 +2647,13 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					KinkyDungeonSendFloater(KinkyDungeonPlayerEntity, "SUBMIT!", "#ff00ff", 2);
 				}
 				entity.ravage.progress++
-
 				RFDebug('[Ravager Framework] Checking for range callback at range ', range[1], ' ...')
 				if (
 					typeof rangeData.callback == 'string' &&
 					KDEventMapEnemy['ravagerCallbacks'] &&
 					typeof KDEventMapEnemy['ravagerCallbacks'][rangeData.callback] == 'function'
 				) {
-					RFDebug('[Ravager Framework] Calling rangeData callback for range ', range[1], ' ...')
+					RFDebug('[Ravager Framework] Calling rangeData callback for range ', range[1], ' ...') // TODO: Expand parameters to include ravage progress and rangeData
 					KDEventMapEnemy['ravagerCallbacks'][rangeData.callback](entity, target, entity.ravage.slot)
 				}
 				if (
@@ -2756,8 +2668,8 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				increasePlayerRavagedCount(getPreviousRange(range, enemy), slotOfChoice, target, enemy)
 			} else {			
 				// Done playing, if they were
-				if(entity.playWithPlayer) entity.playWithPlayer = 0
-				
+				if(entity.playWithPlayer)
+					entity.playWithPlayer = 0
 				// If player doesn't pass out, just remove that enemy from slot and reset progress, give self a cooldown timer
 				let passedOut = false
 				if(KinkyDungeonStatWill != 0 || KinkyDungeonStatStamina > 1) {
@@ -2767,19 +2679,15 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					entity.ravageRefractory = enemy.ravage.refractory
 					KDBreakTether(KinkyDungeonPlayerEntity) // Chances are, this enemy was holding the tether
 					delete entity.ravage
-					// KinkyDungeonSendActionMessage(45, "You feel weak as the EnemyName releases you...".replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ee00ee", 4);
 					KinkyDungeonSendActionMessage(45, RavagerData.functions.NameFormat(RavagerData.defaults.releaseMessage, entity), "#e0e", 4) // Maybe make this controllable by a rav dev?
 				} else { // Pass out!
 					KinkyDungeonSendActionMessage(45, RavagerData.defaults.passoutMessage, "#ee00ee", 4);
 					KinkyDungeonPassOut()
 					passedOut = true
 				}
-
 				// Check for increasing ravaged count
 				RFDebug('[Ravager Framework]: Attempting to increment slot use count at end of session...')
 				increasePlayerRavagedCount(getPreviousRange(range, enemy), slotOfChoice, target, enemy, !(enemy.ravage.ranges.filter(v => v[1].useCount).length > 0))
-
-				// if(enemy.ravage.doneTaunts) KinkyDungeonSendDialogue(entity, ravRandom(enemy.ravage.doneTaunts).replace("EnemyName", TextGet("Name" + entity.Enemy.name)), KDGetColor(entity), 6, 6);
 				if (enemy.ravage.doneTaunts)
 					KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(ravRandom(enemy.ravage.doneTaunts), entity), KDGetColor(entity), 6, 6)
 				if (
@@ -2796,19 +2704,22 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 		}
 		////////////////////////////////////////////////////////////////////////
 		/* STRIP/PIN SECTION - If target is player, has belt/plugs, or has lower body clothing */
-		else if(
+		else if (
 			target == KinkyDungeonPlayerEntity &&
 			canRavage &&
-			(!uncovered[entity.ravage.slot] || !KinkyDungeonPlayerTags.get("Item_Pinned")) && 
+			(
+				!uncovered[entity.ravage.slot] ||
+				!KinkyDungeonPlayerTags.get("Item_Pinned")
+			) &&
 			!entity.ravageRefractory
 		) {
 			// Remove restraints first, THEN clothing, then pin once ready
-			if(stripOptions.equipment[entity.ravage.slot].length) {
+			if (stripOptions.equipment[entity.ravage.slot].length) {
 				// Since we want to go in order - remove mask before gag, etc
 				let input = stripOptions.equipment[entity.ravage.slot][0]
 				let targetRestraint
 				let specific = false
-				if(typeof input == "object") { // May pass specific restraints in the case of non-mouth-slot mouth coverings
+				if (typeof input == "object") { // May pass specific restraints in the case of non-mouth-slot mouth coverings
 					targetRestraint = input
 					specific = true
 				} else { // This is just the group string selection
@@ -2818,33 +2729,35 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 				// Can't just add restraints mid-ravage
 				let canBeRemoved = false
 				let restraintRef = KinkyDungeonGetRestraintByName(targetRestraint)
-				if(specific) {
+				if (specific) {
 					KinkyDungeonRemoveRestraintSpecific(targetRestraint, true, false, false, false, false, entity)
 				} else {
 					KinkyDungeonRemoveRestraint(input, true, false, false, false, false, entity)
 				}
-				// KinkyDungeonSendTextMessage(10, `EnemyName tears your ${TextGet("Restraint" + targetRestraint.name)} away!`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff0000", 4);	
-				KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.restraintTearMessage, entity, targetRestraint), "#f00", 4) // Maybe make this controllable for a rav dev?
-			} else if(stripOptions.clothing[entity.ravage.slot].length) {
+				KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.restraintTearMessage, entity, targetRestraint), "#f00", 4) // TODO: Maybe make this controllable for a rav dev?
+			} else if (stripOptions.clothing[entity.ravage.slot].length) {
 				RFTrace('[Ravager Framework DBG]: PlayerEffect stripping clothing; clothing strip options: ', stripOptions.clothing[entity.ravage.slot])
 				let stripped = stripOptions.clothing[entity.ravage.slot][0]
 				RFTrace('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped: ', stripped)
 				RFTrace('[Ravager Framework DBG]: PlayerEffect stripping clothing; slot check; slot not = ItemMouth: ', entity.ravage.slot != "ItemMouth", '; !getRestraintItem ItemPelvis: ', !KinkyDungeonGetRestraintItem("ItemPelvis"), '; clothing includes shorts, bikini, or panties: ', ["Shorts", "Bikini", "Panties"].some(str => stripped.Item.includes(str)), '; Total: ', entity.ravage.slot != "ItemMouth" && !KinkyDungeonGetRestraintItem("ItemPelvis") && ["Shorts", "Bikini", "Panties"].some(str => stripped.Item.includes(str)))
-				if(entity.ravage.slot != "ItemMouth" && !KinkyDungeonGetRestraintItem("ItemPelvis") && ["Shorts", "Bikini", "Panties"].some(str => stripped.Item.includes(str))) {
-					if (!entity.Enemy.ravage.bypassAll) KinkyDungeonAddRestraintIfWeaker("Stripped") // Since panties are sacred normally
+				if (
+					entity.ravage.slot != "ItemMouth" &&
+					!KinkyDungeonGetRestraintItem("ItemPelvis") &&
+					["Shorts", "Bikini", "Panties"].some(str => stripped.Item.includes(str))
+				) {
+					if (!entity.Enemy.ravage.bypassAll)
+						KinkyDungeonAddRestraintIfWeaker("Stripped") // Since panties are sacred normally
 				}
-				// KinkyDungeonSendTextMessage(10, `EnemyName tears your ${stripped.Item} away!`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff0000", 4);
-				KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.clothingTearMessage, entity, undefined, stripped), "#f00", 4) // Maybe make this controllable for a rav dev?
+				KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.clothingTearMessage, entity, undefined, stripped), "#f00", 4) // TODO: Maybe make this controllable for a rav dev?
 				RFTrace('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped.Lost = ', stripped.Lost)
 				stripped.Lost = true
 				RFTrace('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped.Lost = ', stripped.Lost)
 			} else {
 				KinkyDungeonAddRestraintIfWeaker("Pinned")
-				// KinkyDungeonSendTextMessage(10, `EnemyName gets a good grip on you...`.replace("EnemyName", TextGet("Name" + entity.Enemy.name)), "#ff00ff	", 4);
 				KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.pinMessage, entity), "#f0f", 4)
 			}
 			KinkyDungeonDressPlayer()
-			return {sfx: "Miss", effect: true};
+			return { sfx: "Miss", effect: true };
 		}
 		////////////////////////////////////////////////////////////////////////
 		/* ATTACK SECTION - A basic distraction add if ineligible for other stuff */
@@ -2865,9 +2778,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 					// Get jail restraints -- we're using these until I can figure out how to get a specific set of jail restraints or until I can be bothered to make a way of cleanly defining a list of restraints in the ravager declaration
 					let possibleRestraints = KDGetJailRestraints()
 					// Filter out restraints that can't be added
-					possibleRestraints = possibleRestraints.filter((item) => {
-						return KDCanAddRestraint(KinkyDungeonGetRestraintByName(item.Name))
-					})
+					possibleRestraints = possibleRestraints.filter(item => KDCanAddRestraint(KinkyDungeonGetRestraintByName(item.Name)))
 					RFDebug('[Ravager Framework] Valid restraints for fallback: ', possibleRestraints)
 					// Check that the possible restraints list is not empty
 					if (possibleRestraints.length > 0) {
@@ -2880,7 +2791,6 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 								let ret = KinkyDungeonAddRestraintIfWeaker(canidateRestraint)
 								// If we succeeded, print a message about that and set didRestrain to true
 								if (ret) {
-									// KinkyDungeonSendTextMessage(10, 'The EnemyName forces you to wear a RestraintName'.replace('EnemyName', TextGet('Name' + entity.Enemy.name)).replace('RestraintName', TextGet('Restraint' + canidateRestraint.name)), '#FF00FF', 4)
 									KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.addRestraintMessage, entity, canidateRestraint), "#f0f", 4)
 									didRestrain = true
 								}
@@ -2890,32 +2800,26 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
 						} else { RFError('[Ravager Framework] CANIDATE RESTRAINT INVALID! ', canidateRestraint) }
 					}
 				}
-				//
 				// Grope damage dealing
 				if (!didRestrain) {
 					RFDebug('[Ravager Framework] We DIDN\'T add a restraint, let\'s grope')
 					let dmg = KinkyDungeonDealDamage({damage: 1, type: "grope"});
 					if (!enemy.ravage.noFallbackNarration) {
-						if(enemy.ravage.fallbackNarration) {
-							// KinkyDungeonSendTextMessage( 10, ravRandom(enemy.ravage.fallbackNarration).replace("EnemyName", TextGet("Name" + enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff", 4);
+						if (enemy.ravage.fallbackNarration) {
 							KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(ravRandom(enemy.ravage.fallbackNarration), entity, undefined, undefined, dmg), "#f0f", 4)
 						} else {
-							// KinkyDungeonSendTextMessage( 10, "The EnemyName roughly gropes you! (DamageTaken)".replace("EnemyName", TextGet("Name" + enemy.name)).replace("DamageTaken", dmg.string), "#ff00ff", 4);
 							KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.fallbackNarration, entity, undefined, undefined, dmg), "#f0f", 4)
 						}
 					} else {
 						RFDebug('[Ravager Framework] ', enemy.name, ' requests no fallback narration.')
 					}
 				}
-				//
 			}
 		}
-
 		return {sfx: "Struggle", effect: true};
 	}
 	return {sfx: "Struggle", effect: true};
 }
-
 
 /**********************************************
  * Misc definitions
@@ -2961,7 +2865,6 @@ KinkyDungeonRestraints.push(
 		customEquip: 'RavagerPinned',
 		customEscapeSucc: 'RavagerPinned'
 	},
-
 	// This is really just to remove panties
 	{
 		name: "Stripped", 
@@ -2984,10 +2887,8 @@ KinkyDungeonRestraints.push(
 		customEquip: 'RavagerStripped',
 		customEscapeSucc: 'RavagerStripped'
 	},
-
-
-	// Definitions for the "occupied" slots to stop other people from interrupting
-	// These are removed by breaking Pinned, and they're just mechanical, so they can't be struggled out of.
+	// Definitions for the "occupied" slots to stop other ravagers from interrupting
+	// These are removed by breaking Pinned, and they're just a mechanic, so they can't be struggled out of.
 	{
 		name: "RavagerOccupiedMouth", 
 		Color: "#333333", 
@@ -3018,7 +2919,7 @@ KinkyDungeonRestraints.push(
 		power: 99, 
 		weight: 0, 
 		specStruggleTypes: ["Struggle"], escapeChance: {"Struggle": -99, "Cut": -99, "Remove": -99},
-		playerTags: {"ItemMouthFull": 6},
+		playerTags: {"ItemMouthFull": 6}, // TODO: Decide if this makes sense to use; may not make sense if head would be used for a form of hypnosis
 		enemyTags: {},
 		shrine: [],
 		minLevel: 0, 
@@ -3077,9 +2978,9 @@ KinkyDungeonRestraints.push(
 		Model: "RavLiftedSkirt"
 	},
 )
-////////////////
-// Events
-
+/******
+  - Events
+******/
 // Handles preventing enemies from interfering with ravaging, with some narration included
 KDEventMapInventory["tickAfter"]["ravagerSitDownAndShutUp"] = (e, item, data) => {
 	RFDebug("[RavagerFramework] [ravagerSitDownAndShutUp]\ne: ", e, "\nitem: ", item, "\ndata: ", data)
@@ -3117,7 +3018,6 @@ KDEventMapInventory["tickAfter"]["ravagerSitDownAndShutUp"] = (e, item, data) =>
 		KinkyDungeonSendTextMessage(5, msg, "#ff5be9", 4);
 	}
 }
-
 // Each tick, check to see if the player is still pinned by anyone
 KDEventMapInventory["tickAfter"]["ravagerPinCheck"] = (e, item, data) => {
 	RFTrace('[Ravager Framework][ravagerPinCheck]: e: ', e, '; item: ', item, '; data: ', data)
@@ -3126,13 +3026,13 @@ KDEventMapInventory["tickAfter"]["ravagerPinCheck"] = (e, item, data) => {
 	RFTrace('[Ravager Framework][ravagerPinCheck]: nearby: ', nearby)
 	nearby.forEach(enemy=>{
 		RFTrace('[Ravager Framework][ravagerPinCheck]: enemy: ', enemy, '; ravage: ', enemy.ravage, '; stun: ', enemy.stun, '; ravageRefractory: ', enemy.ravageRefractory)
-		if(enemy.ravage && !enemy.stun && !enemy.ravageRefractory) {
+		if (enemy.ravage && !enemy.stun && !enemy.ravageRefractory) {
 			RFTrace(`[Ravager Framework][ravagerPinCheck]: Found enemy playing with player! (${enemy.id})`)
 			cleared = false
 			enemy.playWithPlayer = 5 // Keep them playing until they're done
 		}
 	})
-	if(cleared) {
+	if (cleared) {
 		RFTrace('[Ravager Framework][ravagerPinCheck]: Player is free, clearing all data ...')
 		ravagerFreeAndClearAllData();
 	} else {
@@ -3151,52 +3051,49 @@ KDEventMapInventory["tickAfter"]["ravagerPinCheck"] = (e, item, data) => {
 		});
 	}
 }
-
-// For occupied, make sure pinned is still there - if gone, shouldn't be!!
+// For occupied, make sure pinned is still there; if pinned is gone, occupied should be too
 KDEventMapInventory["tickAfter"]["RavagerCheckForPinned"] = (e, item, data) => {
 	let remove = false
 	for (const inv of KinkyDungeonAllRestraint()) {
-		if(inv.name == "Pinned") remove = true
+		if (inv.name == "Pinned")
+			remove = true
 	}
-	if(remove) KDRemoveThisItem(item)
+	if (remove)
+		KDRemoveThisItem(item)
 }
-
 // We handle narration in an event since it's easier to get everything across multiple enemies grouped nicely this way
 KDEventMapInventory["tickAfter"]["ravagerNarration"] = (e, item, data) => {
 	let playerRavage = KinkyDungeonPlayerEntity.ravage
 	RFDebug('[Ravager Framework][ravagerNarration] ', playerRavage)
-	if(playerRavage) {
-		playerRavage.narrationBuffer.forEach(narration=>{
+	if (playerRavage) {
+		playerRavage.narrationBuffer.forEach(narration => {
 			KinkyDungeonSendActionMessage(20, narration, "#ff00ff", 1, false, true);
 		})
 		playerRavage.narrationBuffer = []
 	}
 }
-
 // In case the player passes out for unrelated reasons
-if(!KDEventMapInventory["passout"]) KDEventMapInventory["passout"] = {}
+if (!KDEventMapInventory["passout"])
+	KDEventMapInventory["passout"] = {}
 KDEventMapInventory["passout"]["ravagerRemove"] = (e, item, data) => {
 	RFTrace('[Ravager Framework][passout/ravagerRemove]: e: ', e, '; item: ', item, '; data: ', data, '; Calling ravagerFreeAndClearAllData')
 	ravagerFreeAndClearAllData()
 	// Keep panties gone as a souvenir
-	setTimeout(()=>
-		KDGetDressList()[KinkyDungeonCurrentDress].forEach(article=> {
-			if(["Panties"].some(str => article.Item.includes(str))) {
+	setTimeout(() =>
+		KDGetDressList()[KinkyDungeonCurrentDress].forEach(article => {
+			if (["Panties"].some(str => article.Item.includes(str))) {
 				article.Lost = true
 			}
-		})
-	, 1)
+		}), 1)
 }
-
 // If pin is broken: resets ravage, clears leash, and stuns ravagers
 KDEventMapInventory["remove"]["ravagerRemove"] = (e, item, data) => {
 	RFTrace('[Ravager Framework][remove/ravagerRemove]: e: ', e, '; item: ', item, '; data: ', data)
-	if(data.item.name == item.name) { // To make sure the item being removed is Pinned
+	if (data.item.name == item.name) { // To make sure the item being removed is Pinned
 		RFTrace(`[Ravager Framework][remove/ravagerRemove]: data.item.name (${data.item.name}) == item.name (${item.name}). Calling ravagerFreeAndClearAllDataIfNoRavagers`)
 		ravagerFreeAndClearAllDataIfNoRavagers()
 	}
 }
-
 // Remove pin if this enemy was the last one ravaging on death
 KDEventMapEnemy["death"]["ravagerRemove"] = (e, enemy, data) => {
 	RFTrace('[Ravager Framework][death/ravagerRemove]: e: ', e, '; enemy: ', enemy, '; data: ', data)
@@ -3209,13 +3106,13 @@ KDEventMapEnemy["death"]["ravagerRemove"] = (e, enemy, data) => {
 		ravagerFreeAndClearAllDataIfNoRavagers()
 	}
 } 
-
 // Remove refractory on ravagers each turn
-if(!KDEventMapEnemy["tickAfter"]) KDEventMapEnemy["tickAfter"] = {}
+if (!KDEventMapEnemy["tickAfter"])
+	KDEventMapEnemy["tickAfter"] = {}
 KDEventMapEnemy["tickAfter"]["ravagerRefractory"] = (e, enemy, data) => {
-	if (enemy?.ravageRefractory > 0) enemy.ravageRefractory--
+	if (enemy?.ravageRefractory > 0)
+		enemy.ravageRefractory--
 } 
-
 ////////////////
 // Buffs/statuses
 let KDRavaging = { // To keep enemy in one spot while they're busy
@@ -3229,7 +3126,6 @@ let KDRavaging = { // To keep enemy in one spot while they're busy
 	noKeep: true,
 	alwaysKeep: false,
 };
-
 let KDRavaged = { // To focus the player in on what's happening
 	id: "Ravaged", 
 	type: "Blindness", 
@@ -3240,10 +3136,8 @@ let KDRavaged = { // To focus the player in on what's happening
 	noKeep: true,
 	alwaysKeep: false,
 }
-
 ////////////////
 // Utils
-
 // Util to just randomly select an array (annoyed at writing long lines)
 function ravRandom(array) {
 	if (array.length === 0) {
@@ -3256,29 +3150,29 @@ function ravRandom(array) {
 }
 
 // Verbose? Perhaps. Accurate? Yes...
+// TODO: This'll need to be changed if we're going to make ravaging able to happen to npcs
 function ravagerFreeAndClearAllDataIfNoRavagers(showMessage = true) {
 	RFTrace('[Ravager Framework][ravagerFreeAndClearAllDataIfNoRavagers]: showMessage: ', showMessage)
 	let nearby = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 2)
 	RFTrace('[Ravager Framework][ravagerFreeAndClearAllDataIfNoRavagers]: nearby: ', nearby)
 	let cleared = false
-	nearby.forEach(enemy=>{
+	nearby.forEach(enemy => {
 		enemy.stun = 5
-		if(enemy.ravage) {
+		if (enemy.ravage)
 			cleared = true
-		}
 	})
-	if(cleared) {
-		if(showMessage && KinkyDungeonPlayerEntity.ravage) KinkyDungeonSendTextMessage(30, "You break free of their grip, leaving an opening to escape!", "#ff0000", 4)
+	if (cleared) {
+		if (showMessage && KinkyDungeonPlayerEntity.ravage)
+			KinkyDungeonSendTextMessage(30, "You break free of their grip, leaving an opening to escape!", "#ff0000", 4)
 		ravagerFreeAndClearAllData()
 		KDBreakTether(KinkyDungeonPlayerEntity)
 	}
 }
-
 // Util to remove player and enemy ravager data
 function ravagerFreeAndClearAllData() {
 	// Clear all enemies
-	for (const enemy of KDMapData.Entities) {
-		if(enemy.ravage)
+	for (const enemy of KDMapData.Entities) { // TODO: This'll need to be changed if we're going to make ravaging able to happen to npcs
+		if (enemy.ravage)
 			delete enemy.ravage
 		else {
 			// Clear the witness property from any enemies that witnessed this session
@@ -3294,41 +3188,33 @@ function ravagerFreeAndClearAllData() {
 	delete KinkyDungeonPlayerEntity.ravage
 	KinkyDungeonRemoveRestraintsWithName("Pinned")
 }
-
 /** Key definitions **/
 // Global "restraints"
-KinkyDungeonAddRestraintText(
-	'Stripped', 'Stripped!', 'Your panties got torn away...', 'You can just put them back on, but maybe don\'t worry about that if you\'re currently pinned down...'
-);
-KinkyDungeonAddRestraintText(
-	'Pinned', 'Pinned!', 'Something or someone is having their way with you.', 'You can\'t move unless you get them off you! Freeing yourself will stun nearby enemies.'
-);
+KinkyDungeonAddRestraintText('Stripped', 'Stripped!', 'Your panties got torn away...', 'You can just put them back on, but maybe don\'t worry about that if you\'re currently pinned down...');
+KinkyDungeonAddRestraintText('Pinned', 'Pinned!', 'Something or someone is having their way with you.', 'You can\'t move unless you get them off you! Freeing yourself will stun nearby enemies.');
 // These all use the same descriptor, suggesting you fight Pinned instead.
 let slotsArr = ['Mouth', 'Vulva', 'Butt']
 for (var i in slotsArr) {
-	// RFDebug('RavagerOccupied' + slotsArr[i])
 	KinkyDungeonAddRestraintText('RavagerOccupied' + slotsArr[i], 'Occupied!', 'Someone or something is having their way with you...', 'Don\'t worry about this restraint. Instead, try to escape "Pinned!"');
 }
-KinkyDungeonAddRestraintText(
-	'RavagerOccupiedHead', 'Gripped!', 'Someone or something is having their way with you...', 'Don\'t worry about this restraint. Instead, try to escape "Pinned!"'
-);
+KinkyDungeonAddRestraintText('RavagerOccupiedHead', 'Gripped!', 'Someone or something is having their way with you...', 'Don\'t worry about this restraint. Instead, try to escape "Pinned!"');
 // Since it's supposed to be impossible to struggle out of "Occupied!", and you have to use debug mode to get one to equip to yourself, you should just use debug mode to give yourself a "Pinned!" and equip it
 addTextKey('KinkyDungeonSelfBondageRavagerOccupied', 'You shouldn\'t have done that~ Equip "Pinned" to yourself to fix it~')
-
+// Pinned struggle fails
 addTextKey('KinkyDungeonStruggleStruggleFailRavagerPinned', 'You try to break free...')
 addTextKey('KinkyDungeonStruggleStruggleFailRavagerPinnedAroused', 'You try to break free, but you\'re quickly put back in your place...')
 addTextKey('KinkyDungeonStruggleStruggleImpossibleRavagerPinned', 'You try to break free, but you can barely push back...')
 addTextKey('KinkyDungeonStruggleStruggleImpossibleRavagerPinnedAroused', 'You try to break free, but you\'re quickly put back in your place...')
 addTextKey('KinkyDungeonStruggleStruggleImpossibleBoundRavagerPinned', 'You squirm and try to fight back, but you can barely move... It\'s hopeless.')
 addTextKey('KinkyDungeonStruggleStruggleImpossibleBoundRavagerPinnedAroused', 'It\'s hopeless... You can only give in...')
-
+// Pinned remove fails
 addTextKey('KinkyDungeonStruggleRemoveFailRavagerPinned', 'You try to push your attacker off you...')
 addTextKey('KinkyDungeonStruggleRemoveFailRavagerPinnedAroused', 'You try to push your attacker away, but they pin you down rougher...')
 addTextKey('KinkyDungeonStruggleRemoveImpossibleRavagerPinned', 'You try to push your attacker away, but you\'re getting weak...')
 addTextKey('KinkyDungeonStruggleRemoveImpossibleRavagerPinnedAroused', 'You try to push your attacker away, but their tightening grip feels so good...')
 addTextKey('KinkyDungeonStruggleRemoveImpossibleBoundRavagerPinned', 'You try to push your attacker away, but you can barely move...')
 addTextKey('KinkyDungeonStruggleRemoveImpossibleBoundRavagerPinnedAroused', 'Fighting back is hopeless... You can only give in...')
-
+// Pinned cut fails
 addTextKey('KinkyDungeonStruggleCutFailRavagerPinned', 'You swing your weapon uselessly at your attacker...')
 addTextKey('KinkyDungeonStruggleCutFailRavagerPinnedAroused', 'You swing your weapon at your attacker, but you\'re too distracted to land a hit...')
 addTextKey('KinkyDungeonStruggleCutImpossibleRavagerPinned', 'You try your best to swing at your attacker, but you\'re getting weak...')
@@ -3338,62 +3224,47 @@ addTextKey('KinkyDungeonStruggleCutImpossibleBoundRavagerPinnedAroused', 'Fighti
 // Custom equip text for pinned just because
 // Self-equipping Pinned will have it immediately removed as well as any Occupied on the player, assuming there isn't a ravager on the player
 addTextKey('KinkyDungeonSelfBondageRavagerPinned', 'How are you planning to pin yourself down?~')
-
 // Stripped keys
 // The 'Impossible' keys may not actually get used ever, but I've made them obvious incase someone finds a way to get them triggered
 addTextKey('KinkyDungeonStruggleRemoveFailRavagerStripped', 'You try to pull your panties back on despite your restraints...')
 addTextKey('KinkyDungeonStruggleRemoveFailRavagerStrippedAroused', 'You try to pull your panties back on, but your arousal makes you clumsy...')
 addTextKey('KinkyDungeonStruggleStruggleFailRavagerStripped', 'You struggle to get your panties back in place despite your restraints...')
 addTextKey('KinkyDungeonStruggleStruggleFailRavagerStrippedAroused', 'You struggle to get your panties back in place, but your arousal makes you clumsy...')
-
-addTextKey('KinkyDungeonStruggleRemoveImpossibleRavagerStripped', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripRI') // 'TESTING KinkyDungeonStruggleRemoveImpossibleRavagerStripped')
-addTextKey('KinkyDungeonStruggleRemoveImpossibleRavagerStrippedAroused', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripRIA') // 'TESTING KinkyDungeonStruggleRemoveImpossibleRavagerStrippedAroused')
-addTextKey('KinkyDungeonStruggleRemoveImpossibleBoundRavagerStripped', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripRIB') // 'TESTING KinkyDungeonStruggleRemoveImpossibleBoundRavagerStripped')
-addTextKey('KinkyDungeonStruggleRemoveImpossibleBoundRavagerStrippedAroused', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripRIBA') // 'TESTING KinkyDungeonStruggleRemoveImpossibleBoundRavagerStrippedAroused')
-
-addTextKey('KinkyDungeonStruggleStruggleImpossibleRavagerStripped', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripSI') // 'TESTING KinkyDungeonStruggleStruggleImpossibleRavagerStripped')
-addTextKey('KinkyDungeonStruggleStruggleImpossibleRavagerStrippedAroused', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripSIA') // 'TESTING KinkyDungeonStruggleStruggleImpossibleRavagerStrippedAroused')
-addTextKey('KinkyDungeonStruggleStruggleImpossibleBoundRavagerStripped', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripSIB') // 'TESTING KinkyDungeonStruggleStruggleImpossibleBoundRavagerStripped')
-addTextKey('KinkyDungeonStruggleStruggleImpossibleBoundRavagerStrippedAroused', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripSIBA') // 'TESTING KinkyDungeonStruggleStruggleImpossibleBoundRavagerStrippedAroused')
+addTextKey('KinkyDungeonStruggleRemoveImpossibleRavagerStripped', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripRI')
+addTextKey('KinkyDungeonStruggleRemoveImpossibleRavagerStrippedAroused', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripRIA')
+addTextKey('KinkyDungeonStruggleRemoveImpossibleBoundRavagerStripped', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripRIB')
+addTextKey('KinkyDungeonStruggleRemoveImpossibleBoundRavagerStrippedAroused', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripRIBA')
+addTextKey('KinkyDungeonStruggleStruggleImpossibleRavagerStripped', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripSI')
+addTextKey('KinkyDungeonStruggleStruggleImpossibleRavagerStrippedAroused', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripSIA')
+addTextKey('KinkyDungeonStruggleStruggleImpossibleBoundRavagerStripped', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripSIB')
+addTextKey('KinkyDungeonStruggleStruggleImpossibleBoundRavagerStrippedAroused', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripSIBA')
 // Custom escape and equip keys just added in 5.4-nightly7b
 addTextKey('KinkyDungeonStruggleStruggleSuccessRavagerStripped', 'You feel relaxed with your panties on again')
 addTextKey('KinkyDungeonStruggleRemoveSuccessRavagerStripped', 'You feel relaxed with your panties on again')
 addTextKey('KinkyDungeonSelfBondageRavagerStripped', 'You slowly slip off your panties')
-
 // I can't seem to modify the Impossible2 and Impossible3 keys that are used *sometimes* when struggling against an impossible restraint repeatedly
 // I'm adding all of these keys to act as an alert if they ever start working
-addTextKey('KinkyDungeonStruggleStruggleImpossible2RavagerOccupied', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Struggle1') // 'TESTING KinkyDungeonStruggleStruggleImpossible2RavagerOccupied')
-addTextKey('KinkyDungeonStruggleStruggleImpossible3RavagerOccupied', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Struggle2') // 'TESTING KinkyDungeonStruggleStruggleImpossible3RavagerOccupied')
-addTextKey('KinkyDungeonStruggleStruggleImpossibleRavagerOccupied2', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Struggle3') // 'TESTING KinkyDungeonStruggleStruggleImpossibleRavagerOccupied2')
-addTextKey('KinkyDungeonStruggleStruggleImpossibleRavagerOccupied3', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Struggle4') // 'TESTING KinkyDungeonStruggleStruggleImpossibleRavagerOccupied3')
-
-addTextKey('KinkyDungeonStruggleCutImpossible2RavagerOccupied', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Cut1') // 'TESTING KinkyDungeonStruggleCutImpossible2RavagerOccupied')
-addTextKey('KinkyDungeonStruggleCutImpossible3RavagerOccupied', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Cut2') // 'TESTING KinkyDungeonStruggleCutImpossible3RavagerOccupied')
-addTextKey('KinkyDungeonStruggleCutImpossibleRavagerOccupied2', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Cut3') // 'TESTING KinkyDungeonStruggleCutImpossibleRavagerOccupied2')
-addTextKey('KinkyDungeonStruggleCutImpossibleRavagerOccupied3', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Cut4') // 'TESTING KinkyDungeonStruggleCutImpossibleRavagerOccupied3')
-
-addTextKey('KinkyDungeonStruggleRemoveImpossible2RavagerOccupied', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Remove1') // 'TESTING KinkyDungeonStruggleRemoveImpossible2RavagerOccupied')
-addTextKey('KinkyDungeonStruggleRemoveImpossible3RavagerOccupied', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Remove2') // 'TESTING KinkyDungeonStruggleRemoveImpossible3RavagerOccupied')
-addTextKey('KinkyDungeonStruggleRemoveImpossibleRavagerOccupied2', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Remove3') // 'TESTING KinkyDungeonStruggleRemoveImpossibleRavagerOccupied2')
-addTextKey('KinkyDungeonStruggleRemoveImpossibleRavagerOccupied3', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Remove4') // 'TESTING KinkyDungeonStruggleRemoveImpossibleRavagerOccupied3')
-//
+addTextKey('KinkyDungeonStruggleStruggleImpossible2RavagerOccupied', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Struggle1')
+addTextKey('KinkyDungeonStruggleStruggleImpossible3RavagerOccupied', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Struggle2')
+addTextKey('KinkyDungeonStruggleStruggleImpossibleRavagerOccupied2', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Struggle3')
+addTextKey('KinkyDungeonStruggleStruggleImpossibleRavagerOccupied3', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Struggle4')
+addTextKey('KinkyDungeonStruggleCutImpossible2RavagerOccupied', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Cut1')
+addTextKey('KinkyDungeonStruggleCutImpossible3RavagerOccupied', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Cut2')
+addTextKey('KinkyDungeonStruggleCutImpossibleRavagerOccupied2', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Cut3')
+addTextKey('KinkyDungeonStruggleCutImpossibleRavagerOccupied3', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Cut4')
+addTextKey('KinkyDungeonStruggleRemoveImpossible2RavagerOccupied', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Remove1')
+addTextKey('KinkyDungeonStruggleRemoveImpossible3RavagerOccupied', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Remove2')
+addTextKey('KinkyDungeonStruggleRemoveImpossibleRavagerOccupied2', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Remove3')
+addTextKey('KinkyDungeonStruggleRemoveImpossibleRavagerOccupied3', 'POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Remove4')
+// Add text keys for occupied, all of them just tell the player to remove pinned
 slotsArr = ['FailRavagerOccupied', 'FailRavagerOccupiedAroused', 'ImpossibleRavagerOccupied', 'ImpossibleRavagerOccupiedAroused', 'ImpossibleBoundRavagerOccupied', 'ImpossibleBoundRavagerOccupiedAroused'] // Need to 'NeedEdgeWrongEdge' keys for Remove keys, as well as HookHigh, ScrapObjectUse
 for (var i in slotsArr) {
 	addTextKey('KinkyDungeonStruggleStruggle' + slotsArr[i], 'You need to get them off you first! (Struggle against "Pinned!")')
 	addTextKey('KinkyDungeonStruggleCut' + slotsArr[i], 'You need to get them off you first! (Struggle against "Pinned!")')
 	addTextKey('KinkyDungeonStruggleRemove' + slotsArr[i], 'You need to get them off you first! (Struggle against "Pinned!")') // This one doesn't seem to be working. Seems it has a different key -- Seems to be working now
 }
-
 addTextKey('KinkyDungeonStruggleRemoveNeedEdgeWrongEdgeRavagerOccupied', 'You need to get them off you first! (Struggle against "Pinned!")')
 addTextKey('KinkyDungeonStruggleRemoveNeedEdgeWrongEdgeRavagerOccupiedAroused', 'You need to get them off you first! (Struggle against "Pinned!")')
-
-// addTextKey("KinkyDungeonStruggleStruggleFailRavagerOccupied","You need to get them off you first! (Struggle against 'Pinned!')")
-// addTextKey("KinkyDungeonStruggleStruggleFailRavagerOccupiedAroused","You need to get them off you first! (Struggle against 'Pinned!')")
-// addTextKey("KinkyDungeonStruggleStruggleImpossibleRavagerOccupied","You need to get them off you first! (Struggle against 'Pinned!')")
-// addTextKey("KinkyDungeonStruggleStruggleImpossibleRavagerOccupiedAroused","You need to get them off you first! (Struggle against 'Pinned!')")
-// addTextKey("KinkyDungeonStruggleStruggleImpossibleBoundRavagerOccupied","You need to get them off you first! (Struggle against 'Pinned!')")
-// addTextKey("KinkyDungeonStruggleStruggleImpossibleBoundRavagerOccupiedAroused","You need to get them off you first! (Struggle against 'Pinned!')")
-
 // Add Ravager Control to the game's custom screen list
 // The game will look in KDRender for a key matching the value of KinkyDungeonState, and run the function in that key as the draw function
 KDRender.RavagerControl = RavagerData.functions.RFControlRun
