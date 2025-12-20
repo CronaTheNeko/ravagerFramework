@@ -9,6 +9,15 @@
 	"gamepatch_max": -1,
 	"priority": 90,
 	"fileorder": [
-		"mod.json"
+		"mod.json",
+		"00-Framework/data.ks",
+		"00-Framework/core_functions.ks",
+		"00-Framework/public_functions.ks",
+		"00-Framework/function_overrides.ks",
+		"00-Framework/events.ks",
+		"00-Framework/init.ks",
+		"00-Framework/text_keys.ks",
+		"00-Framework/restraints.ks",
+		"00-Framework/status.ks"
 	]
 }
