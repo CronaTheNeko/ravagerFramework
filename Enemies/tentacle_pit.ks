@@ -188,7 +188,7 @@ function pitTendrilCompletion(enemy, target, passedOut) {
 	RFDebug('[Ravager Framework][Ravager Tendril] Killing tendril')
 	enemy.hp = 0;
 }
-if (!RavagerAddCallback('pitTendrilCompletion', pitTendrilCompletion)) {
+if (!RFAddCallback('pitTendrilCompletion', pitTendrilCompletion)) {
 	RFError('[Ravager Framework][Ravager Tendril] Failed to add pitTendrilCompletion!')
 }
 // Effect callback for groping before ravaging
@@ -221,7 +221,7 @@ function pitTendrilEffect(enemy, target) {
 	}
 	return false
 }
-if (!RavagerAddCallback('pitTendrilEffectCallback', pitTendrilEffect)) {
+if (!RFAddCallback('pitTendrilEffectCallback', pitTendrilEffect)) {
 	RFError('[Ravager Framework][Ravager Tendril] Failed to add pitTendrilEffectCallback!')
 }
 // Tendril definition

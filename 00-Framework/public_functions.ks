@@ -101,7 +101,7 @@ window.RFPushEnemiesWithStrongVariations = function(enemy, count, textKeys, high
     - func : The callback function to be used
   Returns : True if the callback was added successfully; false otherwise
 */
-window.RavagerAddCallback = (key, func) => {
+window.RFAddCallback = (key, func) => {
   if (!KDEventMapEnemy['ravagerCallbacks']) {
     KDEventMapEnemy['ravagerCallbacks'] = {}
     if (!KDEventMapEnemy['ravagerCallbacks']) {
@@ -117,21 +117,21 @@ window.RavagerAddCallback = (key, func) => {
 // The only parameter is the name of your ravager.
 // Call this after adding your ravager, and it should tell you anything wrong with the Experience Aware Mode settings your ravager has and, at the end, will return true if no issues were found or false if there were issues found
 // To see all messages, enable the debug option for the framework in mod config
-window.RavagerFrameworkVerifyEAM = function(ravagerName) {
+window.RFVerifyEAM = function(ravagerName) {
   const ravager = KDEnemiesCache.get(ravagerName)
   // Check that enemy exists
   if (!ravager) {
-    RFError('[RavagerFrameworkVerifyEAM] Could not find an enemy by the name of ', ravagerName)
+    RFError('[RFVerifyEAM] Could not find an enemy by the name of ', ravagerName)
     return false
   }
   // Check for ravager.ravage to make sure this is a ravager
   if (!ravager.ravage) {
-    RFError('[RavagerFrameworkVerifyEAM] Enemy does not have a "ravage" property. Either you\'re checking the wrong enemy, or you\'ve defined your ravager wrong.')
+    RFError('[RFVerifyEAM] Enemy does not have a "ravage" property. Either you\'re checking the wrong enemy, or you\'ve defined your ravager wrong.')
     return false
   }
   // Check that ravager has ranges
   if (!ravager.ravage.ranges || ravager.ravage.ranges.length < 1) {
-    RFError('[RavagerFrameworkVerifyEAM] Ravager has no ranges. This ravager will be unable to ravage the player.')
+    RFError('[RFVerifyEAM] Ravager has no ranges. This ravager will be unable to ravage the player.')
     return false
   }
   // Track failed ranges
@@ -144,7 +144,7 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
   for (var range of ravager.ravage.ranges) {
     // Check for rangeData
     if (range.length < 2 || !range[1]) {
-      RFError('[RavagerFrameworkVerifyEAM] Invalid range: ', range)
+      RFError('[RFVerifyEAM] Invalid range: ', range)
       failedRanges.push(range)
       continue
     }
@@ -153,39 +153,39 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
     if (rangeData.hasOwnProperty('useCount')) {
       let useCount = rangeData.useCount
       if (typeof useCount == undefined) {
-        RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount defined, but it is set to undefined. Doing so is not well tested. If this is not your last range, the expected behavior is to block incrementing use count, but that is unnecessary, as that is the default bahvior. If this is in your last range, this will result in incrementing the use count by 1 regardless of slot. It is recommended you either remove this setting if it is not in your last range, or set useCount to 0 if this is in your last range and you wish to block incrementing use counts.')
+        RFWarn('[RFVerifyEAM] Range ', range, ' has useCount defined, but it is set to undefined. Doing so is not well tested. If this is not your last range, the expected behavior is to block incrementing use count, but that is unnecessary, as that is the default bahvior. If this is in your last range, this will result in incrementing the use count by 1 regardless of slot. It is recommended you either remove this setting if it is not in your last range, or set useCount to 0 if this is in your last range and you wish to block incrementing use counts.')
       } else if (typeof useCount == 'number') {
         if (useCount == 0)
-          RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to zero. If this is the last range, this will prevent incrementing use counts. If this is not the last range, this setting is unnecessary.')
+          RFDebug('[RFVerifyEAM] Range ', range, ' has useCount set to zero. If this is the last range, this will prevent incrementing use counts. If this is not the last range, this setting is unnecessary.')
         else if (useCount < 0)
-          RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to a negative value. This will result in DECREMENTING use counts instead of incrementing them.')
+          RFDebug('[RFVerifyEAM] Range ', range, ' has useCount set to a negative value. This will result in DECREMENTING use counts instead of incrementing them.')
         else if (useCount > 0)
-          RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use counts by ', useCount, ' for every slot')
+          RFDebug('[RFVerifyEAM] Range ', range, ' will increment use counts by ', useCount, ' for every slot')
         else
-          RFError('[RavagerFrameworkVerifyEAM] wtf just happened? (useCount = number)')
+          RFError('[RFVerifyEAM] wtf just happened? (useCount = number)')
       } else if (typeof useCount == 'object') {
         let hasSlots = false
         if (useCount.hasOwnProperty('ItemVulva')) {
-          RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemVulva by ', useCount.ItemVulva)
+          RFDebug('[RFVerifyEAM] Range ', range, ' will increment use count for ItemVulva by ', useCount.ItemVulva)
           hasSlots = true
         }
         if (useCount.hasOwnProperty('ItemMouth')) {
-          RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemMouth by ', useCount.ItemMouth)
+          RFDebug('[RFVerifyEAM] Range ', range, ' will increment use count for ItemMouth by ', useCount.ItemMouth)
           hasSlots = true
         }
         if (useCount.hasOwnProperty('ItemButt')) {
-          RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemButt by ', useCount.ItemButt)
+          RFDebug('[RFVerifyEAM] Range ', range, ' will increment use count for ItemButt by ', useCount.ItemButt)
           hasSlots = true
         }
         if (useCount.hasOwnProperty('ItemHead')) {
-          RFDebug('[RavagerFrameworkVerifyEAM] Range ', range, ' will increment use count for ItemHead by ', useCount.ItemHead)
+          RFDebug('[RFVerifyEAM] Range ', range, ' will increment use count for ItemHead by ', useCount.ItemHead)
           hasSlots = true
         }
         if (!hasSlots) {
-          RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' defines useCount as a dictionary, but has no slots. This will result in never incrementing use counts.')
+          RFWarn('[RFVerifyEAM] Range ', range, ' defines useCount as a dictionary, but has no slots. This will result in never incrementing use counts.')
         }
       } else {
-        RFError('[RavagerFrameworkVerifyEAM] Range ', range, ' has useCount set to an unknown type. This scenario is untested. If you beleive this is a mistake, please report the issue. Otherwise, it is recommended to fix your definition of useCount.')
+        RFError('[RFVerifyEAM] Range ', range, ' has useCount set to an unknown type. This scenario is untested. If you beleive this is a mistake, please report the issue. Otherwise, it is recommended to fix your definition of useCount.')
       }
     }
     // Track if this range has any EAM settings
@@ -197,7 +197,7 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
       for (var count of rangeData.experiencedTaunts) {
         // Check structure of taunt range
         if (count.length < 2 || !count[1]) {
-          RFWarn('[RavagerFrameworkVerifyEAM] This range has an invalid EAM taunt definition: ', count)
+          RFWarn('[RFVerifyEAM] This range has an invalid EAM taunt definition: ', count)
           if (!eamFailedRanges.includes(count))
             eamFailedRanges.push(count)
           continue
@@ -211,24 +211,24 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
             continue
           let stringsValid = Array.isArray(countData[slot])
           if (!stringsValid) {
-            RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
+            RFWarn('[RFVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
             continue
           }
           for (var string of countData[slot]) {
             stringsValid = stringsValid && typeof string == 'string'
           }
           if (!stringsValid) {
-            RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains taunts which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
+            RFWarn('[RFVerifyEAM] Range ', count, ' contains taunts which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
           }
           hasSlots = true
         }
         // Warn if there's no slots
         if (!hasSlots)
-          RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
+          RFWarn('[RFVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
         tauntsValid = tauntsValid && hasSlots
       }
       if (!tauntsValid)
-        RFWarn('[RavagerFrameworkVerifyEAM] experiencedTaunts is defined for range ' + range[0] + '. Either experiencedTaunts is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
+        RFWarn('[RFVerifyEAM] experiencedTaunts is defined for range ' + range[0] + '. Either experiencedTaunts is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
       hasEAMProps = hasEAMProps || tauntsValid
     }
     // Check for narration
@@ -236,7 +236,7 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
       let narrationValid = true
       for (var count of rangeData.experiencedTaunts) {
         if (count.length < 2 || !count[1]) {
-          RFWarn('[RavagerFrameworkVerifyEAM] This range has an invalid EAM narration definition: ', count)
+          RFWarn('[RFVerifyEAM] This range has an invalid EAM narration definition: ', count)
           if (!eamFailedRanges.includes(count))
             eamFailedRanges.push(count)
           continue
@@ -248,23 +248,23 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
             continue
           let stringsValid = Array.isArray(countData[slot])
           if (!stringsValid) {
-            RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
+            RFWarn('[RFVerifyEAM] Range ', count, ' contains a value which isn\'t an array for slot ', slot)
             continue
           }
           for (var string of countData[slot]) {
             stringsValid = stringsValid && typeof string == 'string'
           }
           if (!stringsValid) {
-            RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' contains narrations which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
+            RFWarn('[RFVerifyEAM] Range ', count, ' contains narrations which are not strings in slot "' + slot + '". This isn\'t necessarily fatal, but should still be fixed.')
           }
           hasSlots = true
         }
         if (!hasSlots)
-          RFWarn('[RavagerFrameworkVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
+          RFWarn('[RFVerifyEAM] Range ', count, ' doesn\'t appear to have any slots assigned. A use count range with no slots assigned is either defined wrong, or shouldn\'t be defined. Check for earlier errors or remove this range.')
         narrationValid = narrationValid && hasSlots
       }
       if (!narrationValid)
-        RFWarn('[RavagerFrameworkVerifyEAM] experiencedNarration is defined for range ' + range[0] + '. Either experiencedNarration is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
+        RFWarn('[RFVerifyEAM] experiencedNarration is defined for range ' + range[0] + '. Either experiencedNarration is invalid or shouldn\'t be defined. Please check for previous errors and warnings.')
       hasEAMProps = hasEAMProps || narrationValid
     }
     //
@@ -272,38 +272,38 @@ window.RavagerFrameworkVerifyEAM = function(ravagerName) {
     let hasAlways = rangeData.hasOwnProperty('experiencedAlways')
     //
     if (!hasEAMProps && (hasChance || hasAlways)) {
-      RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, 'defines EAM chance or always, but does not appear to have any valid taunts or narrations. Without taunts or narrations to use, EAM text will not be used, and the chance and always settings are pointless')
+      RFWarn('[RFVerifyEAM] Range ', range, 'defines EAM chance or always, but does not appear to have any valid taunts or narrations. Without taunts or narrations to use, EAM text will not be used, and the chance and always settings are pointless')
     }
     //
     hasEAMProps = hasEAMProps || hasChance || hasAlways
     //
     if (hasChance && hasAlways && rangeData.experiencedAlways) {
-      RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' defines both experiencedChance and experiencedAlways. experiencedAlways overrides experiencedChance, so it\'s pointless to have them both declared at the same time.')
+      RFWarn('[RFVerifyEAM] Range ', range, ' defines both experiencedChance and experiencedAlways. experiencedAlways overrides experiencedChance, so it\'s pointless to have them both declared at the same time.')
       continue
     }
     // Check for chance
     if (hasChance && rangeData.experiencedChance <= 0) {
-      RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' has experiencedChance set to or below 0. This setting will result in EAM text never being used unless the user overrides your ravager\'s preference.')
+      RFWarn('[RFVerifyEAM] Range ', range, ' has experiencedChance set to or below 0. This setting will result in EAM text never being used unless the user overrides your ravager\'s preference.')
     }
     // Check for always
     if (hasAlways && !rangeData.experiencedAlways) {
-      RFWarn('[RavagerFrameworkVerifyEAM] Range ', range, ' has experiencedAlways set to false. Doing so is entirely unneeded, as this setting only has any effect when true.')
+      RFWarn('[RFVerifyEAM] Range ', range, ' has experiencedAlways set to false. Doing so is entirely unneeded, as this setting only has any effect when true.')
     }
     hasEAMRanges = hasEAMRanges || hasEAMProps
   }
   // Bail on failed ranges
   if (failedRanges.length > 0) {
-    RFError('[RavagerFrameworkVerifyEAM] The following ranges are invalid and may cause crashes: ', failedRanges)
+    RFError('[RFVerifyEAM] The following ranges are invalid and may cause crashes: ', failedRanges)
     return false
   }
   // Bail of EAM failures in ranges
   if (eamFailedRanges.length > 0) {
-    RFError('[RavagerFrameworkVerifyEAM] The following ranges have invalid EAM properties and may cause crashes: ', eamFailedRanges)
+    RFError('[RFVerifyEAM] The following ranges have invalid EAM properties and may cause crashes: ', eamFailedRanges)
     return false
   }
   //
   if (!hasEAMRanges) {
-    RFError('[RavagerFrameworkVerifyEAM] Ravager doesn\'t appear to have any ranges with valid EAM properties.')
+    RFError('[RFVerifyEAM] Ravager doesn\'t appear to have any ranges with valid EAM properties.')
     return false
   }
   return true
@@ -336,7 +336,7 @@ window.RFPlayerCanSeeEnemy = function(entity) {
 
 // Conditions helper
 // TODO: Rename to RFAddCondition
-window.RavagerFrameworkAddCondition = function(key, func) {
+window.RFAddCondition = function(key, func) {
   if (!RavagerData.conditions) {
     RavagerData.conditions = {}
     if (!RavagerData.conditions) {

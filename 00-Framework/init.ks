@@ -36,7 +36,7 @@ let debugCallbacks = {
   }
 }
 for (var key in debugCallbacks) {
-  if (!RavagerAddCallback(key, debugCallbacks[key]))
+  if (!RFAddCallback(key, debugCallbacks[key]))
     RFError('[Ravager Framework] Failed to add debug callback: ', key)
 }
 

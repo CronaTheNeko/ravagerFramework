@@ -16,7 +16,7 @@ function wolfgirlRavagerAllRange(entity, target) {
 		KinkyDungeonSendTextMessage(5, RavagerData.functions.NameFormat("EnemyCName fixes a collar around your neck...", entity), "#ff44ff", 3);
 	}
 }
-if (!RavagerAddCallback('wolfgirlRavagerAllRangeCallback', wolfgirlRavagerAllRange)) {
+if (!RFAddCallback('wolfgirlRavagerAllRangeCallback', wolfgirlRavagerAllRange)) {
 	RFError('[Ravager Framework][Wolfgirl Ravager] Failed to add wolfgirlRavagerAllRangeCallback!')
 }
 // Increase submission chance if wearing shock module
@@ -27,7 +27,7 @@ function wolfgirlSubmitChanceModifier(entity, target, baseSubmitChance) {
 	}
 	return baseSubmitChance
 }
-if (!RavagerAddCallback('wolfgirlSubmitChanceModifierCallback', wolfgirlSubmitChanceModifier)) {
+if (!RFAddCallback('wolfgirlSubmitChanceModifierCallback', wolfgirlSubmitChanceModifier)) {
 	RFError('[Ravager Framework][Wolfgirl Ravager] Failed to add wolfgirlSubmitChanceModifierCallback!')
 }
 // Workaround for not being able to get the spell working well with ravaging
@@ -39,7 +39,7 @@ function wolfgirlRavagerEffect(entity, target) {
 	}
 	return false
 }
-if (!RavagerAddCallback('wolfgirlRavagerEffectCallback', wolfgirlRavagerEffect)) {
+if (!RFAddCallback('wolfgirlRavagerEffectCallback', wolfgirlRavagerEffect)) {
 	RFError('[Ravager Framework][Wolfgirl Ravager] Failed to add wolfgirlRavagerEffectCallback!')
 }
 // Outfit declaration

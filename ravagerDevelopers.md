@@ -341,7 +341,7 @@ Notes:
 - If you simply want to increment the player's use count by one at the end of a session, regardless of slot, this value is unnecessary since that is the framework's default behavior.
 - If you'd like to increment the player's use count for some slots and not others, set this value to a dictionary which has the slots you want to increment, while omitting the slots you don't want to increment
 - If you'd like to not increment the player's use count at all, set this value to 0
-- To validate you ravager's EAM settings, use the browser console and call `RavagerFrameworkVerifyEAM(ravagerName)` with your ravager's name
+- To validate you ravager's EAM settings, use the browser console and call `RFVerifyEAM(ravagerName)` with your ravager's name
 
 Examples:
 - Incrementing use count by two for all slots: `useCount: 2`
@@ -370,7 +370,7 @@ Notes:
 - Each slot is optional, and there shouldn't be any issue in omitting any slots from these taunt lists.
 - Just like [Taunts](#taunts), the taunt that will be used is chosen randomly from the given array of taunts.
 - Just like [Taunts](#taunts), the string "EnemyName" in your taunts will be replaced by the ravager's name.
-- To validate you ravager's EAM settings, use the browser console and call `RavagerFrameworkVerifyEAM(ravagerName)` with your ravager's name
+- To validate you ravager's EAM settings, use the browser console and call `RFVerifyEAM(ravagerName)` with your ravager's name
 
 Example:
 ```
@@ -404,7 +404,7 @@ Notes:
 - Each slot is optional, and there shouldn't be any issue in omitting any slots from these narration lists.
 - Just like [Narration](#narration), the narration that will be used is chosen randomly from the given array of narrations.
 - Just like [Narration](#narration), the string "EnemyName" in your narrations will be replaced by the ravager's name.
-- To validate you ravager's EAM settings, use the browser console and call `RavagerFrameworkVerifyEAM(ravagerName)` with your ravager's name
+- To validate you ravager's EAM settings, use the browser console and call `RFVerifyEAM(ravagerName)` with your ravager's name
 
 Example:
 ```
@@ -436,7 +436,7 @@ Valid values: Decimals between `0.0` and `1.0`, representing a `0%` to `100%` ch
 Notes:
 - This value overrides the mod config preference for chance-based/guaranteed use of Experience Aware text, but can also be overridden by the mod config if the user desires.
 - When neither this property nor `rangeData.experiencedAlways` are set, the use of Experience Aware text is left up to the relevant mod configs and controlled by the user. This means that Experience Aware text being used is determined by either the user-controlled chance or always, based on which the user prefers.
-- To validate you ravager's EAM settings, use the browser console and call `RavagerFrameworkVerifyEAM(ravagerName)` with your ravager's name
+- To validate you ravager's EAM settings, use the browser console and call `RFVerifyEAM(ravagerName)` with your ravager's name
 
 #### Experience Aware Mode Always
 Makes a ravager prefer to always use Experience Aware Mode taunts and narration.
@@ -452,7 +452,7 @@ Default value: false
 Notes:
 - This value overrides the mod config preference for chance-based/guaranteed use of Experience Aware text, but can also be overridden by the mod config if the user desires.
 - When neither this property nor `rangeData.experiencedChance` are set, the use of Experience Aware text is left up to the relevant mod configs and controlled by the user. This means that Experience Aware text being used is determined by either the user-controlled chance or always, based on which the user prefers.
-- To validate you ravager's EAM settings, use the browser console and call `RavagerFrameworkVerifyEAM(ravagerName)` with your ravager's name
+- To validate you ravager's EAM settings, use the browser console and call `RFVerifyEAM(ravagerName)` with your ravager's name
 
 ##### Callback
 A reference to a callback function to be called during a specific range. Allows you to do extra stuff after all the normal ravaging actions for a specific range.
@@ -482,15 +482,15 @@ The following are the currently available callbacks that you can bind functions 
 
 For security, the callback functions cannot be declared directly in the enemy declaration. The callback keys in the ravager's declaration are strings which reference the name of your callback. 
 
-To add a callback, define your function and add it via the [RavagerAddCallback helper](#ravageraddcallback-helper) function, and set the corresponding callback property in your ravager to the callback name you gave to `RavagerAddCallback`.
+To add a callback, define your function and add it via the [RFAddCallback helper](#rfaddcallback-helper) function, and set the corresponding callback property in your ravager to the callback name you gave to `RFAddCallback`.
 
 Note: The parameters given to each callback are not set in stone. Incase of any changes to the parameter list, I will attempt to ensure the following:
 1) Do not remove any parameters without notice in some form.
 2) If a value provided as a parameter is no longer in use/available to the framework, provide an empty/default value of the same type, which will hopefully avoid breakages
 3) Any new parameters added will be added to the end of the parameter list
 
-#### RavagerAddCallback helper
-When adding callbacks, it is recommended to use the function `RavagerAddCallback`. This function is globally available, so you simply need to call it with the required parameters for your callback to be added in the way the framework expects it to be.
+#### RFAddCallback helper
+When adding callbacks, it is recommended to use the function `RFAddCallback`. This function is globally available, so you simply need to call it with the required parameters for your callback to be added in the way the framework expects it to be.
 
 Parameters:
 1) `callbackKey` - The name your callback will be referenced by. This needs to match the value of the corresponding callback property in your ravager.
@@ -503,7 +503,7 @@ Recommended usage:
 function myCallback(x, y, z) {
   ...
 }
-if (!RavagerAddCallback('exampleCallbackName', myCallback)) {
+if (!RFAddCallback('exampleCallbackName', myCallback)) {
   // Print an error about your callback or do something to handle its absence
 }
 ```
@@ -515,13 +515,13 @@ Note 2: This helper function does some checks to ensure the keys can be stored c
 #### Manually adding a callback
 While there's nothing stopping you from avoiding the helper function, it is not recommended, as the helper function is there to ensure your callbacks get placed where the framework expects them to be and that location is not set in stone.
 
-Nevertheless, you may still want to do so. For example, if `RavagerAddCallback` returns false to indicate your callback was not added, you may want to attempt to add it yourself.
+Nevertheless, you may still want to do so. For example, if `RFAddCallback` returns false to indicate your callback was not added, you may want to attempt to add it yourself.
 
 Here's the steps to add a callback manually:
 1) Make sure the dictionary `KDEventMapEnemy['ravagerCallbacks']` exists. This should exist, unless something has gone quite wrong with the framework, as the framework adds multiple of its own debug/example callbacks during initialization.
 2) Set the value of `KDEventMapEnemy['ravagerCallbacks'][yourCallbackKey]` to be your function, either by referencing the name of a function you've declared or using the `(x, y, z) => { code }` syntax.
 
-If you are experiencing issues with this method, please try using `RavagerAddCallback` and check your parameters before filing a bug report.
+If you are experiencing issues with this method, please try using `RFAddCallback` and check your parameters before filing a bug report.
 
 #### Effect callback
 Property path: `enemy.ravage.effectCallback`

@@ -15,7 +15,7 @@ function slimegirlRavagerAllRange(entity, target) {
 		}
 	}
 }
-if (!RavagerAddCallback('slimegirlRavagerAllRangeCallback', slimegirlRavagerAllRange)) {
+if (!RFAddCallback('slimegirlRavagerAllRangeCallback', slimegirlRavagerAllRange)) {
 	RFError('[Ravager Framework][Slimegirl Ravager] Failed to add slimegirlRavagerAllRangeCallback!')
 }
 // Outfits

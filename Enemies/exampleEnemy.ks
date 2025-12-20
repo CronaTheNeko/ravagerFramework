@@ -1,6 +1,6 @@
 /**
 	* An example of adding a callback
-	* For consistency and simplicity, this example uses helper function `RavagerAddCallback(key, func)`
+	* For consistency and simplicity, this example uses helper function `RFAddCallback(key, func)`
 	* The `key` parameter is the name of your callback, and is what you will put in the relavant `*Callback` value of your ravager definition
 	* The `func` parameter is the function that will be executed
 	* Note: Please keep your callback name reasonably unique in order to avoid overwriting another ravager's callback function
@@ -10,7 +10,7 @@ function exampleRavagerRange1(entity, target, itemGroup) {
 	console.log('[Ravager Framework] This is a range 1 callback function for the ExampleRavager! Here\'s the values you have access to in this function: Ravaging entity: ', entity, '; Target: ', target, '; itemGroup: ', itemGroup)
 }
 // Use the helper to add your callback to the game. The helper returns true if the callback was successfully added, and false if adding it failed
-if (!RavagerAddCallback('exampleRavagerRange1', exampleRavagerRange1)) {
+if (!RFAddCallback('exampleRavagerRange1', exampleRavagerRange1)) {
 	console.error('[Ravager Framework][Example Ravager] Failed to add exampleRavagerRange1!')
 }
 
@@ -128,7 +128,7 @@ let exampleEnemy = {
 		 * Ravaging callbacks
 		 * If callback values are not a string, they will not be used to find a callback.
 		 * If you want to use a callback, set the relavant value to the string key of your function.
-		 * See RavagerAddCallback function near the top of this file to add your callbacks.
+		 * See RFAddCallback function near the top of this file to add your callbacks.
 		 * I will add a debugging/testing callback for every callback available for the sake of figuring out what values you'll have available to your callbacks. These will be the default values for this example enemy.
 		*/
 
