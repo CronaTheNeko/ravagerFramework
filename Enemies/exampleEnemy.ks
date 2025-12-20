@@ -7,11 +7,11 @@
   */
 // Callback declaration. The parameters your callback is given depend on what section of the framework code is triggering your callback. Explanations in 'ravagerDevelopers.md'
 function exampleRavagerRange1(entity, target, itemGroup) {
-	console.log('[Ravager Framework] This is a range 1 callback function for the ExampleRavager! Here\'s the values you have access to in this function: Ravaging entity: ', entity, '; Target: ', target, '; itemGroup: ', itemGroup)
+	RFInfo('[Ravager Framework] This is a range 1 callback function for the ExampleRavager! Here\'s the values you have access to in this function: Ravaging entity: ', entity, '; Target: ', target, '; itemGroup: ', itemGroup)
 }
 // Use the helper to add your callback to the game. The helper returns true if the callback was successfully added, and false if adding it failed
 if (!RFAddCallback('exampleRavagerRange1', exampleRavagerRange1)) {
-	console.error('[Ravager Framework][Example Ravager] Failed to add exampleRavagerRange1!')
+	RFError('[Ravager Framework][Example Ravager] Failed to add exampleRavagerRange1!')
 }
 
 

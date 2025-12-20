@@ -1,8 +1,8 @@
 // Moved the All Range Callback so it'll actually work
 function slimegirlRavagerAllRange(entity, target) {
-	console.log(entity)
-	console.log(entity.Enemy.ravage.addSlimeChance)
-	console.log(KDModSettings['RavagerFramework'].ravagerSlimeAddChance)
+	RFTrace(entity)
+	RFTrace(entity.Enemy.ravage.addSlimeChance)
+	RFTrace(KDModSettings['RavagerFramework'].ravagerSlimeAddChance)
 	let roll = Math.random() < entity.Enemy.ravage.addSlimeChance
 	if(roll) {
 		let restraintAdd = KinkyDungeonGetRestraint({tags: ["slimeRestraintsRandom"]}, MiniGameKinkyDungeonLevel + 1, KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint])
