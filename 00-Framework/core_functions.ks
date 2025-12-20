@@ -1,6 +1,7 @@
 // Function to get a mod setting value
-// If settings are undefined, it'll return the default value given to KDModConfigs
-// If there is not matching value given to KDModConfigs, it'll return undefined
+// If KDModSettings.RavagerFramework is unavailable, we're likely in the middle of initialization, and this will attempt to return the matching value saved in localStorage
+// If there's no setting in localStorage, user hasn't loaded this mod before (or has cleared data from the browser), and this will return the default value defined in RavagerData.ModConfig
+// If there's no matching default value, it'll return undefined
 window.RavagerGetSetting = function(refvar) {
   if (refvar == "ravagerDebug" && _RavagerFrameworkDebugEnabled)
     return true
