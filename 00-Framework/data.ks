@@ -532,6 +532,13 @@ window.RavagerData = {
     },
     AnnounceRavagers: function(e, enemy, data) {
       RFDebug(`[Ravager Framework][AnnounceRavagers]: { ${KinkyDungeonCurrentTick} }  ${enemy.Enemy.name} (id ${enemy.id}) at (${enemy.x}, ${enemy.y})`)
+      // Count ravagers for post-tick message
+      if (!RavagerData.Variables.RavagerCount)
+        RavagerData.Variables.RavagerCount = {}
+      if (!RavagerData.Variables.RavagerCount[enemy.Enemy.name])
+        RavagerData.Variables.RavagerCount[enemy.Enemy.name] = 1
+      else
+        RavagerData.Variables.RavagerCount[enemy.Enemy.name]++
     },
     SetAnnounceRavagers: function(enabled) {
       RFDebug(`[Ravager Framework][RFControl][SetAnnounceRavagers]: Setting ravager announcement to ${enabled} ...`)
@@ -542,11 +549,44 @@ window.RavagerData = {
         KDEventMapEnemy.tickAfter["RavagerFrameworkAnnounceRavagers"] = RavagerData.functions.AnnounceRavagers
         for (let e of enemies)
           e.events.push({ trigger: "tickAfter", type: "RavagerFrameworkAnnounceRavagers" })
+        // Enable post-tick announce message in text log
+        RavagerData.functions.KinkyDungeonAdvanceTime = KinkyDungeonAdvanceTime
+        window.KinkyDungeonAdvanceTime = RavagerData.functions.RavagerFrameworkAdvanceTime
       } else {
         delete KDEventMapGeneric.tick.RavagerFrameworkTrackPlayer
         delete KDEventMapEnemy.tickAfter.RavagerFrameworkAnnounceRavagers
+        // Disable post-tick announce message in text log
+        window.KinkyDungeonAdvanceTime = RavagerData.functions.KinkyDungeonAdvanceTime
       }
       RavagerData.Variables.RFControl.AnnounceRavagers = enabled
+    },
+    // Wrapper for KinkyDungeonAdvanceTime to add post-tick ravager count messages
+    RavagerFrameworkAdvanceTime: function(...args) {
+      RavagerData.functions.KinkyDungeonAdvanceTime(...args)
+      if (Object.keys(RavagerData.Variables.RavagerCount).length) {
+        var count = {}
+        for (var e of Object.entries(RavagerData.Variables.RavagerCount)) {
+          var [k, v] = e
+          var name = k.replace(/Ravager[0-9]*/, "")
+          if (!count[name])
+            count[name] = v
+          else
+            count[name] += v
+        }
+        var actionMsg = ""
+        var consoleMsg = "[Ravager Count]: { "
+        for (var e of Object.entries(count)) {
+          var [k, v] = e
+          actionMsg += `${k.substring(0, 4)}: ${v}, `
+          consoleMsg += `${k}: ${v}, `
+        }
+        actionMsg = actionMsg.substring(0, actionMsg.length - 2)
+        consoleMsg = consoleMsg.substring(0, consoleMsg.length - 2) + " }"
+        KinkyDungeonSendActionMessage(100000, actionMsg, "#f6f", 1)
+        RFDebug(consoleMsg)
+      }
+      // Clear ravager count
+      RavagerData.Variables.RavagerCount = {}
     },
     // Custom version of KinkyDungeonGetRestraint so I can have name-based exclusions and per-item weight modifiers
     // All the same params as KinkyDungeonGetRestraint, but with the addition of:
