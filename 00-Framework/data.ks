@@ -563,7 +563,7 @@ window.RavagerData = {
     // Wrapper for KinkyDungeonAdvanceTime to add post-tick ravager count messages
     RavagerFrameworkAdvanceTime: function(...args) {
       RavagerData.functions.KinkyDungeonAdvanceTime(...args)
-      if (Object.keys(RavagerData.Variables.RavagerCount).length) {
+      if (RavagerData.Variables.RavagerCount && Object.keys(RavagerData.Variables.RavagerCount).length) {
         var count = {}
         for (var e of Object.entries(RavagerData.Variables.RavagerCount)) {
           var [k, v] = e
