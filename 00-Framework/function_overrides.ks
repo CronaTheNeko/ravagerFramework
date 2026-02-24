@@ -284,6 +284,21 @@ KinkyDungeonHandleClick = function(event) {
     // Set ret so it'll play a sound
     ret = true
   }
+  // Enable sounds for my custom buttons
+  if (!ret) {
+    for (let b of Object.keys(KDButtonsCache).filter(v => v.startsWith("RFControl") || v.startsWith("ravager"))) {
+      let btn = KDButtonsCache[b]
+      if (
+        btn &&
+        btn.enabled &&
+        MouseIn(btn.Left, btn.Top, btn.Width, btn.Height)
+      ) {
+        RFTrace(`[RF][KinkyDungeonHandleClick]: Clicked on button ${b}. Sound will be made.`)
+        ret = true
+        break
+      }
+    }
+  }
   //
   return ret
 }
