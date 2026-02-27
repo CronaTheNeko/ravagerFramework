@@ -194,3 +194,17 @@ const keys = {
 }
 // Gives the enemy to a function that handles adding stronger variations
 RFPushEnemiesWithStrongVariations(banditRavager, 4, keys)
+// I'd like less bandits on the first floor, and this seems easier than figuring out a way to modify spawn weights based on the current level
+KDEventMapGeneric.postMapgen.RFRemoveExtraBandits = function(e, data) {
+	if (RavagerData.Variables.RFControl.ControlBanditsFirstLevel && MiniGameKinkyDungeonLevel == 1) {
+		let bandits = KDNearbyEnemies(0, 0, 10000).filter(v => v.Enemy.name == "BanditRavager")
+		let rand = RFArrayRand(bandits)
+		while (bandits.length > RavagerData.Variables.RFControl.MaxStartingBandits) {
+			RFDebug(`[Ravager Framework][RFRemoveExtraBandits]: Removing pre-spawned bandit (ID: ${rand.id})`)
+			KinkyDungeonSendActionMessage(100000, `Removing Bandit ${rand.id}`, "#f6f", 3)
+			KDRemoveEntity(rand)
+			bandits = KDNearbyEnemies(0, 0, 10000).filter(v => v.Enemy.name == "BanditRavager")
+			rand = RFArrayRand(bandits)
+		}
+	}
+}

@@ -200,250 +200,421 @@ window.RavagerData = {
       return string
     },
     // Draws the ravager control menu
-    // Wanna rework this to dynamically place the buttons
     RFControlRun: function() {
       // Draw custom background
       KDDraw(kdcanvas, kdpixisprites, "bg", `${KinkyDungeonRootDirectory}Backgrounds/${RavagerData.Variables.RFControl.Background}.png`, 0, 0, CanvasWidth, CanvasHeight, undefined, { zIndex: -115 });
-      // All the buttons we'll draw
-      const buttons = [
-        {
-          name: "RFControlBack",
-          func: () => {
-            RFDebug("[Ravager Framework][RFControlRun] Leaving ravager control")
-            RavagerData.Variables.State = RavagerData.Variables.PrevState
-            RavagerData.Variables.DrawState = RavagerData.Variables.PrevDrawState
+      if (RavagerData.Variables.RFControl.UseOldRFControl) {
+        // All the buttons we'll draw
+        const buttons = [
+          {
+            name: "RFControlBack",
+            func: () => {
+              RFDebug("[Ravager Framework][RFControlRun] Leaving ravager control")
+              RavagerData.Variables.State = RavagerData.Variables.PrevState
+              RavagerData.Variables.DrawState = RavagerData.Variables.PrevDrawState
+            },
+            enabled: true,
+            Left: 1650,
+            Top: 900,
+            Width: 300,
+            Height: 64,
+            Label: "Return"
           },
-          enabled: true,
-          Left: 1650,
-          Top: 900,
-          Width: 300,
-          Height: 64,
-          Label: "Return"
-        },
-        {
-          name: "RFControlRevertFunctions",
-          func: () => { RavagerFrameworkRevertFunctions() },
-          enabled: true,
-          Left: 550,
-          Top: 496,
-          Width: 300,
-          Height: 64,
-          Label: "Revert functions"
-        },
-        {
-          name: "RFControlEndIWantToHelpDebugMode",
-          func: () => { KDModSettings.RavagerFramework.ravagerHelpDebug = false; RavagerFrameworkIWantToHelpDebug('Finish') },
-          enabled: KDModSettings?.RavagerFramework?.ravagerHelpDebug,
-          Left: 550,
-          Top: 792,
-          Width: 300,
-          Height: 64,
-          Label: "End Debug Log"
-        },
-        {
-          name: "RFControlSaveFunctionOverrides",
-          func: () => { RavagerData.functions.SaveFunctionOverrides(); },
-          enabled: true,
-          Left: 1100,
-          Top: 200,
-          Width: 300,
-          Height: 64,
-          Label: "Save Overridden Functions"
-        },
-        {
-          name: "RFControlCheckFunctionOverrides",
-          func: () => { RavagerData.functions.CheckFunctionOverrides(); },
-          enabled: true,
-          Left: 1100,
-          Top: 274,
-          Width: 300,
-          Height: 64,
-          Label: "Check Overridden Functions"
-        }
-      ]
-      // All the checkboxes we'll draw
-      const checkboxes = [
-        {
-          name: "RFControlDebug",
-          func: () => { RavagerFrameworkToggleDebug() },
-          Left: 550,
-          Top: 200,
-          Disabled: false,
-          Text: "Heavy Debugging",
-          IsChecked: _RavagerFrameworkDebugEnabled,
-          enabled: true
-        },
-        {
-          name: "RFControlNameFormatDebug",
-          func: (_bdata) => {
-            RavagerData.Variables.RFControl.NameFormatDebug = !RavagerData.Variables.RFControl.NameFormatDebug
+          {
+            name: "RFControlRevertFunctions",
+            func: () => { RavagerFrameworkRevertFunctions() },
+            enabled: true,
+            Left: 550,
+            Top: 496,
+            Width: 300,
+            Height: 64,
+            Label: "Revert functions"
           },
-          Left: 550,
-          Top: 274,
-          Disabled: false,
-          Text: "Debug NameFormat function",
-          IsChecked: RavagerData.Variables.RFControl.NameFormatDebug,
-          enabled: true
-        },
-        {
-          name: "RFControlExposeMimics",
-          func: (_bdata) => {
-            RavagerData.functions.MimicExposure(!RavagerData.Variables.ExposeMimics)
+          {
+            name: "RFControlEndIWantToHelpDebugMode",
+            func: () => { KDModSettings.RavagerFramework.ravagerHelpDebug = false; RavagerFrameworkIWantToHelpDebug('Finish') },
+            enabled: KDModSettings?.RavagerFramework?.ravagerHelpDebug,
+            Left: 550,
+            Top: 792,
+            Width: 300,
+            Height: 64,
+            Label: "End Debug Log"
           },
-          Left: 550,
-          Top: 348,
-          Disabled: RavagerGetSetting("ravagerDisableMimic"),
-          Text: "Expose Mimics",
-          IsChecked: RavagerData.Variables.ExposeMimics,
-          enabled: !RavagerGetSetting("ravagerDisableMimic"),
-          options: {
-            // HoveringText: "Enable to force the mimic spoiler bubble to be constantly shown" // Apparently HoveringText is only shown within the bounds of the button. How can I make it do a popup?
+          {
+            name: "RFControlSaveFunctionOverrides",
+            func: () => { RavagerData.functions.SaveFunctionOverrides(); },
+            enabled: true,
+            Left: 1100,
+            Top: 200,
+            Width: 300,
+            Height: 64,
+            Label: "Save Overridden Functions"
+          },
+          {
+            name: "RFControlCheckFunctionOverrides",
+            func: () => { RavagerData.functions.CheckFunctionOverrides(); },
+            enabled: true,
+            Left: 1100,
+            Top: 274,
+            Width: 300,
+            Height: 64,
+            Label: "Check Overridden Functions"
           }
-        },
-        {
-          name: "RFControlPassiveMimic",
-          func: () => {
-            RavagerData.functions.MimicPassive(!RavagerData.Variables.RFControl.PassiveMimics)
+        ]
+        // All the checkboxes we'll draw
+        const checkboxes = [
+          {
+            name: "RFControlDebug",
+            func: () => { RavagerFrameworkToggleDebug() },
+            Left: 550,
+            Top: 200,
+            Disabled: false,
+            Text: "Heavy Debugging",
+            IsChecked: _RavagerFrameworkDebugEnabled,
+            enabled: true
           },
-          Left: 550,
-          Top: 422,
-          Disabled: RavagerGetSetting("ravagerDisableMimic"),
-          Text: "Oblivious Mimics",
-          IsChecked: RavagerData.Variables.RFControl.PassiveMimics,
-          enabled: !RavagerGetSetting("ravagerDisableMimic"),
-          options: {
-            // HoveringText: "Enable to make mimic ravagers never notice the player" // Apparently HoveringText is only shown within the bounds of the button. How can I make it do a popup?
+          {
+            name: "RFControlNameFormatDebug",
+            func: (_bdata) => {
+              RavagerData.Variables.RFControl.NameFormatDebug = !RavagerData.Variables.RFControl.NameFormatDebug
+            },
+            Left: 550,
+            Top: 274,
+            Disabled: false,
+            Text: "Debug NameFormat function",
+            IsChecked: RavagerData.Variables.RFControl.NameFormatDebug,
+            enabled: true
+          },
+          {
+            name: "RFControlExposeMimics",
+            func: (_bdata) => {
+              RavagerData.functions.MimicExposure(!RavagerData.Variables.RFControl.ExposeMimics)
+            },
+            Left: 550,
+            Top: 348,
+            Disabled: RavagerGetSetting("ravagerDisableMimic"),
+            Text: "Expose Mimics",
+            IsChecked: RavagerData.Variables.RFControl.ExposeMimics,
+            enabled: !RavagerGetSetting("ravagerDisableMimic"),
+            options: {
+              // HoveringText: "Enable to force the mimic spoiler bubble to be constantly shown" // Apparently HoveringText is only shown within the bounds of the button. How can I make it do a popup?
+            }
+          },
+          {
+            name: "RFControlPassiveMimic",
+            func: () => {
+              RavagerData.functions.MimicPassive(!RavagerData.Variables.RFControl.PassiveMimics)
+            },
+            Left: 550,
+            Top: 422,
+            Disabled: RavagerGetSetting("ravagerDisableMimic"),
+            Text: "Oblivious Mimics",
+            IsChecked: RavagerData.Variables.RFControl.PassiveMimics,
+            enabled: !RavagerGetSetting("ravagerDisableMimic"),
+            options: {
+              // HoveringText: "Enable to make mimic ravagers never notice the player" // Apparently HoveringText is only shown within the bounds of the button. How can I make it do a popup?
+            }
+          },
+          {
+            name: "RFControlTrackMimics",
+            func: () => {
+              RavagerData.functions.SetTrackMimics(!RavagerData.Variables.RFControl.TrackMimics)
+            },
+            Left: 550,
+            Top: 570,
+            Disabled: RavagerGetSetting("ravagerDisableMimic"),
+            Text: "Track Mimics",
+            IsChecked: RavagerData.Variables.RFControl.TrackMimics,
+            enabled: !RavagerGetSetting("ravagerDisableMimic")
+          },
+          {
+            name: "RFControlAnnounceRavagers",
+            func: () => {
+              RavagerData.functions.SetAnnounceRavagers(!RavagerData.Variables.RFControl.AnnounceRavagers)
+            },
+            Left: 550,
+            Top: 644,
+            Disabled: RavagerGetSetting("ravagerDisableBandit") && RavagerGetSetting("ravagerDisableWolfgirl") && RavagerGetSetting("ravagerDisableSlimegirl") && RavagerGetSetting("ravagerDisableTentaclePit") && RavagerGetSetting("ravagerDisableMimic"),
+            Text: "Announce Ravagers",
+            IsChecked: RavagerData.Variables.RFControl.AnnounceRavagers,
+            enabled: !(RavagerGetSetting("ravagerDisableBandit") && RavagerGetSetting("ravagerDisableWolfgirl") && RavagerGetSetting("ravagerDisableSlimegirl") && RavagerGetSetting("ravagerDisableTentaclePit") && RavagerGetSetting("ravagerDisableMimic"))
+          },
+          {
+            name: "RFControlDebugVanillaTextOverrides",
+            func: () => {
+              RavagerData.Variables.RFControl.DebugVanillaTextOverrides = !RavagerData.Variables.RFControl.DebugVanillaTextOverrides
+            },
+            Left: 550,
+            Top: 718,
+            Disabled: false,
+            Text: "Debug Text Replacements",
+            IsChecked: RavagerData.Variables.RFControl.DebugVanillaTextOverrides,
+            enabled: true,
+          },
+          {
+            name: "RFControlControlBanditsFirstLevel",
+            func: () => {
+              RavagerData.Variables.RFControl.ControlBanditsFirstLevel = !RavagerData.Variables.RFControl.ControlBanditsFirstLevel
+            },
+            Left: 1100,
+            Top: 348,
+            Disabled: false,
+            Text: "Control 1st lvl Bandit #s",
+            IsChecked: RavagerData.Variables.RFControl.ControlBanditsFirstLevel,
+            enabled: !RavagerGetSetting("ravagerDisableBandit")
+          },
+          {
+            name: "RFControlUseOldRFControlLayout",
+            func: () => {
+              RavagerData.Variables.RFControl.UseOldRFControl = !RavagerData.Variables.RFControl.UseOldRFControl
+              return true
+            },
+            Left: 1100,
+            Top: 422,
+            Disabled: false,
+            Text: "Use old RFControl layout",
+            IsChecked: RavagerData.Variables.RFControl.UseOldRFControl,
+            enabled: true
+          },
+        ]
+        // All the labels we'll draw
+        const labels = [
+          {
+            Text: "Ravager Controls",
+            X: 1250,
+            Y: 100,
+            Width: 1000
           }
-        },
-        {
-          name: "RFControlTrackMimics",
-          func: () => {
-            RavagerData.functions.SetTrackMimics(!RavagerData.Variables.RFControl.TrackMimics)
-          },
-          Left: 550,
-          Top: 570,
-          Disabled: RavagerGetSetting("ravagerDisableMimic"),
-          Text: "Track Mimics",
-          IsChecked: RavagerData.Variables.RFControl.TrackMimics,
-          enabled: !RavagerGetSetting("ravagerDisableMimic")
-        },
-        {
-          name: "RFControlAnnounceRavagers",
-          func: () => {
-            RavagerData.functions.SetAnnounceRavagers(!RavagerData.Variables.RFControl.AnnounceRavagers)
-          },
-          Left: 550,
-          Top: 644,
-          Disabled: RavagerGetSetting("ravagerDisableBandit") && RavagerGetSetting("ravagerDisableWolfgirl") && RavagerGetSetting("ravagerDisableSlimegirl") && RavagerGetSetting("ravagerDisableTentaclePit") && RavagerGetSetting("ravagerDisableMimic"),
-          Text: "Announce Ravagers",
-          IsChecked: RavagerData.Variables.RFControl.AnnounceRavagers,
-          enabled: !(RavagerGetSetting("ravagerDisableBandit") && RavagerGetSetting("ravagerDisableWolfgirl") && RavagerGetSetting("ravagerDisableSlimegirl") && RavagerGetSetting("ravagerDisableTentaclePit") && RavagerGetSetting("ravagerDisableMimic"))
-        },
-        {
-          name: "RFControlDebugVanillaTextOverrides",
-          func: () => {
-            RavagerData.Variables.RFControl.DebugVanillaTextOverrides = !RavagerData.Variables.RFControl.DebugVanillaTextOverrides
-          },
-          Left: 550,
-          Top: 718,
-          Disabled: false,
-          Text: "Debug Text Replacements",
-          IsChecked: RavagerData.Variables.RFControl.DebugVanillaTextOverrides,
-          enabled: true,
-        },
-      ]
-      // All the labels we'll draw
-      const labels = [
-        {
-          Text: "Ravager Controls",
-          X: 1250,
-          Y: 100,
-          Width: 1000
+        ]
+        // All the rectangles we'll draw
+        const rects = [
+          // { // Doesn't fit with new background, but still here bc I like the idea
+          //  Container: kdcanvas,
+          //  Map: kdpixisprites,
+          //  id: "RFControlTitleHR",
+          //  Params: {
+          //    Left: 550,
+          //    Top: 130,
+          //    Width: 1400,
+          //    Height: 1,
+          //    Color: "#f3f"
+          //  }
+          // }
+        ]
+        // Draw each button
+        for (var btn of buttons)
+          DrawButtonKDEx(
+            btn?.name,
+            btn?.func,
+            btn?.enabled,
+            btn?.Left,
+            btn?.Top,
+            btn?.Width,
+            btn?.Height,
+            btn?.Label,
+            (btn?.enabled ? (btn?.Color ? btn.Color : KDBaseWhite) : "#757575"),
+            btn?.Image,
+            btn?.HoveringText,
+            !btn?.enabled,
+            btn?.NoBorder,
+            btn?.FillColor,
+            btn?.FontSize,
+            btn?.ShiftText,
+            btn?.options
+          )
+        // Draw each checkbox
+        for (var box of checkboxes)
+          DrawCheckboxRFEx(
+            box?.name,
+            box?.func,
+            box?.enabled,
+            box?.Left,
+            box?.Top,
+            box?.Width,
+            box?.Height,
+            box?.Text,
+            box?.IsChecked,
+            box?.Disabled,
+            box?.TextColor,
+            box?._CheckImage,
+            box?.options
+          )
+        // Draw each label
+        for (var label of labels)
+          DrawTextFitKD(
+            label?.Text,
+            label?.X,
+            label?.Y,
+            label?.Width,
+            label?.Color ? label.Color : KDBaseWhite,
+            label?.BackColor,
+            label?.FontSize,
+            label?.Align,
+            label?.zIndex,
+            label?.alpha,
+            label?.border,
+            label?.unique,
+            label?.font
+          )
+        // Draw each rectangle
+        for (var rect of rects)
+          DrawRectKD(
+            rect?.Container,
+            rect?.Map,
+            rect?.id,
+            rect?.Params
+          )
+      } else {
+        // Rework
+        const Ystart = 190
+        let Y = Ystart
+        const Ystep = 80
+        const Xstart = 550
+        const confRows = 8 // Number of options
+        const confXOffset = 350
+        let bordercolor = "#000"
+        try { bordercolor = string2hex(RavagerData.Variables.RFControl.Customization_BorderColor) } catch {}
+        // Title
+        DrawTextFitKD("Ravager Controls", 1250, Ystart - 120, 1000, KDBaseWhite, undefined, 40)
+        // Return button
+        DrawButtonKDEx("RFCReturn", () => { RFDebug("[RFC] Leaving ravager control"); RavagerData.Variables.State = RavagerData.Variables.PrevState; RavagerData.Variables.DrawState = RavagerData.Variables.PrevDrawState; return true }, true, 975, 880, 550, 64, "Return", KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+        // Categories
+        let confCategories = Object.keys(RavagerData.Definitions.FrameworkControls).splice(RavagerData.Variables.RFControl._CategoryPage * confRows, confRows) // Select just the page we are on
+        // Draw category buttons
+        confCategories.forEach((currentCategory) => {
+          DrawButtonKDEx("RFCCat" + currentCategory, () => { console.log("[RFC] Pressed button for category " + currentCategory); RavagerData.Variables.RFControl._ConfPage = 0; RavagerData.Variables.RFControl._ConfCategory = currentCategory; return true }, true, Xstart, Y, 300, 64, currentCategory, KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+          Y += Ystep
+        })
+        if (Object.keys(RavagerData.Definitions.FrameworkControls).length > confRows) {
+          if (RavagerData.Variables.RFControl._CategoryPage != 0) {
+            DrawButtonKDEx("RFCCatListUp", (b) => { RavagerData.Variables.RFControl._CategoryPage--; return true }, true, Xstart + 105, Ystart - 50, 90, 40, "", KDBaseWhite, KinkyDungeonRootDirectory + "UI/RavUp.png", undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+          }
+          if (RavagerData.Variables.RFControl._CategoryPage < (!(Object.keys(RavagerData.Definitions.FrameworkControls).length % confRows) ? Object.keys(RavagerData.Definitions.FrameworkControls).length / confRows - 1 : Math.floor(Object.keys(RavagerData.Definitions.FrameworkControls).length / confRows))) {
+            DrawButtonKDEx("RFCCatListDown", (b) => { RavagerData.Variables.RFControl._CategoryPage++; return true }, true, Xstart + 105, Ystart + (Ystep * confRows), 90, 40, "", KDBaseWhite, KinkyDungeonRootDirectory + "UI/RavDown.png", undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+          }
         }
-      ]
-      // All the rectangles we'll draw
-      const rects = [
-        // { // Doesn't fit with new background, but still here bc I like the idea
-        //  Container: kdcanvas,
-        //  Map: kdpixisprites,
-        //  id: "RFControlTitleHR",
-        //  Params: {
-        //    Left: 550,
-        //    Top: 130,
-        //    Width: 1400,
-        //    Height: 1,
-        //    Color: "#f3f"
-        //  }
-        // }
-      ]
-      // Draw each button
-      for (var btn of buttons)
-        DrawButtonKDEx(
-          btn?.name,
-          btn?.func,
-          btn?.enabled,
-          btn?.Left,
-          btn?.Top,
-          btn?.Width,
-          btn?.Height,
-          btn?.Label,
-          (btn?.enabled ? (btn?.Color ? btn.Color : KDBaseWhite) : "#757575"),
-          btn?.Image,
-          btn?.HoveringText,
-          !btn?.enabled,
-          btn?.NoBorder,
-          btn?.FillColor,
-          btn?.FontSize,
-          btn?.ShiftText,
-          btn?.options
-        )
-      // Draw each checkbox
-      for (var box of checkboxes)
-        DrawCheckboxRFEx(
-          box?.name,
-          box?.func,
-          box?.enabled,
-          box?.Left,
-          box?.Top,
-          box?.Width,
-          box?.Height,
-          box?.Text,
-          box?.IsChecked,
-          box?.Disabled,
-          box?.TextColor,
-          box?._CheckImage,
-          box?.options
-        )
-      // Draw each label
-      for (var label of labels)
-        DrawTextFitKD(
-          label?.Text,
-          label?.X,
-          label?.Y,
-          label?.Width,
-          label?.Color ? label.Color : KDBaseWhite,
-          label?.BackColor,
-          label?.FontSize,
-          label?.Align,
-          label?.zIndex,
-          label?.alpha,
-          label?.border,
-          label?.unique,
-          label?.font
-        )
-      // Draw each rectangle
-      for (var rect of rects)
-        DrawRectKD(
-          rect?.Container,
-          rect?.Map,
-          rect?.id,
-          rect?.Params
-        )
+        Y = Ystart
+        if (RavagerData.Definitions.FrameworkControls.hasOwnProperty(RavagerData.Variables.RFControl._ConfCategory)) {
+          let categoryConfs = RavagerData.Definitions.FrameworkControls[RavagerData.Variables.RFControl._ConfCategory]
+          if (categoryConfs.length > confRows * 2) {
+            if (RavagerData.Variables.RFControl._ConfPage != 0) {
+              DrawButtonKDEx("RFCToggleListUp", (b) => { RavagerData.Variables.RFControl._ConfPage--; return true }, true, Xstart + 105 + confXOffset * 2, Ystart - 50, 90, 40, "", KDBaseWhite, KinkyDungeonRootDirectory + "UI/RavUp.png", undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+            }
+            if (RavagerData.Variables.RFControl._ConfPage < (categoryConfs.length % (confRows * 2) == 0 ? categoryConfs.length / (confRows * 2) - 1 : Math.floor(categoryConfs.length / (confRows * 2)))) {
+              DrawButtonKDEx("RFCToggleListDown", (b) => { RavagerData.Variables.RFControl._ConfPage++; return true }, true, Xstart + 105 + confXOffset * 2, Ystart + ((Ystep) * confRows), 90, 40, "", KDBaseWhite, KinkyDungeonRootDirectory + "UI/RavDown.png", undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+            }
+          }
+          let categoryConfsSlice = categoryConfs.slice(RavagerData.Variables.RFControl._ConfPage * (confRows * 2), RavagerData.Variables.RFControl._ConfPage * (confRows * 2) + (confRows * 2))
+          let confSecondColumnOffset = 0
+          let confCount = 0
+          categoryConfsSlice.forEach((confEntry) => {
+            // Variable is a toggle
+            if (confEntry.type == "boolean") {
+              // Custom get-value function; don't mind how wasteful this all is :)
+              if (RavagerData.Variables.RFControl[confEntry.refvar] == undefined && typeof confEntry.getval == "function")
+                RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.getval()
+              // Default value
+              if (RavagerData.Variables.RFControl[confEntry.refvar] == undefined) {
+                RavagerData.Variables.RFControl[confEntry.refvar] = (confEntry.default != undefined) ? confEntry.default : false
+              }
+              // Disable button?
+              let blocking = (typeof confEntry.block == "function") ? confEntry.block() : undefined
+              // Internal button name
+              let name = confEntry.name ? confEntry.name : confEntry.refvar
+              // Click function - If direct on-click function control is needed, define `onclick` as you function. If you just need to update some stuff with the new value, define `postclick` as a function that'll take the new refvar value as the only argument
+              let click = confEntry.onclick ? confEntry.onclick : (bdata) => { if (confEntry.refvar) RavagerData.Variables.RFControl[confEntry.refvar] = !RavagerData.Variables.RFControl[confEntry.refvar]; if (confEntry.postclick) confEntry.postclick(RavagerData.Variables.RFControl[confEntry.refvar]); return true; }
+              // When declaring your own on-click function, you'll may not be using a reference variable in the normal refvar location, so you can declare `checked` as a function that returns true or false for the checked value
+              let checked = (confEntry.hasOwnProperty('checked') && typeof confEntry.checked == "function") ? confEntry.checked() : RavagerData.Variables.RFControl[confEntry.refvar]
+              DrawCheckboxRFEx("RFCToggle_" + name, click, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 64, 64, confEntry.label, checked, false, blocking ? "#888" : KDBaseWhite, undefined, { bordercolor: bordercolor })
+              Y += Ystep;
+            } else if (confEntry.type == "range") { // Range selection
+              // Custom get-value function; don't mind how wasteful this all is :)
+              if (RavagerData.Variables.RFControl[confEntry.refvar] == undefined && typeof confEntry.getval == "function")
+                RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.getval()
+              // Default value
+              if (RavagerData.Variables.RFControl[confEntry.refvar] == undefined) {
+                RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.default != undefined ? confEntry.default : ((confEntry.rangehigh + confEntry.rangelow) / 2)
+              }
+              let blocking = typeof confEntry.block == "function" ? confEntry.block() : undefined
+              // Determine significant digits in stepcount
+              let significantDigits = confEntry.stepcount.toString().includes(".") ? confEntry.stepcount.toString().split(".")[1].length : 0
+              let name = confEntry.name ? confEntry.name : confEntry.refvar
+              // Decrement
+              DrawButtonKDEx(`RFCRangeButtonL_${name}`, (bdata) => {
+                if (RavagerData.Variables.RFControl[confEntry.refvar] > confEntry.rangelow)
+                  RavagerData.Variables.RFControl[confEntry.refvar] = parseFloat((RavagerData.Variables.RFControl[confEntry.refvar] - confEntry.stepcount).toFixed(significantDigits))
+                if (typeof confEntry.postclick == "function")
+                  confEntry.postclick(RavagerData.Variables.RFControl[confEntry.refvar])
+                return true
+              }, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 64, 64, "<", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+              // Label
+              DrawTextFitKD(`${confEntry.label}: ${RavagerData.Variables.RFControl[confEntry.refvar]}`, Xstart + confXOffset + 64 + 190 + confSecondColumnOffset, Y + 32, 360, blocking ? "#888" : KDBaseWhite, undefined, 30)
+              // Increment
+              DrawButtonKDEx(`RFCRangeButtonR_${name}`, (bdata) => {
+                if (RavagerData.Variables.RFControl[confEntry.refvar] < confEntry.rangehigh)
+                  RavagerData.Variables.RFControl[confEntry.refvar] = parseFloat((RavagerData.Variables.RFControl[confEntry.refvar] + confEntry.stepcount).toFixed(significantDigits))
+                if (typeof confEntry.postclick == "function")
+                  confEntry.postclick(RavagerData.Variables.RFControl[confEntry.refvar])
+                return true
+              }, !blocking, Xstart + confXOffset + 64 + 360 + 20 + confSecondColumnOffset, Y, 64, 64, ">", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+              Y += Ystep
+            } else if (confEntry.type == "button") { // Custom button to run custom code when clicked
+              let blocking = (typeof confEntry.block == "function") ? confEntry.block() : undefined
+              DrawButtonKDEx(confEntry.name, confEntry.click, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 370, 64, confEntry.label ? confEntry.label : confEntry.name, blocking ? "#888" : KDBaseWhite, confEntry.image, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+              Y += Ystep
+            } else if (confEntry.type == "text") { // Just a label, no settings control
+              let blocking = (typeof confEntry.block == "function") ? confEntry.block() : undefined
+              DrawTextFitKD(confEntry.label, Xstart + confXOffset + 64 + 190 + confSecondColumnOffset, Y + 32, 480, blocking ? "#888" : KDBaseWhite, undefined, 30)
+              Y += Ystep
+            } else if (confEntry.type == "string") { // Text input
+              // Custom get-value function; don't mind how wasteful this all is :)
+              if (RavagerData.Variables.RFControl[confEntry.refvar] == undefined && typeof confEntry.getval == "function")
+                RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.getval()
+              let elem = KDTextField(confEntry.refvar, Xstart + confXOffset + confSecondColumnOffset, Y, 480, 64, undefined, RavagerData.Variables.RFControl[confEntry.refvar], 100).Element
+              elem.addEventListener("input", () => { RavagerData.Variables.RFControl[confEntry.refvar] = elem.value })
+              Y += Ystep
+            } else if (confEntry.type == "list") { // List of options; similar to range, but iterating over an array of options and allowing arbitrary types
+              // Custom get-value function; don't mind how wasteful this all is :)
+              if (RavagerData.Variables.RFControl[confEntry.refvar] == undefined && typeof confEntry.getval == "function")
+                RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.getval()
+              // Default
+              if (RavagerData.Variables.RFControl[confEntry.refvar] == undefined)
+                RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.default
+              let blocking = (typeof confEntry.block == "function") ? confEntry.block() : undefined
+              let name = confEntry.name ? confEntry.name : confEntry.refvar
+              // Decrement
+              DrawButtonKDEx(`RFCListButtonL_${name}`, (bdata) => {
+                let newindex = (confEntry.options.indexOf(RavagerData.Variables.RFControl[confEntry.refvar]) - 1) == -1 ? confEntry.options.length - 1 : confEntry.options.indexOf(RavagerData.Variables.RFControl[confEntry.refvar]) - 1
+                RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.options[newindex]
+                if (typeof confEntry.postclick == "function")
+                  confEntry.postclick(RavagerData.Variables.RFControl[confEntry.refvar])
+                return true
+              }, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 64, 64, "<", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+              // Label
+              DrawTextFitKD(`${confEntry.label ? confEntry.label : name}: ${RavagerData.Variables.RFControl[confEntry.refvar]}`, Xstart + confXOffset + 64 + 190 + confSecondColumnOffset, Y + 32, 360, blocking ? "#888" : KDBaseWhite, undefined, 30)
+              // Increment
+              DrawButtonKDEx(`RFCListButtonR_${name}`, (bdata) => {
+                let newindex = (confEntry.options.indexOf(RavagerData.Variables.RFControl[confEntry.refvar]) + 1) == confEntry.options.length ? 0 : confEntry.options.indexOf(RavagerData.Variables.RFControl[confEntry.refvar]) + 1
+                RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.options[newindex]
+                if (typeof confEntry.postclick == "function")
+                  confEntry.postclick(RavagerData.Variables.RFControl[confEntry.refvar])
+                return true
+              }, !blocking, Xstart + confXOffset + 64 + 360 + 20 + confSecondColumnOffset, Y, 64, 64, ">", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+              Y += Ystep
+            }
+            confCount++
+            if (confCount == confRows) {
+              confSecondColumnOffset = 550
+              Y = Ystart
+            }
+          })
+        }
+      }
     },
     // Sets whether the mimic spoiler is guaranteed
     MimicExposure: function(exposed) {
       // Save the setting
-      RavagerData.Variables.ExposeMimics = exposed
+      RavagerData.Variables.RFControl.ExposeMimics = exposed
       // Exit early if mimic is disabled
       if (RavagerGetSetting('ravagerDisableMimic')) {
         RFDebug("[Ravager Framework][MimicExposure]: Mimic disabled. Nothing to do.")
@@ -1074,7 +1245,226 @@ window.RavagerData = {
         width: 1
       }
     },
-    FontFaces: {}
+    FontFaces: {},
+    FrameworkControls: {
+      // Categories of controls shown during RFControl. Built similar to mod configs with tabs and scrolling
+      Debugging: [
+        {
+          name: "HeavyDebug",
+          type: "boolean",
+          onclick: () => { RavagerFrameworkToggleDebug(); return true },
+          block: undefined,
+          checked: () => { return _RavagerFrameworkDebugEnabled },
+          label: "Heavy Debugging"
+        },
+        {
+          refvar: "NameFormatDebug",
+          type: "boolean",
+          label: "Debug NameFormat function"
+        },
+        {
+          refvar: "ExposeMimics",
+          type: "boolean",
+          label: "Expose Mimics",
+          postclick: (val) => { return RavagerData.functions.MimicExposure(val); },
+          block: () => RavagerGetSetting("ravagerDisableMimic")
+        },
+        {
+          refvar: "PassiveMimics",
+          type: "boolean",
+          label: "Oblivious Mimics",
+          postclick: (val) => { return RavagerData.functions.MimicPassive(val); },
+          block: () => RavagerGetSetting("ravagerDisableMimic")
+        },
+        {
+          name: "RevertFunctions",
+          type: "button",
+          click: () => { RavagerFrameworkRevertFunctions(); return true; },
+          label: "Revert Functions"
+        },
+        {
+          refvar: "TrackMimics",
+          type: "boolean",
+          label: "Track Mimics",
+          postclick: (val) => { return RavagerData.functions.SetTrackMimics(val); },
+          block: () => RavagerGetSetting("ravagerDisableMimic")
+        },
+        {
+          refvar: "AnnounceRavagers",
+          type: "boolean",
+          label: "Announce Ravagers",
+          postclick: (val) => { return RavagerData.functions.SetAnnounceRavagers(val); },
+          block: () => RavagerGetSetting("ravagerDisableBandit") && RavagerGetSetting("ravagerDisableWolfgirl") && RavagerGetSetting("ravagerDisableSlimegirl") && RavagerGetSetting("ravagerDisableTentaclePit") && RavagerGetSetting("ravagerDisableMimic")
+        },
+        {
+          refvar: "DebugVanillaTextOverrides",
+          type: "boolean",
+          label: "Debug Text Replacements",
+        },
+        {
+          name: "EndDebugLog",
+          type: "button",
+          label: "End Debug Log",
+          click: () => { KDModSettings.RavagerFramework.ravagerHelpDebug = false; RavagerFrameworkIWantToHelpDebug('Finish'); return true; },
+          block: () => !KDModSettings?.RavagerFramework?.ravagerHelpDebug
+        },
+        {
+          name: "SaveFunctionOverrides",
+          type: "button",
+          label: "Save Overridden Functions",
+          click: () => { RavagerData.functions.SaveFunctionOverrides(); return true; }
+        },
+        {
+          name: "CheckFunctionOverrides",
+          type: "button",
+          label: "Check Overridden Functions",
+          click: () => { RavagerData.functions.CheckFunctionOverrides(); return true; }
+        },
+        {
+          refvar: "ControlBanditsFirstLevel",
+          type: "boolean",
+          label: "Control 1st lvl Bandit #s",
+          default: true,
+          block: () => RavagerGetSetting("ravagerDisableBandit")
+        },
+        {
+          refvar: "UseOldRFControl",
+          type: "boolean",
+          label: "Use old RFControl layout",
+          default: false
+        },
+      ],
+      Customization: [
+        {
+          type: "text",
+          label: "Border Color"
+        },
+        {
+          refvar: "Customization_BorderColor",
+          type: "string"
+        },
+        // Need background and possibly others
+        {
+          refvar: "Customization_Background",
+          type: "list",
+          label: "Background",
+          default: "Dark",
+          options: [ "Dark", "Bright" ],
+          postclick: (val) => { RavagerData.Variables.RFControl.Background = "RFControl" + val }
+        },
+      ],
+      Bandit: [
+        {
+          name: "EnemyApply",
+          type: "button",
+          label: "Apply Changes",
+          click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
+          block: () => RavagerGetSetting('ravagerDisableBandit')
+        },
+        {
+          refvar: "Bandit_SpawnW8",
+          type: "range",
+          label: "Spawn Weight",
+          rangehigh: 20,
+          rangelow: -20,
+          stepcount: 0.1,
+          getval: () => KinkyDungeonEnemies.find(v => v.name == "BanditRavager").weight,
+          postclick: (val) => { KinkyDungeonEnemies.find(v => v.name == "BanditRavager").weight = val },
+          block: () => RavagerGetSetting('ravagerDisableBandit')
+        },
+        {
+          refvar: "MaxStartingBandits",
+          type: "range",
+          label: "Lvl 1 Max Count",
+          rangehigh: 50,
+          rangelow: 0,
+          stepcount: 1,
+          // getval: () => RavagerData.Variables.MaxStartingBandits,
+          // postclick: (val)
+          block: () => RavagerGetSetting('ravagerDisableBandit')
+        },
+      ],
+      Wolfgirl: [
+        {
+          name: "EnemyApply",
+          type: "button",
+          label: "Apply Changes",
+          click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
+          block: () => RavagerGetSetting('ravagerDisableWolfgirl')
+        },
+        {
+          refvar: "Wolf_SpawnW8",
+          type: "range",
+          label: "Spawn Weight",
+          rangehigh: 20,
+          rangelow: -20,
+          stepcount: 0.1,
+          getval: () => KinkyDungeonEnemies.find(v => v.name == "WolfgirlRavager").weight,
+          postclick: (val) => { KinkyDungeonEnemies.find(v => v.name == "WolfgirlRavager").weight = val },
+          block: () => RavagerGetSetting('ravagerDisableWolfgirl')
+        },
+      ],
+      Slimegirl: [
+        {
+          name: "EnemyApply",
+          type: "button",
+          label: "Apply Changes",
+          click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
+          block: () => RavagerGetSetting('ravagerDisableSlimegirl')
+        },
+        {
+          refvar: "Slime_SpawnW8",
+          type: "range",
+          label: "Spawn Weight",
+          rangehigh: 20,
+          rangelow: -20,
+          stepcount: 0.1,
+          getval: () => KinkyDungeonEnemies.find(v => v.name == "SlimeRavager").weight,
+          postclick: (val) => { KinkyDungeonEnemies.find(v => v.name == "SlimeRavager").weight = val },
+          block: () => RavagerGetSetting('ravagerDisableSlimegirl')
+        },
+      ],
+      Tentacle: [
+        {
+          name: "EnemyApply",
+          type: "button",
+          label: "Apply Changes",
+          click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
+          block: () => RavagerGetSetting('ravagerDisableWolfgirl')
+        },
+        {
+          refvar: "Tentacle_SpawnW8",
+          type: "range",
+          label: "Spawn Weight",
+          rangehigh: 20,
+          rangelow: -20,
+          stepcount: 0.1,
+          getval: () => KinkyDungeonEnemies.find(v => v.name == "TentaclePit").weight,
+          postclick: (val) => { KinkyDungeonEnemies.find(v => v.name == "TentaclePit").weight = val },
+          block: () => RavagerGetSetting('ravagerDisableTentaclePit')
+        },
+      ],
+      Mimic: [
+        {
+          name: "EnemyApply",
+          type: "button",
+          label: "Apply Changes",
+          click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
+          block: () => RavagerGetSetting('ravagerDisableWolfgirl')
+        },
+        {
+          refvar: "Mimic_SpawnW8",
+          type: "range",
+          label: "Spawn Weight",
+          rangehigh: 20,
+          rangelow: -20,
+          stepcount: 0.1,
+          getval: () => KinkyDungeonEnemies.find(v => v.name == "MimicRavager").weight,
+          postclick: (val) => { KinkyDungeonEnemies.find(v => v.name == "MimicRavager").weight = val },
+          block: () => RavagerGetSetting('ravagerDisableMimic')
+        },
+      ],
+    },
   },
   // Variable, general purpose data
   Variables: {
@@ -1124,6 +1514,13 @@ window.RavagerData = {
       TrackMimics: false,
       AnnounceRavagers: false,
       DebugVanillaTextOverrides: false,
+      ControlBanditsFirstLevel: true,
+      // Max number of bandit ravs on floor 1
+      MaxStartingBandits: 2,
+      _ConfCategory: "Main", // Hold the current RFControl tab we're in
+      _CategoryPage: 0, // Operates as KDModListPage, for scrolling through category tabs in RFControl
+      _ConfPage: 0, // The page of the current RFControl category we're on
+      Customization_BorderColor: "#6100cf"
     },
     DebugWasTurnedOn: false,
     DebugWasTurnedOff: false,
