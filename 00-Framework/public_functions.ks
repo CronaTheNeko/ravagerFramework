@@ -356,8 +356,161 @@ window.RFVerifyEAM = function(ravagerName) {
   return true
 }
 
-// Shortcut to custom GetRestraint
-window.RFGetRestraint = RavagerData.functions.GetRandomRestraint
+// Custom version of KinkyDungeonGetRestraint so I can have name-based exclusions and per-item weight modifiers
+// All the same params as KinkyDungeonGetRestraint, but with the addition of:
+//   - `exclude` as an array of strings that are restraint names, which should not be chosen
+//   - `weightMods` as a dictionary with the keys being restraint names and the values being a number to multiply that restraint's weight by
+// Also want to add some weight modifiers
+window.RFGetRestraint = function(enemy, Level, Index, exclude, weightMods, Bypass, Lock, RequireWill, LeashingOnly, NoStack, extraTags, agnostic, filter, securityEnemy, curse, useAugmented, augmentedInventory, options) {
+  RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Starting RFGetRestraint(enemy: ", enemy, "; Level: ", Level, "; Index: ", Index, "; exclude: ", exclude, "; weightMods: ", weightMods, "; Bypass: ", Bypass, "; Lock: ", Lock, "; RequireWill: ", RequireWill, "; LeashingOnly: ", LeashingOnly, "; NoStack: ", NoStack, "; extraTags: ", extraTags, "; agnostic: ", agnostic, "; filter: ", filter, "; securityEnemy: ", securityEnemy, "; curse: ", curse, "; useAugmented: ", useAugmented, "; augmentedInventory: ", augmentedInventory, "; options: ", options)
+  // Starting weight stuff
+  let restraintWeightTotal = 0;
+  let restraintWeights = [];
+  // Get restraints
+  let Restraints = KDGetRestraintsEligible(enemy, Level, Index, Bypass, Lock, RequireWill, LeashingOnly, NoStack, extraTags, agnostic, filter, securityEnemy, curse, undefined, undefined, useAugmented, augmentedInventory, options);
+  RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Eligible restraints: ", Restraints)
+  for (let rest of Restraints) {
+    let restraint = rest.restraint;
+    RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Processing restraint ${restraint.name}: `, rest)
+    // Skip restraints in exclude
+    if (exclude && exclude.includes(restraint.name)) {
+      RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Skipping excluded restraint")
+      continue
+    }
+    // Base weight
+    let weight = rest.weight;
+    RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Base weight: ", weight)
+    // Modify weight if this restraint has a modifier in weightMods
+    if (weightMods && Object.keys(weightMods).includes(restraint.name) && typeof weightMods[restraint.name] == "number") {
+      weight = weight * weightMods[restraint.name]
+      RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Modifying weight of ${restraint.name} (X${weightMods[restraint.name]}); New weight: ${weight}`)
+    }
+    // Push the weight and update weight total
+    restraintWeights.push({restraint: restraint, weight: restraintWeightTotal, inventoryVariant: rest.inventoryVariant});
+    restraintWeightTotal += Math.max(0, weight);
+  }
+  // Decide a random number within the range of weights
+  let selection = KDRandom() * restraintWeightTotal;
+  RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Restraint weight total: ${restraintWeightTotal}; Restraints: `, restraintWeights, `; Selection: ${selection}`)
+  // Pick the first restraint whose weight is less then the number in `selection`
+  for (let L = restraintWeights.length - 1; L >= 0; L--) {
+    if (selection > restraintWeights[L].weight) {
+      RFTrace(`[Ravager Framework][DBG][RFGetRestraint]: Decided restraint. L: ${L}; `, restraintWeights[L])
+      return restraintWeights[L].restraint;
+    }
+  }
+  RFTrace("[Ravager Framework][DBG][RFGetRestraint]: Looks like there's no restraints left to return. End of RFGetRestraint.")
+}
+
+// Format strings used throughout the framework. Handles enemy, restraint, and clothing names, damage strings, and runtime string variations
+// Runtime string variations could be made faster in the case of nested variations, as this code is depth first, and having nested variations will lead to all deeper levels being decided and (potentially) later thrown away. It'd likely be faster if I trimmed the tree of choices as soon as I could, but that would be significantly more effort :) -- Possibly pretty easy to do by deciding on the top level variation and recursing back into inStringRandom with the chosen section of the input string.
+window.RFStringFormat = function(string, entity, restraint, clothing, damage, skipCapitalize) {
+  function RFNFTrace(...args) {
+    RavagerData.Variables.RFControl.NameFormatDebug && RFDebug(...args)
+  }
+  RFNFTrace('[Ravager Framework][DBG][NameFormat]: Initial string "' + string + '"; entity: ', entity, '; restraint: ', restraint, '; clothing: ', clothing, '; damage: ', damage, '; skipCapitalize: ', skipCapitalize)
+  // Player name
+  string = string.replace("PlayerName", KDGameData.PlayerName)
+  RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+  // Enemy name
+  if (entity) {
+    // Definition name
+    string = string.replace("EnemyName", TextGet('Name' + entity.Enemy.name))
+    // Possible custom entity name (no formatting)
+    string = string.replace("EnemyCNameBare", KDEnemyName(entity))
+    // Possible custom entity name (w/ formatting)
+    string = string.replace("EnemyCName", entity.CustomName || KDGetName(entity.id) || "the " + TextGet("Name" + entity.Enemy.name))
+    RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+  }
+  // Restraint name
+  if (restraint) {
+    string = string.replace("RestraintName", TextGet('Restraint' + restraint.name))
+    RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+  }
+  // Clothing name
+  if (clothing) {
+    string = string.replace("ClothingName", TextGet("m_" + clothing.Item).includes("[NotFound]") ? clothing.Item : TextGet("m_" + clothing.Item))
+    RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+  }
+  // Damage string
+  if (damage) {
+    string = string.replace("DamageTaken", damage.string)
+    RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
+  }
+  // In-string randomization
+  function inStringRandom(input) {
+    if (!input.includes("{") && !input.includes("}") && !input.includes("|")) {
+      RFNFTrace("[Ravager Framework][DBG][InStringRandom]: Input string doesn't contain any selections. Skipping.")
+      return input
+    }
+    function characterCount(input, char) {
+      var count = 0
+      for (var i = 0; i < input.length; i++)
+        if (input[i] == char)
+          count++
+      RFNFTrace("[Ravager Framework][DBG][InStringRandom][characterCount]: Found a total of " + count + " of character \"" + char + "\" in input string \"" + input + "\"")
+      return count
+    }
+    var currentLevel = 0
+    var holding = ""
+    var output = ""
+    for (var i = 0; i < input.length; i++) {
+      RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (L) Level: " + currentLevel)
+      if (input[i] == "{") {
+        currentLevel++
+        holding += "{"
+        RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (L+) Holding: " + holding)
+      } else if (input[i] == "}") {
+        currentLevel--
+        holding += "}"
+        RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (L-) Holding: " + holding)
+      } else if (currentLevel > 0) {
+        holding += input[i]
+        RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (L0) Holding: " + holding)
+      } else {
+        output += input[i]
+        RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (L) Output: " + output)
+      }
+      if (currentLevel == 0 && holding.length > 0) {
+        RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P) Holding: " + output)
+        if (!holding.includes("|")) {
+          output += holding
+          RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P)(NC) Output: " + output)
+        } else {
+          var sub = holding.substring(1, holding.length - 1)
+          RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P) Substring: " + sub)
+          if (sub.includes("{") && sub.includes("}") && characterCount(sub, "|") > 1) {
+            sub = inStringRandom(sub)
+            RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P)(R) Substring: " + sub)
+          }
+          var options = sub.split("|")
+          RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P) Options: ", options)
+          var selection = Math.floor(Math.random() * options.length)
+          RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P) Selection: " + options[selection])
+          output += options[selection]
+          RFNFTrace("[Ravager Framework][DBG][InStringRandom]: (P) Output: " + output)
+        }
+        holding = ""
+      }
+    }
+    if (currentLevel > 0) {
+      RFWarn("[Ravager Framework][NameFormat][InStringRandom]: Input string contains more opening brackets than closing brackets. We will return the input string with an error prefix. Please report this to the author! Offending string:\n" + input)
+      return "[ERROR]" + input
+    } else if (currentLevel < 0) {
+      RFWarn("[Ravager Framework][NameFormat][InStringRandom]: Input string contains more closing brackets than opening brackets. We will return the input string with an error prefix. Please report this to the author! Offending string:\n" + input)
+      return "[ERROR]" + input
+    }
+    RFNFTrace("[Ravager Framework][DBG][InStringRandom]: Final output: " + output)
+    return output
+  }
+  string = inStringRandom(string)
+  RFNFTrace('[Ravager Framework][DBG][NameFormat]: inStringRandom transformed to "' + string + '"')
+  // Capitalize
+  if (!skipCapitalize)
+    string = string.replaceAt(0, string[0].toUpperCase())
+  RFNFTrace('[Ravager Framework][DBG][NameFormat]: Final string: "' + string + '"')
+  return string
+}
 
 // A variation of DrawCheckboxKDEx so I can default to a custom check image
 window.DrawCheckboxRFEx = function(name, func, enabled, Left, Top, Width = 64, Height = 64, Text, IsChecked, Disabled, TextColor, _CheckImage, options) {

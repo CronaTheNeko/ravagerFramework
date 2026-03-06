@@ -7,13 +7,13 @@ function wolfgirlRavagerAllRange(entity, target) {
 	let leashed = KinkyDungeonPlayerTags.get("Item_WolfLeash") || KinkyDungeonPlayerTags.get("Item_BasicLeash")
 	if (collared && moduled && !leashed) {
 		KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName("WolfLeash"), 1, false, "Red", undefined, undefined, undefined, "Nevermere", true);
-		KinkyDungeonSendTextMessage(5, RavagerData.functions.NameFormat("EnemyCName clicks a leash onto your collar, pulling you close...", entity), "#ff44ff", 3);
+		KinkyDungeonSendTextMessage(5, RFStringFormat("EnemyCName clicks a leash onto your collar, pulling you close...", entity), "#ff44ff", 3);
 	} else if (collared && !moduled) {
 		KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName("ShockModule"), 1, false, "Red", undefined, undefined, undefined, "Nevermere", true);
-		KinkyDungeonSendTextMessage(5, RavagerData.functions.NameFormat("EnemyCName activates your collar's training module...", entity), "#ff44ff", 3);
+		KinkyDungeonSendTextMessage(5, RFStringFormat("EnemyCName activates your collar's training module...", entity), "#ff44ff", 3);
 	} else if (!collared) {
 		KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName("WolfCollar"), 1, false, "Red", undefined, undefined, undefined, "Nevermere", true);
-		KinkyDungeonSendTextMessage(5, RavagerData.functions.NameFormat("EnemyCName fixes a collar around your neck...", entity), "#ff44ff", 3);
+		KinkyDungeonSendTextMessage(5, RFStringFormat("EnemyCName fixes a collar around your neck...", entity), "#ff44ff", 3);
 	}
 }
 if (!RFAddCallback('wolfgirlRavagerAllRangeCallback', wolfgirlRavagerAllRange)) {
