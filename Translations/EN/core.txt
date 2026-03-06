@@ -1,0 +1,214 @@
+; Mid-load missing functions check
+MissingFuncTitle = Ravager Alert
+MissingFuncPreamble1 = It appears that your game is missing a few functions that the Ravager Framework uses to function.
+MissingFuncPreamble2 = This is most likely caused by the game updating and renaming / removing some functions.
+MissingFuncPreamble3 = These functions not being present may result in issues.
+MissingFuncPreamble4 = The severity of these issues can't be known by this message, but can range anywhere between unexpected behavior and full game crashes.
+MissingFuncPreamble5 = While it would be best to report these missing functions as an issue, it may be possible to resolve the issue by enabling Kinky Dungeon's \"Mod Compat Mode\" option.
+MissingFuncLabel = Missing functions
+MissingFuncCloseButton = Close
+
+; Default narrations
+NarrationsRelease = You feel weak as EnemyCName releases you...
+NarrationsPassout = Your body is broken and exhausted...
+NarrationsRestraintTear = EnemyCName tears your RestraintName away!
+NarrationsClothingTear = EnemyCName tears your ClothingName away!
+NarrationsPin = EnemyCName gets a good grip on you...
+NarrationsAddRestraint = EnemyCName forces you to wear a RestraintName
+NarrationsFallback = EnemyCName roughly gropes you! (DamageTaken)
+NarrationsPinBreakFree = You break free of their grip, leaving an opening to escape!
+NarrationsStunNearbySingle = The nearby EnemyCName notices your predicament and stays to watch
+NarrationsStunNearbyCrowd = Your situation attracts some attention nearby
+
+; Line played when orgasming while mod sound is enabled
+OrgasmLine = You make a loud moaning noise
+
+; Submission lines
+RavageSubmit = You moan softly as you let it happen...
+RavageSubmitStun = You're too stunned to resist...
+RavageSubmitSubmissive = (STUN) Your submissiveness gets the better of you...
+RavageSubmitLeash = (STUN) With a tug of your leash, you're put in your place...
+RavageSubmitWillpower = (STUN) You can't will yourself to resist...
+RavageSubmitFloater = SUBMIT!
+
+; Mod config labels
+- KDModButtonRavagerFramework = Ravager Framework
+- KDModButtonravagerDebug = Enable Debug Messages
+- KDModButtonravagerDisableBandit = Disable Bandit Ravager
+- KDModButtonravagerDisableWolfgirl = Disable Wolfgirl Ravager
+- KDModButtonravagerDisableSlimegirl = Disable Slimegirl Ravager
+- KDModButtonravagerDisableTentaclePit = Disable Tentacle Pit
+- KDModButtonravagerDisableMimic = Disable Mimic Ravager
+- KDModButtonravagerSpicyTendril = Spicy RavagerDialogue
+- KDModButtonravagerSlimeAddChance = Slimegirl Restrict Chance
+- KDModButtonravagerEnableSound = Enable Sounds
+- KDModButtononHitChance = Moan Chance
+- KDModButtonravagerSoundVolume = Moan Volume
+- KDModButtonravEnableUseCount = Enable Experience Aware Mode
+- KDModButtonravUseCountMode = Exp Aware Mode
+- KDModButtonravUseCountModeChance = Exp Aware Chance
+- KDModButtonravUseCountOverride = Override Exp Aware Mode
+- KDModButtonravagerCustomDrop = Enable Multi-item Drops
+- KDModButtonravagerEnableNudeOutfit = Enable Full Nude
+- KDModButtonravagerFancyFont = Custom font for help
+- KDModButtonravagerHelpDebug = I want to help debug
+
+; Mod config hover descriptions
+ConfigHoverravagerDebug = Print verbose messages to the browser console
+ConfigHoverravagerSpicyTendril = Enables some more questionable dialogue for the ravagers that may not be for everyone
+ConfigHoverravagerSlimeAddChance = The chance of the slime girl to add slime to you. Setting this too high would cause significant difficulty, as this chance is rolled on every attack, including during ravaging.
+ConfigHoverravagerEnableSound = Enable moans when getting hit and orgasming. Note: This will have no effect if the Girl Sound mod is loaded.
+ConfigHoveronHitChance = The chance to moan when getting hit.
+ConfigHoverravagerSoundVolume = The volume of moans
+ConfigHoverravEnableUseCount = Enable special dialogue based on how many times you've been ravaged before.
+ConfigHoverravUseCountMode = Should experience aware dialogue be used sometimes, always, or do you not have a preference? Can be overridden by a ravager wanting a specific mode.
+ConfigHoverravUseCountModeChance = Chance to use experience aware dialogue.
+ConfigHoverravUseCountOverride = Overrides ravagers wanting a specific experience aware mode. With this enabled, all ravagers will follow your Exp Aware Mode setting. Note: None of the framework's ravagers prefer one mode or the other, so this setting only matters if you're using an external ravager mod that has ravagers that do have a preference.
+ConfigHoverravagerCustomDrop = Allow ravagers to use custom item drop behaviors, which enables dropping random quantaties of multiple items. If enemies stop dropping items, try disabling this, as it may have broken due to a game update.
+ConfigHoverravagerEnableNudeOutfit = Allow ravagers to fully strip you when passing out, instead of leaving you minimally clothed.
+ConfigHoverravagerFancyFont = Who doesn't like a fancy font in their help messages?
+ConfigHoverravagerHelpDebug = Turn on heavy debugging mode so that you can provide a log file to help CTN with tracking down bugs. Turning this on will begin saving all of the framework's console messages to memory. To save the log to a file, return to this menu and disable this setting, or enter the Ravager Hacking menu and click End Debug Log.
+
+; Restraints
+- RestraintStripped = Stripped!
+- RestraintStrippedDesc = Your panties got torn away...
+- RestraintStrippedDesc2 = You can just put them back on, but maybe don't worry about that if you're currently pinned down...
+- RestraintPinned = Pinned!
+- RestraintPinnedDesc = Something or someone is having their way with you.
+- RestraintPinnedDesc2 = You can't move unless you get them off you! Freeing yourself will stun nearby enemies.
+- RestraintOccupiedMouth = Occupied!
+- RestraintOccupiedMouthDesc = Someone or something is having their way with you...
+- RestraintOccupiedMouthDesc2 = Don't worry about this restraint. Instead, try to escape "Pinned!"
+- RestraintOccupiedVulva = Occupied!
+- RestraintOccupiedVulvaDesc = Someone or something is having their way with you...
+- RestraintOccupiedVulvaDesc2 = Don't worry about this restraint. Instead, try to escape "Pinned!"
+- RestraintOccupiedButt = Occupied!
+- RestraintOccupiedButtDesc = Someone or something is having their way with you...
+- RestraintOccupiedButtDesc2 = Don't worry about this restraint. Instead, try to escape "Pinned!"
+- RestraintOccupiedHead = Gripped!
+- RestraintOccupiedHeadDesc = Someone or something is having their way with you...
+- RestraintOccupiedHeadDesc2 = Don't worry about this restraint. Instead, try to escape "Pinned!"
+
+; Restraint actions
+; ; Since it's supposed to be impossible to struggle out of "Occupied!", and you have to use debug mode to get one to equip to yourself, you should just use debug mode to give yourself a "Pinned!" and equip it
+- KinkyDungeonSelfBondageRavagerOccupied = You shouldn't have done that~ Equip "Pinned" to yourself to fix it~
+; ; Pinned struggle fails
+- KinkyDungeonStruggleStruggleFailRavagerPinned = You try to break free...
+- KinkyDungeonStruggleStruggleFailRavagerPinnedAroused = You try to break free, but you're quickly put back in your place...
+- KinkyDungeonStruggleStruggleImpossibleRavagerPinned = You try to break free, but you can barely push back...
+- KinkyDungeonStruggleStruggleImpossibleRavagerPinnedAroused = You try to break free, but you're quickly put back in your place...
+- KinkyDungeonStruggleStruggleImpossibleBoundRavagerPinned = You squirm and try to fight back, but you can barely move... It's hopeless.
+- KinkyDungeonStruggleStruggleImpossibleBoundRavagerPinnedAroused = It's hopeless... You can only give in...
+; ; Pinned remove fails
+- KinkyDungeonStruggleRemoveFailRavagerPinned = You try to push your attacker off you...
+- KinkyDungeonStruggleRemoveFailRavagerPinnedAroused = You try to push your attacker away, but they pin you down rougher...
+- KinkyDungeonStruggleRemoveImpossibleRavagerPinned = You try to push your attacker away, but you're getting weak...
+- KinkyDungeonStruggleRemoveImpossibleRavagerPinnedAroused = You try to push your attacker away, but their tightening grip feels so good...
+- KinkyDungeonStruggleRemoveImpossibleBoundRavagerPinned = You try to push your attacker away, but you can barely move...
+- KinkyDungeonStruggleRemoveImpossibleBoundRavagerPinnedAroused = Fighting back is hopeless... You can only give in...
+; ; Pinned cut fails
+- KinkyDungeonStruggleCutFailRavagerPinned = You swing your weapon uselessly at your attacker...
+- KinkyDungeonStruggleCutFailRavagerPinnedAroused = You swing your weapon at your attacker, but you're too distracted to land a hit...
+- KinkyDungeonStruggleCutImpossibleRavagerPinned = You try your best to swing at your attacker, but you're getting weak...
+- KinkyDungeonStruggleCutImpossibleRavagerPinnedAroused = You try your best to strike at your attacker, but the pleasure in your body makes you sloppy...
+- KinkyDungeonStruggleCutImpossibleBoundRavagerPinned = You try to lift your weapon, but your body doesn't obey...
+- KinkyDungeonStruggleCutImpossibleBoundRavagerPinnedAroused = Fighting is useless... You can only give in...
+; ; Custom equip text for pinned just because
+; ; Self-equipping Pinned will have it immediately removed as well as any Occupied on the player, assuming there isn't a ravager on the player
+- KinkyDungeonSelfBondageRavagerPinned = How are you planning to pin yourself down?~
+; ; Stripped keys
+; ; The 'Impossible' keys may not actually get used ever, but I've made them obvious incase someone finds a way to get them triggered
+- KinkyDungeonStruggleRemoveFailRavagerStripped = You try to pull your panties back on despite your restraints...
+- KinkyDungeonStruggleRemoveFailRavagerStrippedAroused = You try to pull your panties back on, but your arousal makes you clumsy...
+- KinkyDungeonStruggleStruggleFailRavagerStripped = You struggle to get your panties back in place despite your restraints...
+- KinkyDungeonStruggleStruggleFailRavagerStrippedAroused = You struggle to get your panties back in place, but your arousal makes you clumsy...
+- KinkyDungeonStruggleRemoveImpossibleRavagerStripped = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripRI
+- KinkyDungeonStruggleRemoveImpossibleRavagerStrippedAroused = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripRIA
+- KinkyDungeonStruggleRemoveImpossibleBoundRavagerStripped = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripRIB
+- KinkyDungeonStruggleRemoveImpossibleBoundRavagerStrippedAroused = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripRIBA
+- KinkyDungeonStruggleStruggleImpossibleRavagerStripped = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripSI
+- KinkyDungeonStruggleStruggleImpossibleRavagerStrippedAroused = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripSIA
+- KinkyDungeonStruggleStruggleImpossibleBoundRavagerStripped = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripSIB
+- KinkyDungeonStruggleStruggleImpossibleBoundRavagerStrippedAroused = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -StripSIBA
+; ; Custom escape and equip keys just added in 5.4-nightly7b
+- KinkyDungeonStruggleStruggleSuccessRavagerStripped = You feel relaxed with your panties on again
+- KinkyDungeonStruggleRemoveSuccessRavagerStripped = You feel relaxed with your panties on again
+- KinkyDungeonSelfBondageRavagerStripped = You slowly slip off your panties
+; ; I can't seem to modify the Impossible2 and Impossible3 keys that are used *sometimes* when struggling against an impossible restraint repeatedly
+; ; I'm adding all of these keys to act as an alert if they ever start working
+- KinkyDungeonStruggleStruggleImpossible2RavagerOccupied = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Struggle1
+- KinkyDungeonStruggleStruggleImpossible3RavagerOccupied = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Struggle2
+- KinkyDungeonStruggleStruggleImpossibleRavagerOccupied2 = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Struggle3
+- KinkyDungeonStruggleStruggleImpossibleRavagerOccupied3 = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Struggle4
+- KinkyDungeonStruggleCutImpossible2RavagerOccupied = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Cut1
+- KinkyDungeonStruggleCutImpossible3RavagerOccupied = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Cut2
+- KinkyDungeonStruggleCutImpossibleRavagerOccupied2 = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Cut3
+- KinkyDungeonStruggleCutImpossibleRavagerOccupied3 = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Cut4
+- KinkyDungeonStruggleRemoveImpossible2RavagerOccupied = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Remove1
+- KinkyDungeonStruggleRemoveImpossible3RavagerOccupied = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Remove2
+- KinkyDungeonStruggleRemoveImpossibleRavagerOccupied2 = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Remove3
+- KinkyDungeonStruggleRemoveImpossibleRavagerOccupied3 = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Remove4
+; ; Add text keys for occupied, all of them just tell the player to remove pinned
+- KinkyDungeonStruggleStruggleFailRavagerOccupied = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleCutFailRavagerOccupied = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleRemoveFailRavagerOccupied = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleStruggleFailRavagerOccupiedAroused = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleCutFailRavagerOccupiedAroused = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleRemoveFailRavagerOccupiedAroused = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleStruggleImpossibleRavagerOccupied = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleCutImpossibleRavagerOccupied = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleRemoveImpossibleRavagerOccupied = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleStruggleImpossibleRavagerOccupiedAroused = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleCutImpossibleRavagerOccupiedAroused = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleRemoveImpossibleRavagerOccupiedAroused = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleStruggleImpossibleBoundRavagerOccupied = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleCutImpossibleBoundRavagerOccupied = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleRemoveImpossibleBoundRavagerOccupied = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleStruggleImpossibleBoundRavagerOccupiedAroused = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleCutImpossibleBoundRavagerOccupiedAroused = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleRemoveImpossibleBoundRavagerOccupiedAroused = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleRemoveNeedEdgeWrongEdgeRavagerOccupied = You need to get them off you first! (Struggle against "Pinned!")
+- KinkyDungeonStruggleRemoveNeedEdgeWrongEdgeRavagerOccupiedAroused = You need to get them off you first! (Struggle against "Pinned!")
+
+
+; Ravager Control menu
+; This whole menu is relatively low priority, as it is intended for developing or deeper level debugging / testing.
+; If there's only some things you translate in this section, translate RFCEnter, RFCTitle, RFCReturn, and RFCButtonDebugEndDebugLog
+RFCEnter = Ravager Hacking
+RFCTitle = Ravager Controls
+RFCReturn = Return
+; ; Ravager Control categories
+RFCCategoryDebug = Debugging
+RFCCategoryCustomize = Customization
+RFCCategoryBand = Bandit
+RFCCategoryWolf = Wolfgirl
+RFCCategorySlime = Slimegirl
+RFCCategoryTent = Tentacle
+RFCCategoryMimic = Mimic
+; ; Ravager Control buttons
+RFCBoolDebugHeavyDebug = Heavy Debugging
+RFCBoolDebugNameFormatDebug = Debug NameFormat function
+RFCBoolMimicExposeMimics = Expose Mimics
+RFCBoolMimicPassiveMimics = Oblivious Mimics
+RFCButtonDebugRevertFunctions = Revert Functions
+RFCBoolMimicTrackMimics = Track Mimics
+RFCBoolDebugAnnounceRavagers = Announce Ravagers
+RFCBoolDebugDebugVanillaTextOverrides = Debug Text Replacements
+RFCButtonDebugEndDebugLog = End Debug Log
+RFCButtonDebugSaveFunctionOverrides = Save Overridden Functions
+RFCButtonDebugCheckFunctionOverrides = Check Overridden Functions
+RFCBoolBandControlBanditsFirstLevel = Control 1st lvl Bandit #s
+RFCBoolDebugUseOldRFControl = Use old RFControl layout
+RFCTextCustomizeBorder = Border Color
+RFCListCustomizeCustomization_Background = Background
+RFCButtonBandEnemyApply = ApplyChanges
+RFCRangeBandBandit_SpawnW8 = Spawn Weight
+RFCRangeBandMaxStartingBandits = Lvl 1 Max Count
+RFCButtonWolfEnemyApply = ApplyChanges
+RFCRangeWolfWolf_SpawnW8 = Spawn Weight
+RFCButtonSlimeEnemyApply = ApplyChanges
+RFCRangeSlimeSlime_SpawnW8 = Spawn Weight
+RFCButtonTentEnemyApply = ApplyChanges
+RFCRangeTentTentacle_SpawnW8 = Spawn Weight
+RFCButtonMimicEnemyApply = ApplyChanges
+RFCRangeMimicMimic_SpawnW8 = Spawn Weight

@@ -62,15 +62,15 @@ DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, 
     } else if (KDModToggleTab == "RavagerFramework") {
       // Setup description popups
       let possibleNewName = name.replace(/ModRangeButton[L|R]?/, "")
-      if (RavagerData.ModConfig[possibleNewName] && RavagerData.ModConfig[possibleNewName].hoverDesc && !RavagerData.Variables.ModConfig.BoxData[possibleNewName]) {
+      if (RavagerData.ModConfig[possibleNewName] && RFHasText("ConfigHover" + possibleNewName) && !RavagerData.Variables.ModConfig.BoxData[possibleNewName]) {
         RavagerData.Variables.ModConfig.BoxData[possibleNewName] = {
           name: possibleNewName,
           Left: Left,
           Top: Top,
           Width: RavagerData.ModConfig[possibleNewName].type.match(/list|range/) ? 500 : Width,
           Height: Height,
-          Text: TextGetKD(`KDModButton${possibleNewName}`),
-          hoverDesc: RavagerData.ModConfig[possibleNewName].hoverDesc,
+          Text: RFGetText(`KDModButton${possibleNewName}`),
+          hoverDesc: RFGetText("ConfigHover" + possibleNewName),
           modPage: KDModPage
         }
       }
@@ -117,7 +117,7 @@ KinkyDungeonDrawGame = function() {
       830,
       300,
       64,
-      'Ravager Hacking',
+      RFGetText("RFCEnter"),
       '#f6f',
       "",
       undefined,
@@ -164,7 +164,7 @@ KinkyDungeonRun = function() {
       926,
       300,
       64,
-      'Ravager Hacking',
+      RFGetText("RFCEnter"),
       '#f6f',
       "",
       undefined,

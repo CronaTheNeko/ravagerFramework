@@ -61,7 +61,7 @@ window.RavagerData = {
             AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio" + (KinkyDungeonGagTotal > 0 ? "GagOrgasm.ogg" : "Ah1 liliana.ogg"), RavagerGetSetting('ravagerSoundVolume') / 2)
           }
           // Text log message
-          KinkyDungeonSendTextMessage(8, "You make a loud moaning noise", "#1fffc7", 1);
+          KinkyDungeonSendTextMessage(8, RFGetText("OrgasmLine"), "#1fffc7", 1);
           // Make noise so enemies hear
           KinkyDungeonMakeNoise(9, KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y)
           return true
@@ -475,14 +475,14 @@ window.RavagerData = {
         let bordercolor = "#000"
         try { bordercolor = string2hex(RavagerData.Variables.RFControl.Customization_BorderColor) } catch {}
         // Title
-        DrawTextFitKD("Ravager Controls", 1250, Ystart - 120, 1000, KDBaseWhite, undefined, 40)
+        DrawTextFitKD(RFGetText("RFCTitle"), 1250, Ystart - 120, 1000, KDBaseWhite, undefined, 40)
         // Return button
-        DrawButtonKDEx("RFCReturn", () => { RFDebug("[RFC] Leaving ravager control"); RavagerData.Variables.State = RavagerData.Variables.PrevState; RavagerData.Variables.DrawState = RavagerData.Variables.PrevDrawState; return true }, true, 975, 880, 550, 64, "Return", KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+        DrawButtonKDEx("RFCReturn", () => { RFDebug("[RFC] Leaving ravager control"); RavagerData.Variables.State = RavagerData.Variables.PrevState; RavagerData.Variables.DrawState = RavagerData.Variables.PrevDrawState; return true }, true, 975, 880, 550, 64, RFGetText("RFCReturn"), KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
         // Categories
         let confCategories = Object.keys(RavagerData.Definitions.FrameworkControls).splice(RavagerData.Variables.RFControl._CategoryPage * confRows, confRows) // Select just the page we are on
         // Draw category buttons
         confCategories.forEach((currentCategory) => {
-          DrawButtonKDEx("RFCCat" + currentCategory, () => { console.log("[RFC] Pressed button for category " + currentCategory); RavagerData.Variables.RFControl._ConfPage = 0; RavagerData.Variables.RFControl._ConfCategory = currentCategory; return true }, true, Xstart, Y, 300, 64, currentCategory, KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+          DrawButtonKDEx("RFCCat" + currentCategory, () => { console.log("[RFC] Pressed button for category " + currentCategory); RavagerData.Variables.RFControl._ConfPage = 0; RavagerData.Variables.RFControl._ConfCategory = currentCategory; return true }, true, Xstart, Y, 300, 64, RFGetText("RFCCategory" + currentCategory), KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
           Y += Ystep
         })
         if (Object.keys(RavagerData.Definitions.FrameworkControls).length > confRows) {
@@ -494,8 +494,9 @@ window.RavagerData = {
           }
         }
         Y = Ystart
-        if (RavagerData.Definitions.FrameworkControls.hasOwnProperty(RavagerData.Variables.RFControl._ConfCategory)) {
-          let categoryConfs = RavagerData.Definitions.FrameworkControls[RavagerData.Variables.RFControl._ConfCategory]
+        let currentCategory = RavagerData.Variables.RFControl._ConfCategory
+        if (RavagerData.Definitions.FrameworkControls.hasOwnProperty(currentCategory)) {
+          let categoryConfs = RavagerData.Definitions.FrameworkControls[currentCategory]
           if (categoryConfs.length > confRows * 2) {
             if (RavagerData.Variables.RFControl._ConfPage != 0) {
               DrawButtonKDEx("RFCToggleListUp", (b) => { RavagerData.Variables.RFControl._ConfPage--; return true }, true, Xstart + 105 + confXOffset * 2, Ystart - 50, 90, 40, "", KDBaseWhite, KinkyDungeonRootDirectory + "UI/RavUp.png", undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
@@ -525,7 +526,7 @@ window.RavagerData = {
               let click = confEntry.onclick ? confEntry.onclick : (bdata) => { if (confEntry.refvar) RavagerData.Variables.RFControl[confEntry.refvar] = !RavagerData.Variables.RFControl[confEntry.refvar]; if (confEntry.postclick) confEntry.postclick(RavagerData.Variables.RFControl[confEntry.refvar]); return true; }
               // When declaring your own on-click function, you'll may not be using a reference variable in the normal refvar location, so you can declare `checked` as a function that returns true or false for the checked value
               let checked = (confEntry.hasOwnProperty('checked') && typeof confEntry.checked == "function") ? confEntry.checked() : RavagerData.Variables.RFControl[confEntry.refvar]
-              DrawCheckboxRFEx("RFCToggle_" + name, click, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 64, 64, confEntry.label, checked, false, blocking ? "#888" : KDBaseWhite, undefined, { bordercolor: bordercolor })
+              DrawCheckboxRFEx("RFCToggle_" + name, click, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 64, 64, RFGetText("RFCBool" + currentCategory + name), checked, false, blocking ? "#888" : KDBaseWhite, undefined, { bordercolor: bordercolor })
               Y += Ystep;
             } else if (confEntry.type == "range") { // Range selection
               // Custom get-value function; don't mind how wasteful this all is :)
@@ -548,7 +549,7 @@ window.RavagerData = {
                 return true
               }, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 64, 64, "<", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
               // Label
-              DrawTextFitKD(`${confEntry.label}: ${RavagerData.Variables.RFControl[confEntry.refvar]}`, Xstart + confXOffset + 64 + 190 + confSecondColumnOffset, Y + 32, 360, blocking ? "#888" : KDBaseWhite, undefined, 30)
+              DrawTextFitKD(`${RFGetText("RFCRange" + currentCategory + name)}: ${RavagerData.Variables.RFControl[confEntry.refvar]}`, Xstart + confXOffset + 64 + 190 + confSecondColumnOffset, Y + 32, 360, blocking ? "#888" : KDBaseWhite, undefined, 30)
               // Increment
               DrawButtonKDEx(`RFCRangeButtonR_${name}`, (bdata) => {
                 if (RavagerData.Variables.RFControl[confEntry.refvar] < confEntry.rangehigh)
@@ -560,11 +561,11 @@ window.RavagerData = {
               Y += Ystep
             } else if (confEntry.type == "button") { // Custom button to run custom code when clicked
               let blocking = (typeof confEntry.block == "function") ? confEntry.block() : undefined
-              DrawButtonKDEx(confEntry.name, confEntry.click, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 370, 64, confEntry.label ? confEntry.label : confEntry.name, blocking ? "#888" : KDBaseWhite, confEntry.image, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+              DrawButtonKDEx(confEntry.name, confEntry.click, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 370, 64, RFGetText("RFCButton" + currentCategory + confEntry.name), blocking ? "#888" : KDBaseWhite, confEntry.image, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
               Y += Ystep
             } else if (confEntry.type == "text") { // Just a label, no settings control
               let blocking = (typeof confEntry.block == "function") ? confEntry.block() : undefined
-              DrawTextFitKD(confEntry.label, Xstart + confXOffset + 64 + 190 + confSecondColumnOffset, Y + 32, 480, blocking ? "#888" : KDBaseWhite, undefined, 30)
+              DrawTextFitKD(RFGetText("RFCText" + currentCategory + confEntry.name), Xstart + confXOffset + 64 + 190 + confSecondColumnOffset, Y + 32, 480, blocking ? "#888" : KDBaseWhite, undefined, 30)
               Y += Ystep
             } else if (confEntry.type == "string") { // Text input
               // Custom get-value function; don't mind how wasteful this all is :)
@@ -591,7 +592,7 @@ window.RavagerData = {
                 return true
               }, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 64, 64, "<", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
               // Label
-              DrawTextFitKD(`${confEntry.label ? confEntry.label : name}: ${RavagerData.Variables.RFControl[confEntry.refvar]}`, Xstart + confXOffset + 64 + 190 + confSecondColumnOffset, Y + 32, 360, blocking ? "#888" : KDBaseWhite, undefined, 30)
+              DrawTextFitKD(`${RFGetText("RFCList" + currentCategory + name)}: ${RavagerData.Variables.RFControl[confEntry.refvar]}`, Xstart + confXOffset + 64 + 190 + confSecondColumnOffset, Y + 32, 360, blocking ? "#888" : KDBaseWhite, undefined, 30)
               // Increment
               DrawButtonKDEx(`RFCListButtonR_${name}`, (bdata) => {
                 let newindex = (confEntry.options.indexOf(RavagerData.Variables.RFControl[confEntry.refvar]) + 1) == confEntry.options.length ? 0 : confEntry.options.indexOf(RavagerData.Variables.RFControl[confEntry.refvar]) + 1
@@ -876,7 +877,7 @@ window.RavagerData = {
       heading.appendChild(ErrorImage("WolfgirlRavager"))
       heading.appendChild(ErrorImage("Hearts", "Conditions/RavBubble"))
       heading.appendChild(ErrorImage("SlimeRavager"))
-      heading.appendChild(document.createTextNode("Ravager Alert"))
+      heading.appendChild(document.createTextNode(RFGetText("MissingFuncTitle")))
       heading.appendChild(ErrorImage("SlimeRavager"))
       heading.appendChild(ErrorImage("Hearts", "Conditions/RavBubble"))
       heading.appendChild(ErrorImage("WolfgirlRavager"))
@@ -891,18 +892,10 @@ window.RavagerData = {
       })
       modal.appendChild(hr)
       // Plain text explaining the popup
-      modal.appendChild(KinkyDungeonErrorPreamble([
-        "It appears that your game is missing a few functions that the Ravager Framework uses to function.",
-        "This is most likely caused by the game updating and renaming / removing some functions."
-      ]))
-      modal.appendChild(KinkyDungeonErrorPreamble([
-        "These functions not being present may result in issues.",
-        "The severity of these issues can't be known by this message, but can range anywhere between unexpected behavior and full game crashes."
-      ]))
+      modal.appendChild(KinkyDungeonErrorPreamble([ RFGetText("MissingFuncPreamble1"), RFGetText("MissingFuncPreamble2") ]))
+      modal.appendChild(KinkyDungeonErrorPreamble([ RFGetText("MissingFuncPreamble3"), RFGetText("MissingFuncPreamble4") ]))
 
-      modal.appendChild(KinkyDungeonErrorPreamble([
-        "While it would be best to report these missing functions as an issue, it may be possible to resolve the issue by enabling Kinky Dungeon's \"Mod Compat Mode\" option."
-      ]))
+      modal.appendChild(KinkyDungeonErrorPreamble([ RFGetText("MissingFuncPreamble5") ]))
       // The code-style info box
       const pre = document.createElement("pre")
       Object.assign(pre.style, {
@@ -919,11 +912,11 @@ window.RavagerData = {
         whiteSpace: "pre-wrap"
       })
       // The list of missing functions
-      pre.textContent = "Missing functions: " + missingFunctions
+      pre.textContent = RFGetText("MissingFuncLabel") + ": " + missingFunctions
       modal.appendChild(pre)
       // Close button
       const closeButton = document.createElement("button")
-      closeButton.textContent = "Close"
+      closeButton.textContent = RFGetText("MissingFuncCloseButton")
       Object.assign(closeButton.style, {
         fontSize: "1.25em",
         padding: "0.5em 1em",
@@ -1033,39 +1026,30 @@ window.RavagerData = {
     ravagerDebug: {
       type: 'boolean',
       refvar: 'ravagerDebug',
-      hoverDesc: "Print verbose messages to the browser console",
-      textKeyVal: "Enable Debug Messages"
     },
     ravagerDisableBandit: {
       type: 'boolean',
       refvar: 'ravagerDisableBandit',
-      textKeyVal: "Disable Bandit Ravager"
     },
     ravagerDisableWolfgirl: {
       type: 'boolean',
       refvar: 'ravagerDisableWolfgirl',
-      textKeyVal: "Disable Wolfgirl Ravager"
     },
     ravagerDisableSlimegirl: {
       type: 'boolean',
       refvar: 'ravagerDisableSlimegirl',
-      textKeyVal: "Disable Silmegirl Ravager"
     },
     ravagerDisableTentaclePit: {
       type: 'boolean',
       refvar: 'ravagerDisableTentaclePit',
-      textKeyVal: "Disable Tentacle Pit"
     },
     ravagerDisableMimic: {
       type: 'boolean',
       refvar: 'ravagerDisableMimic',
-      textKeyVal: "Disable Mimic Ravager"
     },
     ravagerSpicyTendril: {
       type: 'boolean',
       refvar: 'ravagerSpicyTendril',
-      hoverDesc: "Enables some more questionable dialogue for the ravagers that may not be for everyone",
-      textKeyVal: "Spicy Ravager Dialogue"
     },
     ravagerSlimeAddChance: {
       type: 'range',
@@ -1075,15 +1059,11 @@ window.RavagerData = {
       rangelow: 0,
       rangehigh: 1,
       stepcount: 0.01,
-      hoverDesc: "The chance of the slime girl to add slime to you. Setting this too high would cause significant difficulty, as this chance is rolled on every attack, including during ravaging.",
-      textKeyVal: "Slimegirl Restrict Chance"
     },
     ravagerEnableSound: {
       type: 'boolean',
       refvar: 'ravagerEnableSound',
       default: true,
-      hoverDesc: "Enable moans when getting hit and orgasming. Note: This will have no effect if the Girl Sound mod is loaded.",
-      textKeyVal: "Enable Sounds"
     },
     onHitChance: {
       type: 'range',
@@ -1093,8 +1073,6 @@ window.RavagerData = {
       rangelow: 0,
       rangehigh: 1,
       stepcount: 0.05,
-      hoverDesc: "The chance to moan when getting hit.",
-      textKeyVal: "Moan Chance"
     },
     ravagerSoundVolume: {
       type: 'range',
@@ -1103,15 +1081,11 @@ window.RavagerData = {
       rangelow: 0,
       rangehigh: 2,
       stepcount: 0.05,
-      hoverDesc: "The volume of moans",
-      textKeyVal: "Moan Volume"
     },
     ravEnableUseCount: {
       type: 'boolean',
       refvar: 'ravEnableUseCount',
       default: true,
-      hoverDesc: "Enable special dialogue based on how many times you've been ravaged before.",
-      textKeyVal: "Enable Experience Aware Mode"
     },
     ravUseCountMode: {
       type: 'list',
@@ -1119,8 +1093,6 @@ window.RavagerData = {
       refvar: 'ravUseCountMode',
       options: [ 'Any', 'Sometimes', 'Always' ],
       default: 'Any',
-      hoverDesc: "Should experience aware dialogue be used sometimes, always, or do you not have a preference? Can be overridden by a ravager wanting a specific mode.",
-      textKeyVal: "Exp Aware Mode"
     },
     ravUseCountModeChance: {
       type: 'range',
@@ -1130,39 +1102,27 @@ window.RavagerData = {
       rangelow: 0,
       rangehigh: 1,
       stepcount: 0.05,
-      hoverDesc: "Chance to use experience aware dialogue.",
-      textKeyVal: "Exp Aware Chance"
     },
     ravUseCountOverride: {
       type: 'boolean',
       refvar: 'ravUseCountOverride',
-      hoverDesc: "Overrides ravagers wanting a specific experience aware mode. With this enabled, all ravagers will follow your Exp Aware Mode setting. Note: None of the framework's ravagers prefer one mode or the other, so this setting only matters if you're using an external ravager mod that has ravagers that do have a preference.",
-      textKeyVal: "Override Exp Aware Mode"
     },
     ravagerCustomDrop: {
       type: "boolean",
       refvar: "ravagerCustomDrop",
       default: true,
-      hoverDesc: "Allow ravagers to use custom item drop behaviors, which enables dropping random quantaties of multiple items. If enemies stop dropping items, try disabling this, as it may have broken due to a game update.",
-      textKeyVal: "Enable Multi-item Drops"
     },
     ravagerEnableNudeOutfit: {
       type: "boolean",
       refvar: "ravagerEnableNudeOutfit",
-      hoverDesc: 'Allow ravagers to fully strip you when passing out, instead of leaving you minimally clothed.',
-      textKeyVal: "Enable Full Nude"
     },
     ravagerFancyFont: {
       type: "boolean",
       refvar: "ravagerFancyFont",
-      hoverDesc: "Who doesn't like a fancy font in their help messages?",
-      textKeyVal: "Custom font for help"
     },
     ravagerHelpDebug: {
       type: "boolean",
       refvar: "ravagerHelpDebug",
-      hoverDesc: "Turn on heavy debugging mode so that you can provide a log file to help CTN with tracking down bugs. Turning this on will begin saving all of the framework's console messages to memory. To save the log to a file, return to this menu and disable this setting, or enter the Ravager Hacking menu and click End Debug Log.",
-      textKeyVal: "I want to help debug"
     },
   },
   // Copy of mod info; default values incase reading reading mod.json fails
@@ -1250,84 +1210,53 @@ window.RavagerData = {
     FontFaces: {},
     FrameworkControls: {
       // Categories of controls shown during RFControl. Built similar to mod configs with tabs and scrolling
-      Debugging: [
+      Debug: [
         {
           name: "HeavyDebug",
           type: "boolean",
           onclick: () => { RavagerFrameworkToggleDebug(); return true },
-          block: undefined,
           checked: () => { return _RavagerFrameworkDebugEnabled },
-          label: "Heavy Debugging"
         },
         {
           refvar: "NameFormatDebug",
           type: "boolean",
-          label: "Debug NameFormat function"
-        },
-        {
-          refvar: "ExposeMimics",
-          type: "boolean",
-          label: "Expose Mimics",
-          postclick: (val) => { return RavagerData.functions.MimicExposure(val); },
-          block: () => RavagerGetSetting("ravagerDisableMimic")
-        },
-        {
-          refvar: "PassiveMimics",
-          type: "boolean",
-          label: "Oblivious Mimics",
-          postclick: (val) => { return RavagerData.functions.MimicPassive(val); },
-          block: () => RavagerGetSetting("ravagerDisableMimic")
-        },
-        {
-          name: "RevertFunctions",
-          type: "button",
-          click: () => { RavagerFrameworkRevertFunctions(); return true; },
-          label: "Revert Functions"
-        },
-        {
-          refvar: "TrackMimics",
-          type: "boolean",
-          label: "Track Mimics",
-          postclick: (val) => { return RavagerData.functions.SetTrackMimics(val); },
-          block: () => RavagerGetSetting("ravagerDisableMimic")
-        },
-        {
-          refvar: "AnnounceRavagers",
-          type: "boolean",
-          label: "Announce Ravagers",
-          postclick: (val) => { return RavagerData.functions.SetAnnounceRavagers(val); },
-          block: () => RavagerGetSetting("ravagerDisableBandit") && RavagerGetSetting("ravagerDisableWolfgirl") && RavagerGetSetting("ravagerDisableSlimegirl") && RavagerGetSetting("ravagerDisableTentaclePit") && RavagerGetSetting("ravagerDisableMimic")
         },
         {
           refvar: "DebugVanillaTextOverrides",
           type: "boolean",
-          label: "Debug Text Replacements",
         },
         {
-          name: "EndDebugLog",
-          type: "button",
-          label: "End Debug Log",
-          click: () => { KDModSettings.RavagerFramework.ravagerHelpDebug = false; RavagerFrameworkIWantToHelpDebug('Finish'); return true; },
-          block: () => !KDModSettings?.RavagerFramework?.ravagerHelpDebug
+          refvar: "AnnounceRavagers",
+          type: "boolean",
+          postclick: (val) => { return RavagerData.functions.SetAnnounceRavagers(val); },
+          block: () => RavagerGetSetting("ravagerDisableBandit") && RavagerGetSetting("ravagerDisableWolfgirl") && RavagerGetSetting("ravagerDisableSlimegirl") && RavagerGetSetting("ravagerDisableTentaclePit") && RavagerGetSetting("ravagerDisableMimic")
+        },
+        {
+          type: "padding"
         },
         {
           name: "SaveFunctionOverrides",
           type: "button",
-          label: "Save Overridden Functions",
           click: () => { RavagerData.functions.SaveFunctionOverrides(); return true; }
         },
         {
           name: "CheckFunctionOverrides",
           type: "button",
-          label: "Check Overridden Functions",
           click: () => { RavagerData.functions.CheckFunctionOverrides(); return true; }
         },
         {
-          refvar: "ControlBanditsFirstLevel",
-          type: "boolean",
-          label: "Control 1st lvl Bandit #s",
-          default: true,
-          block: () => RavagerGetSetting("ravagerDisableBandit")
+          type: "padding"
+        },
+        {
+          name: "RevertFunctions",
+          type: "button",
+          click: () => { RavagerFrameworkRevertFunctions(); return true; },
+        },
+        {
+          name: "EndDebugLog",
+          type: "button",
+          click: () => { KDModSettings.RavagerFramework.ravagerHelpDebug = false; RavagerFrameworkIWantToHelpDebug('Finish'); return true; },
+          block: () => !KDModSettings?.RavagerFramework?.ravagerHelpDebug
         },
         {
           refvar: "UseOldRFControl",
@@ -1336,37 +1265,33 @@ window.RavagerData = {
           default: false
         },
       ],
-      Customization: [
+      Customize: [
         {
           type: "text",
-          label: "Border Color"
+          name: "Border"
         },
         {
           refvar: "Customization_BorderColor",
           type: "string"
         },
-        // Need background and possibly others
         {
           refvar: "Customization_Background",
           type: "list",
-          label: "Background",
           default: "Dark",
           options: [ "Dark", "Bright" ],
           postclick: (val) => { RavagerData.Variables.RFControl.Background = "RFControl" + val }
         },
       ],
-      Bandit: [
+      Band: [
         {
           name: "EnemyApply",
           type: "button",
-          label: "Apply Changes",
           click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
           block: () => RavagerGetSetting('ravagerDisableBandit')
         },
         {
           refvar: "Bandit_SpawnW8",
           type: "range",
-          label: "Spawn Weight",
           rangehigh: 20,
           rangelow: -20,
           stepcount: 0.1,
@@ -1375,29 +1300,30 @@ window.RavagerData = {
           block: () => RavagerGetSetting('ravagerDisableBandit')
         },
         {
+          refvar: "ControlBanditsFirstLevel",
+          type: "boolean",
+          default: true,
+          block: () => RavagerGetSetting("ravagerDisableBandit")
+        },
+        {
           refvar: "MaxStartingBandits",
           type: "range",
-          label: "Lvl 1 Max Count",
           rangehigh: 50,
           rangelow: 0,
           stepcount: 1,
-          // getval: () => RavagerData.Variables.MaxStartingBandits,
-          // postclick: (val)
           block: () => RavagerGetSetting('ravagerDisableBandit')
         },
       ],
-      Wolfgirl: [
+      Wolf: [
         {
           name: "EnemyApply",
           type: "button",
-          label: "Apply Changes",
           click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
           block: () => RavagerGetSetting('ravagerDisableWolfgirl')
         },
         {
           refvar: "Wolf_SpawnW8",
           type: "range",
-          label: "Spawn Weight",
           rangehigh: 20,
           rangelow: -20,
           stepcount: 0.1,
@@ -1406,18 +1332,16 @@ window.RavagerData = {
           block: () => RavagerGetSetting('ravagerDisableWolfgirl')
         },
       ],
-      Slimegirl: [
+      Slime: [
         {
           name: "EnemyApply",
           type: "button",
-          label: "Apply Changes",
           click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
           block: () => RavagerGetSetting('ravagerDisableSlimegirl')
         },
         {
           refvar: "Slime_SpawnW8",
           type: "range",
-          label: "Spawn Weight",
           rangehigh: 20,
           rangelow: -20,
           stepcount: 0.1,
@@ -1426,18 +1350,16 @@ window.RavagerData = {
           block: () => RavagerGetSetting('ravagerDisableSlimegirl')
         },
       ],
-      Tentacle: [
+      Tent: [
         {
           name: "EnemyApply",
           type: "button",
-          label: "Apply Changes",
           click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
           block: () => RavagerGetSetting('ravagerDisableWolfgirl')
         },
         {
           refvar: "Tentacle_SpawnW8",
           type: "range",
-          label: "Spawn Weight",
           rangehigh: 20,
           rangelow: -20,
           stepcount: 0.1,
@@ -1450,20 +1372,36 @@ window.RavagerData = {
         {
           name: "EnemyApply",
           type: "button",
-          label: "Apply Changes",
           click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
           block: () => RavagerGetSetting('ravagerDisableWolfgirl')
         },
         {
           refvar: "Mimic_SpawnW8",
           type: "range",
-          label: "Spawn Weight",
           rangehigh: 20,
           rangelow: -20,
           stepcount: 0.1,
           getval: () => KinkyDungeonEnemies.find(v => v.name == "MimicRavager").weight,
           postclick: (val) => { KinkyDungeonEnemies.find(v => v.name == "MimicRavager").weight = val },
           block: () => RavagerGetSetting('ravagerDisableMimic')
+        },
+        {
+          refvar: "ExposeMimics",
+          type: "boolean",
+          postclick: (val) => { return RavagerData.functions.MimicExposure(val); },
+          block: () => RavagerGetSetting("ravagerDisableMimic")
+        },
+        {
+          refvar: "PassiveMimics",
+          type: "boolean",
+          postclick: (val) => { return RavagerData.functions.MimicPassive(val); },
+          block: () => RavagerGetSetting("ravagerDisableMimic")
+        },
+        {
+          refvar: "TrackMimics",
+          type: "boolean",
+          postclick: (val) => { return RavagerData.functions.SetTrackMimics(val); },
+          block: () => RavagerGetSetting("ravagerDisableMimic")
         },
       ],
     },
@@ -1529,7 +1467,8 @@ window.RavagerData = {
     MimicBurstPossibleDress: [ "Leotard", "GreenLeotard", "Bikini", "Lingerie" ],
     IWantToHelpDebug: false,
     IWantToHelpDebugBuffer: []
-  }
+  },
+  Translations: {}
 }
 
 // Slots that need to be stripped to occupy a given slot; slots to clear are in order

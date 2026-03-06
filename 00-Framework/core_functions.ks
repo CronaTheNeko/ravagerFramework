@@ -311,7 +311,7 @@ window.RavagerFreeAndClearAllDataIfNoRavagers = function(showMessage = true) {
   })
   if (cleared) {
     if (showMessage && KinkyDungeonPlayerEntity.ravage)
-      KinkyDungeonSendTextMessage(30, "You break free of their grip, leaving an opening to escape!", "#ff0000", 4)
+      KinkyDungeonSendTextMessage(30, RFGetText("NarrationsPinBreakFree"), "#ff0000", 4)
     RavagerFreeAndClearAllData()
     KDBreakTether(KinkyDungeonPlayerEntity)
   }

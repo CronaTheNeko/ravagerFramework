@@ -363,3 +363,69 @@ window.RFToTileTest = function() {
   KDTileToTest = KDTE_ExportTile();
   KinkyDungeonStartNewGame();
 }
+
+// Similar to KD's TextGet, returns text for a specific text key.
+// This mimics KD's translation system, but doesn't directly use it, as I wrote it before figuring out how KD's translation system works.
+// If there's not a translated version available for a specific text key, the english value will be used as a fallback.
+// If there's not an english version available, this will default to returning "[Not Found]: {key}", but can be made to return just the key by setting the `fail` parameter to false
+// This function also handles returning a random value from an array in multiple ways. If key is an array, that array will be passed to RFArrayRand and the result will be returned. If the value found for the text key is surrounded by square brackets ( [ "option1", "option2", ... ] ), this function will attempt to parse it to an array and return the result of RFArrayRand, but will return the unparsed string if parsing fails
+window.RFGetText = function(key, fail = true, skipRandom = false) {
+  let ret = undefined
+  if (RavagerData.Translations[localStorage.BondageClubLanguage] && RavagerData.Translations[localStorage.BondageClubLanguage][key])
+    ret = RavagerData.Translations[localStorage.BondageClubLanguage][key]
+  else if (RavagerData.Translations[""][key])
+    ret = RavagerData.Translations[""][key]
+  else {
+    let src = textProvider.getTextFromGroupStrict(textProvider.defaultGroupId, key)
+    ret = src ? src : (fail ? "[Not Found]: " + key : key)
+  }
+  if (!skipRandom) {
+    if (Array.isArray(key))
+      ret = RFArrayRand(key)
+    else if (ret.startsWith("[") && ret.endsWith("]")) {
+      try {
+        let t = JSON.parse(ret)
+        ret = RFArrayRand(t)
+      } catch (err) {
+        RFWarn("[RF][RFGetText]: Caught error while attempting to parse array: ", err)
+      }
+    }
+  }
+  return ret
+}
+
+// Check if there is a text key available somewhere; first checks the current framework translation, then checks the english framework translation, then checks the game's text map
+window.RFHasText = function(key) {
+  if (RavagerData.Translations[localStorage.BondageClubLanguage] && RavagerData.Translations[localStorage.BondageClubLanguage][key])
+    return true
+  if (RavagerData.Translations[""][key])
+    return true
+  return Boolean(textProvider.getTextFromGroupStrict(textProvider.defaultGroupId, key))
+}
+
+// Similar to KD's addTextKey, adds a key-value pair for a line of text to the framework.
+// If you're adding translated text, set the `lang` parameter to the two character language abbreviation that the game uses.
+// The abbreviation *should* be the same as shown on the title screen's language button, but you can also set the game to your language and check `localStorage.BondageClubLanguage` to be certain
+// If your text key should also be added to the game (via addTextKey()`), prepend your text key with a hyphen and a space "- "
+window.RFAddTextKey = function(key, value, lang = "") {
+  // Ensure lang is upper case
+  lang = lang.toUpperCase()
+  // Default game language of english will be changed to an empty string; makes referencing text keys easier
+  if (lang == "EN")
+    lang = ""
+  // Ensure relevant translation dictionary exists
+  if (!RavagerData.Translations)
+    RavagerData.Translations = {}
+  if (!RavagerData.Translations[lang])
+    RavagerData.Translations[lang] = {}
+  // Adding translated text keys to the game, so they can be returned by TextGet and TextGetKD
+  if (key.startsWith("- ")) {
+    key = key.substr(2)
+    if (lang == "")
+      textProvider.textGroupManager.sourceTextGroupMap.get("default").set(key, value)
+    else if (textProvider.translationServiceGroup.get("default").localizationMap.get(lang))
+      textProvider.translationServiceGroup.get("default").localizationMap.get(lang).tagTranslationMap.set(key, value)
+  }
+  // Add text key
+  RavagerData.Translations[lang][key] = value
+}

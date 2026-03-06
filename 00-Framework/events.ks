@@ -57,9 +57,6 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
         RFDebug('Setting default value for ' + i.refvar + ' ...')
         settingsobject[i.refvar] = i.default
       }
-      // Text keys
-      if (i.textKeyVal)
-        addTextKey(`KDModButton${i.refvar}`, i.textKeyVal)
     }
     KDModSettings['RavagerFramework'] = settingsobject
     RavagerFrameworkSettingsRefresh('load')
@@ -312,7 +309,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
       // If player waited, SP and WP damage is halved - counts as "submitting"
       // They can also unwillingly submit
       pRav.submitting = KinkyDungeonLastTurnAction == "Wait"
-      pRav.submissionReason = KinkyDungeonFlags.get("playerStun") ? "You're too stunned to resist..." : "You moan softly as you let it happen..."
+      pRav.submissionReason = (KinkyDungeonFlags.get("playerStun") ? "RavageSubmitStun" : "RavageSubmit")
       pRav.submissionLevel = 0
       // Get submit chance
       let submitRoll = Math.random() * 100
@@ -351,7 +348,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
           submitRoll > leashSubmitChance
         )
       ) {
-        pRav.submissionReason = "(STUN) You can't will yourself to resist..."
+        pRav.submissionReason = "RavageSubmitWillpower"
         pRav.submitting = "forced"
         pRav.submissionLevel = 3
       } else if (
@@ -362,14 +359,14 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
           submitRoll > baseSubmitChance
         )
       ) {
-        pRav.submissionReason = "(STUN) With a tug of your leash, you're put in your place..."
+        pRav.submissionReason = "RavageSubmitLeash"
         pRav.submitting = "forced"
         pRav.submissionLevel = 2
       } else if (
         pRav.submissionLevel < 1 &&
         submitRoll < baseSubmitChance
       ) {
-        pRav.submissionReason = "(STUN) Your submissiveness gets the better of you..."
+        pRav.submissionReason = "RavageSubmitSubmissive"
         pRav.submitting = "forced"
         pRav.submissionLevel = 1
       }
@@ -524,26 +521,26 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
         if (checkPreviousUseCount(slotOfChoice) && rangeData.experiencedNarration) {
           let eNarr = rangeData.experiencedNarration.findLast((range) => { if (range[0] <= target.ravagedCounts[slotOfChoice]) return true; })
           if (decideToDoExperiencedText(eNarr, slotOfChoice, rangeData)) {
-            pRav.narrationBuffer.push(RavagerData.functions.NameFormat(RFArrayRand(eNarr[1][slotOfChoice]), entity))
+            pRav.narrationBuffer.push(RavagerData.functions.NameFormat(RFGetText(eNarr[1][slotOfChoice], false), entity))
             didExperiencedNarration = true
           }
         }
         if (rangeData.narration && !didExperiencedNarration)
-          pRav.narrationBuffer.push(RavagerData.functions.NameFormat(RFArrayRand(rangeData.narration[slotOfChoice]), entity))
+          pRav.narrationBuffer.push(RavagerData.functions.NameFormat(RFGetText(rangeData.narration[slotOfChoice], false), entity))
         // Use count based taunts
         let didExperiencedTaunt = false
         if (checkPreviousUseCount(slotOfChoice) && rangeData.experiencedTaunts) {
           let eTaunt = rangeData.experiencedTaunts.findLast((range) => { if (range[0] <= target.ravagedCounts[slotOfChoice]) return true; })
           if (decideToDoExperiencedText(eTaunt, slotOfChoice, rangeData)) {
-            KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(RFArrayRand(eTaunt[1][slotOfChoice]), entity), KDGetColor(entity), 6, 6)
+            KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(RFGetText(eTaunt[1][slotOfChoice], false), entity), KDGetColor(entity), 6, 6)
             didExperiencedTaunt = true
           }
         }
         if (rangeData.taunts && !didExperiencedNarration)
-          KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(RFArrayRand(rangeData.taunts), entity), KDGetColor(entity), 6, 6)
+          KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(RFGetText(rangeData.taunts, false), entity), KDGetColor(entity), 6, 6)
         if(rangeData.dp) { // Only do floaty sound effects if DP is being applied, since that means action is happening
           if(enemy.ravage.onomatopoeia)
-            KinkyDungeonSendFloater(entity, RFArrayRand(enemy.ravage.onomatopoeia), "#ff00ff", 2);
+            KinkyDungeonSendFloater(entity, RFGetText(enemy.ravage.onomatopoeia, false), "#ff00ff", 2);
         }
         // Status effect application/precautions
         KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, KDRavaged) // Blinds player
@@ -554,11 +551,11 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
         if(pRav.submitting) { // When submitting, offset the "self-play" cost associated with doTryOrgasm
           if(KinkyDungeonStatStamina > 3)
             KDChangeStamina(undefined, undefined, undefined, KinkyDungeonEdgeCost * -1) // TODO: --- Haven't figured out yet, but this seems to be meant to reduce stamina loss when submitting, but it makes no difference and in fact results in not draining stamina
-          KinkyDungeonSendActionMessage(20, pRav.submissionReason + ` (Reduced SP loss)`, "#dd00dd", 1, false, true);
+          KinkyDungeonSendActionMessage(20, RFGetText(pRav.submissionReason) + ` (Reduced SP loss)`, "#dd00dd", 1, false, true);
         }
         if(pRav.submitting == "forced") {
           KDStunTurns(1)
-          KinkyDungeonSendFloater(KinkyDungeonPlayerEntity, "SUBMIT!", "#ff00ff", 2);
+          KinkyDungeonSendFloater(KinkyDungeonPlayerEntity, RFGetText("RavageSubmitFloater"), "#ff00ff", 2);
         }
         entity.ravage.progress++
         RFDebug('[Ravager Framework] Checking for range callback at range ', range[1], ' ...')
@@ -593,9 +590,9 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
           entity.ravageRefractory = enemy.ravage.refractory
           KDBreakTether(KinkyDungeonPlayerEntity) // Chances are, this enemy was holding the tether
           delete entity.ravage
-          KinkyDungeonSendActionMessage(45, RavagerData.functions.NameFormat(RavagerData.defaults.releaseMessage, entity), "#e0e", 4) // Maybe make this controllable by a rav dev?
+          KinkyDungeonSendActionMessage(45, RavagerData.functions.NameFormat(RFGetText("NarrationsRelease"), entity), "#e0e", 4) // Maybe make this controllable by a rav dev?
         } else { // Pass out!
-          KinkyDungeonSendActionMessage(45, RavagerData.defaults.passoutMessage, "#ee00ee", 4);
+          KinkyDungeonSendActionMessage(45, RFGetText("NarrationsPassout"), "#ee00ee", 4);
           KinkyDungeonPassOut()
           passedOut = true
         }
@@ -603,7 +600,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
         RFDebug('[Ravager Framework]: Attempting to increment slot use count at end of session...')
         increasePlayerRavagedCount(getPreviousRange(range, enemy), slotOfChoice, target, enemy, !(enemy.ravage.ranges.filter(v => v[1].useCount).length > 0))
         if (enemy.ravage.doneTaunts)
-          KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(RFArrayRand(enemy.ravage.doneTaunts), entity), KDGetColor(entity), 6, 6)
+          KinkyDungeonSendDialogue(entity, RavagerData.functions.NameFormat(RFGetText(enemy.ravage.doneTaunts, false), entity), KDGetColor(entity), 6, 6)
         if (
           typeof enemy.ravage.completionCallback == 'string' &&
           KDEventMapEnemy['ravagerCallbacks'] &&
@@ -648,7 +645,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
         } else {
           KinkyDungeonRemoveRestraint(input, true, false, false, false, false, entity)
         }
-        KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.restraintTearMessage, entity, targetRestraint), "#f00", 4) // TODO: Maybe make this controllable for a rav dev?
+        KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RFGetText("NarrationsRestraintTear"), entity, targetRestraint), "#f00", 4) // TODO: Maybe make this controllable for a rav dev?
       } else if (stripOptions.clothing[entity.ravage.slot].length) {
         RFTrace('[Ravager Framework DBG]: PlayerEffect stripping clothing; clothing strip options: ', stripOptions.clothing[entity.ravage.slot])
         let stripped = stripOptions.clothing[entity.ravage.slot][0]
@@ -662,13 +659,13 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
           if (!entity.Enemy.ravage.bypassAll)
             KinkyDungeonAddRestraintIfWeaker("Stripped") // Since panties are sacred normally
         }
-        KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.clothingTearMessage, entity, undefined, stripped), "#f00", 4) // TODO: Maybe make this controllable for a rav dev?
+        KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RFGetText("NarrationsClothingTear"), entity, undefined, stripped), "#f00", 4) // TODO: Maybe make this controllable for a rav dev?
         RFTrace('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped.Lost = ', stripped.Lost)
         stripped.Lost = true
         RFTrace('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped.Lost = ', stripped.Lost)
       } else {
         KinkyDungeonAddRestraintIfWeaker("Pinned")
-        KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.pinMessage, entity), "#f0f", 4)
+        KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RFGetText("NarrationsPin"), entity), "#f0f", 4)
       }
       KinkyDungeonDressPlayer()
       return { sfx: "Miss", effect: true };
@@ -705,7 +702,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
                 let ret = KinkyDungeonAddRestraintIfWeaker(canidateRestraint)
                 // If we succeeded, print a message about that and set didRestrain to true
                 if (ret) {
-                  KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.addRestraintMessage, entity, canidateRestraint), "#f0f", 4)
+                  KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RFGetText("NarrationsAddRestraint"), entity, canidateRestraint), "#f0f", 4)
                   didRestrain = true
                 }
               } catch (e) {
@@ -720,9 +717,9 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
           let dmg = KinkyDungeonDealDamage({damage: 1, type: "grope"});
           if (!enemy.ravage.noFallbackNarration) {
             if (enemy.ravage.fallbackNarration) {
-              KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RFArrayRand(enemy.ravage.fallbackNarration), entity, undefined, undefined, dmg), "#f0f", 4)
+              KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RFGetText("NarrationsFallback"), entity, undefined, undefined, dmg), "#f0f", 4)
             } else {
-              KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RavagerData.defaults.fallbackNarration, entity, undefined, undefined, dmg), "#f0f", 4)
+              KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RFGetText(RavagerData.defaults.fallbackNarration), entity, undefined, undefined, dmg), "#f0f", 4)
             }
           } else {
             RFDebug('[Ravager Framework] ', enemy.name, ' requests no fallback narration.')
@@ -740,7 +737,7 @@ KDEventMapInventory["tickAfter"]["ravagerSitDownAndShutUp"] = (e, item, data) =>
   RFDebug("[RavagerFramework] [ravagerSitDownAndShutUp]\ne: ", e, "\nitem: ", item, "\ndata: ", data)
   let nearby = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 5)
   let stunnedCount = 0
-  let enemyName = ""
+  let onlyEnemy = undefined
   nearby.forEach(enemy => {
     // Make sure we're only stunning non-ravagers
     if (!enemy.Enemy.ravage) {
@@ -755,7 +752,7 @@ KDEventMapInventory["tickAfter"]["ravagerSitDownAndShutUp"] = (e, item, data) =>
         } else {
           // Count how many new witnesses there are, save their name incase there's only one, and label them as witnesses
           stunnedCount++
-          enemyName = enemy.Enemy.name
+          onlyEnemy = enemy
           enemy.witnessedRavaging = true
         }
       }
@@ -765,9 +762,9 @@ KDEventMapInventory["tickAfter"]["ravagerSitDownAndShutUp"] = (e, item, data) =>
   if (stunnedCount > 0) {
     let msg = ""
     if (stunnedCount === 1) {
-      msg = "The nearby " + TextGet("Name" + enemyName) + " notices your predicament and stays to watch"
+      msg = RavagerData.functions.NameFormat(RFGetText("NarrationsStunNearbySingle"), onlyEnemy)
     } else {
-      msg = "Your situation attracts some attention nearby"
+      msg = RavagerData.functions.NameFormat(RFGetText("NarrationsStunNearbyCrowd"))
     }
     KinkyDungeonSendTextMessage(5, msg, "#ff5be9", 4);
   }
