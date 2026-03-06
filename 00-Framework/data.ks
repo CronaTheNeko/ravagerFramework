@@ -601,6 +601,8 @@ window.RavagerData = {
                 return true
               }, !blocking, Xstart + confXOffset + 64 + 360 + 20 + confSecondColumnOffset, Y, 64, 64, ">", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
               Y += Ystep
+            } else if (confEntry.type == "padding") { // Padding in between entries; does nothing but increment the Y value to push the next config down a row and contribute to the config count
+              Y += Ystep
             }
             confCount++
             if (confCount == confRows) {
