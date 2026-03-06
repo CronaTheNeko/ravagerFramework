@@ -10,7 +10,7 @@ KinkyDungeonSendTextMessage = function(priority, text, color, time, noPush, noDu
 
 // Overriding item drops so I can have multiple drops from enemies
 KDDropItems = function(enemy, mapData) {
-  if (RavagerGetSetting("ravagerCustomDrop") && (enemy.Enemy.addedByMod == "RavagerFramework" || enemy.Enemy.ravagerCustomDrop) && enemy.Enemy.maxDrops) {
+  if (RFGetSetting("ravagerCustomDrop") && (enemy.Enemy.addedByMod == "RavagerFramework" || enemy.Enemy.ravagerCustomDrop) && enemy.Enemy.maxDrops) {
     RFTrace(`[Ravager Framework][DBG][KDDropItems]: Dropping items for enemy: ${enemy.Enemy.name}(${enemy.x}, ${enemy.y}): `, enemy)
     // Multiple drops for enemies that have a maxDrops value, are either added by me or want multiple drops via truthy ravagerCustomDrop, and when custom drop setting is enabled
     if (!enemy.noDrop && (enemy.playerdmg || !enemy.summoned) && !enemy.droppedItems) {

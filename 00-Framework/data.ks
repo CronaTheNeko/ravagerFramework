@@ -30,10 +30,10 @@ window.RavagerData = {
           // Don't remember why we need to interrupt sleep, but sounds like an alright idea, so sure
           KinkyDungeonInterruptSleep()
           // Debug message
-          RFTrace('[Ravager Framework][RavagerSoundHit]: enableSound: ', RavagerGetSetting('ravagerEnableSound'), '\nvolume: ', RavagerGetSetting('ravagerSoundVolume') / 2, '\nonHitChance: ', RavagerGetSetting('onHitChance'))
+          RFTrace('[Ravager Framework][RavagerSoundHit]: enableSound: ', RFGetSetting('ravagerEnableSound'), '\nvolume: ', RFGetSetting('ravagerSoundVolume') / 2, '\nonHitChance: ', RFGetSetting('onHitChance'))
           // Might play a sound
-          if (KDToggles.Sound && RavagerGetSetting('ravagerEnableSound') && Math.random() < RavagerGetSetting('onHitChance')) {
-            AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio/" + (KinkyDungeonGagTotal() > 0 ? "Angry21 liliana.ogg" : "Ah1 liliana.ogg"), RavagerGetSetting('ravagerSoundVolume') / 2)
+          if (KDToggles.Sound && RFGetSetting('ravagerEnableSound') && Math.random() < RFGetSetting('onHitChance')) {
+            AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio/" + (KinkyDungeonGagTotal() > 0 ? "Angry21 liliana.ogg" : "Ah1 liliana.ogg"), RFGetSetting('ravagerSoundVolume') / 2)
           }
           return true
         }
@@ -57,8 +57,8 @@ window.RavagerData = {
       criteria: (C) => {
         if (C == KinkyDungeonPlayer && KinkyDungeonFlags.get("OrgSuccess") == 7) {
           // Might play a sound
-          if (KDToggles.Sound && RavagerGetSetting('ravagerEnableSound')) {
-            AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio" + (KinkyDungeonGagTotal > 0 ? "GagOrgasm.ogg" : "Ah1 liliana.ogg"), RavagerGetSetting('ravagerSoundVolume') / 2)
+          if (KDToggles.Sound && RFGetSetting('ravagerEnableSound')) {
+            AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio" + (KinkyDungeonGagTotal > 0 ? "GagOrgasm.ogg" : "Ah1 liliana.ogg"), RFGetSetting('ravagerSoundVolume') / 2)
           }
           // Text log message
           KinkyDungeonSendTextMessage(8, RFGetText("OrgasmLine"), "#1fffc7", 1);
@@ -1229,7 +1229,7 @@ window.RavagerData = {
           refvar: "AnnounceRavagers",
           type: "boolean",
           postclick: (val) => { return RavagerData.functions.SetAnnounceRavagers(val); },
-          block: () => RavagerGetSetting("ravagerDisableBandit") && RavagerGetSetting("ravagerDisableWolfgirl") && RavagerGetSetting("ravagerDisableSlimegirl") && RavagerGetSetting("ravagerDisableTentaclePit") && RavagerGetSetting("ravagerDisableMimic")
+          block: () => RFGetSetting("ravagerDisableBandit") && RFGetSetting("ravagerDisableWolfgirl") && RFGetSetting("ravagerDisableSlimegirl") && RFGetSetting("ravagerDisableTentaclePit") && RFGetSetting("ravagerDisableMimic")
         },
         {
           type: "padding"
@@ -1287,7 +1287,7 @@ window.RavagerData = {
           name: "EnemyApply",
           type: "button",
           click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
-          block: () => RavagerGetSetting('ravagerDisableBandit')
+          block: () => RFGetSetting('ravagerDisableBandit')
         },
         {
           refvar: "Bandit_SpawnW8",
@@ -1297,13 +1297,13 @@ window.RavagerData = {
           stepcount: 0.1,
           getval: () => KinkyDungeonEnemies.find(v => v.name == "BanditRavager").weight,
           postclick: (val) => { KinkyDungeonEnemies.find(v => v.name == "BanditRavager").weight = val },
-          block: () => RavagerGetSetting('ravagerDisableBandit')
+          block: () => RFGetSetting('ravagerDisableBandit')
         },
         {
           refvar: "ControlBanditsFirstLevel",
           type: "boolean",
           default: true,
-          block: () => RavagerGetSetting("ravagerDisableBandit")
+          block: () => RFGetSetting("ravagerDisableBandit")
         },
         {
           refvar: "MaxStartingBandits",
@@ -1311,7 +1311,7 @@ window.RavagerData = {
           rangehigh: 50,
           rangelow: 0,
           stepcount: 1,
-          block: () => RavagerGetSetting('ravagerDisableBandit')
+          block: () => RFGetSetting('ravagerDisableBandit')
         },
       ],
       Wolf: [
@@ -1319,7 +1319,7 @@ window.RavagerData = {
           name: "EnemyApply",
           type: "button",
           click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
-          block: () => RavagerGetSetting('ravagerDisableWolfgirl')
+          block: () => RFGetSetting('ravagerDisableWolfgirl')
         },
         {
           refvar: "Wolf_SpawnW8",
@@ -1329,7 +1329,7 @@ window.RavagerData = {
           stepcount: 0.1,
           getval: () => KinkyDungeonEnemies.find(v => v.name == "WolfgirlRavager").weight,
           postclick: (val) => { KinkyDungeonEnemies.find(v => v.name == "WolfgirlRavager").weight = val },
-          block: () => RavagerGetSetting('ravagerDisableWolfgirl')
+          block: () => RFGetSetting('ravagerDisableWolfgirl')
         },
       ],
       Slime: [
@@ -1337,7 +1337,7 @@ window.RavagerData = {
           name: "EnemyApply",
           type: "button",
           click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
-          block: () => RavagerGetSetting('ravagerDisableSlimegirl')
+          block: () => RFGetSetting('ravagerDisableSlimegirl')
         },
         {
           refvar: "Slime_SpawnW8",
@@ -1347,7 +1347,7 @@ window.RavagerData = {
           stepcount: 0.1,
           getval: () => KinkyDungeonEnemies.find(v => v.name == "SlimeRavager").weight,
           postclick: (val) => { KinkyDungeonEnemies.find(v => v.name == "SlimeRavager").weight = val },
-          block: () => RavagerGetSetting('ravagerDisableSlimegirl')
+          block: () => RFGetSetting('ravagerDisableSlimegirl')
         },
       ],
       Tent: [
@@ -1355,7 +1355,7 @@ window.RavagerData = {
           name: "EnemyApply",
           type: "button",
           click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
-          block: () => RavagerGetSetting('ravagerDisableWolfgirl')
+          block: () => RFGetSetting('ravagerDisableWolfgirl')
         },
         {
           refvar: "Tentacle_SpawnW8",
@@ -1365,7 +1365,7 @@ window.RavagerData = {
           stepcount: 0.1,
           getval: () => KinkyDungeonEnemies.find(v => v.name == "TentaclePit").weight,
           postclick: (val) => { KinkyDungeonEnemies.find(v => v.name == "TentaclePit").weight = val },
-          block: () => RavagerGetSetting('ravagerDisableTentaclePit')
+          block: () => RFGetSetting('ravagerDisableTentaclePit')
         },
       ],
       Mimic: [
@@ -1373,7 +1373,7 @@ window.RavagerData = {
           name: "EnemyApply",
           type: "button",
           click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
-          block: () => RavagerGetSetting('ravagerDisableWolfgirl')
+          block: () => RFGetSetting('ravagerDisableWolfgirl')
         },
         {
           refvar: "Mimic_SpawnW8",
@@ -1383,25 +1383,25 @@ window.RavagerData = {
           stepcount: 0.1,
           getval: () => KinkyDungeonEnemies.find(v => v.name == "MimicRavager").weight,
           postclick: (val) => { KinkyDungeonEnemies.find(v => v.name == "MimicRavager").weight = val },
-          block: () => RavagerGetSetting('ravagerDisableMimic')
+          block: () => RFGetSetting('ravagerDisableMimic')
         },
         {
           refvar: "ExposeMimics",
           type: "boolean",
           postclick: (val) => { return RavagerData.functions.MimicExposure(val); },
-          block: () => RavagerGetSetting("ravagerDisableMimic")
+          block: () => RFGetSetting("ravagerDisableMimic")
         },
         {
           refvar: "PassiveMimics",
           type: "boolean",
           postclick: (val) => { return RavagerData.functions.MimicPassive(val); },
-          block: () => RavagerGetSetting("ravagerDisableMimic")
+          block: () => RFGetSetting("ravagerDisableMimic")
         },
         {
           refvar: "TrackMimics",
           type: "boolean",
           postclick: (val) => { return RavagerData.functions.SetTrackMimics(val); },
-          block: () => RavagerGetSetting("ravagerDisableMimic")
+          block: () => RFGetSetting("ravagerDisableMimic")
         },
       ],
     },

@@ -1,50 +1,3 @@
-// Function to get a mod setting value
-// If KDModSettings.RavagerFramework is unavailable, we're likely in the middle of initialization, and this will attempt to return the matching value saved in localStorage
-// If there's no setting in localStorage, user hasn't loaded this mod before (or has cleared data from the browser), and this will return the default value defined in RavagerData.ModConfig
-// If there's no matching default value, it'll return undefined
-window.RavagerGetSetting = function(refvar) {
-  if (refvar == "ravagerDebug" && _RavagerFrameworkDebugEnabled)
-    return true
-  // Mod settings and default config objects
-  const settings = KDModSettings.RavagerFramework
-  var config = RavagerData.ModConfig[refvar]
-  // Helper for getting default value
-  function RFConfigDefault(refvar, config) {
-    // Check for missing default values; signals either a data structure change or (dev) failure to declare default values
-    if (config == undefined) {
-      RFError('[Ravager Framework]: RavagerGetSetting couldn\'t find ModConfig values for ' + refvar + ' !')
-      return undefined
-    }
-    return config.default
-  }
-  // Helper for checking localStorage, incase the user has set mod settings previously but we're currently in mod initialization, where mod settings aren't available
-  function RFConfigCheckLocalStorage(refvar, config) {
-    // Chain to get the previous setting for the refvar we're looking for
-    if (localStorage.hasOwnProperty('KDModSettings')) {
-      const savedSettings = JSON.parse(localStorage.KDModSettings)
-      if (savedSettings.hasOwnProperty('RavagerFramework') && savedSettings.RavagerFramework[refvar] != undefined) {
-        return savedSettings.RavagerFramework[refvar]
-      }
-    }
-    // Default to returning the default value in ModConfig
-    return RFConfigDefault(refvar, config)
-  }
-  // No settings, return default; probably should never happen, but I believe I've seen it in the past when there's no localData
-  if (!settings) {
-    if (!_RavagerFrameworkInInit)
-      RFWarn('[Ravager Framework]: RavagerGetSetting couldn\'t get current settings for the framework!')
-    return RFConfigCheckLocalStorage(refvar, config)
-  }
-  // Requested setting isn't set, return default
-  if (settings[refvar] == undefined) {
-    if (!_RavagerFrameworkInInit)
-      RFWarn('[Ravager Framework]: RavagerGetSetting couldn\'t get the current setting for ' + refvar)
-    return RFConfigCheckLocalStorage(refvar, config)
-  }
-  // Return setting
-  return settings[refvar]
-}
-
 // Helper for pushing to debug log buffer
 window.RavagerFrameworkPushToLogBuffer = function(msg, level = "INFO") {
   // Check if we actually want to add logs to a potential log file (assuming yes during initialization)
@@ -107,7 +60,7 @@ window.RavagerFrameworkRevertFunctions = function() {
 
 // Enable heavy debugging from modconfig
 window.RavagerFrameworkIWantToHelpDebug = function(reason) {
-  if (RavagerGetSetting("ravagerHelpDebug")) {
+  if (RFGetSetting("ravagerHelpDebug")) {
     // Set my own variables to track debugging
     RavagerData.Variables.IWantToHelpDebug = true
     RavagerFrameworkToggleDebug(true)
@@ -146,7 +99,7 @@ window.RavagerFrameworkRefreshFonts = function(reason) {
       RavagerData.Definitions.FontFaces[font.alias] = new FontFace(font.alias, `url(${font.src})`)
     }
     let font_face = RavagerData.Definitions.FontFaces[font.alias]
-    if (RavagerGetSetting("ravagerFancyFont")) {
+    if (RFGetSetting("ravagerFancyFont")) {
       // Loads the font
       if (!document.fonts.has(font_face)) {
         document.fonts.add(font_face)
@@ -193,7 +146,7 @@ window.RavagerFrameworkApplySlimeRestrictChance = function(reason) {
 // If I expand the mod settings into a dedicated page, I'll most likely make a way to enable spicy dialogue per enemy, so this will need to be reworked
 window.RavagerFrameworkApplySomeSpice = function(reason) {
   // Relevant settings
-  const spice = RavagerGetSetting('ravagerSpicyTendril')
+  const spice = RFGetSetting('ravagerSpicyTendril')
   RFDebug('[Ravager Framework] RavagerFrameworkApplySomeSpice(' + reason + ')')
   RFDebug('[Ravager Framework] Spicy Dialogue set to ', spice)
   // Filter enemies to ravagers that have Spice options
@@ -250,7 +203,7 @@ window.RavagerFrameworkRefreshEnemies = function(reason) {
     let enemy = RavagerData.Definitions.Enemies[en]
     if (enemy.RFDisableRefvar) {
       let enemyIndex = KinkyDungeonEnemies.findIndex(e => e.name == enemy.name && e.addedByMod == "RavagerFramework")
-      if (RavagerGetSetting(enemy.RFDisableRefvar)) {
+      if (RFGetSetting(enemy.RFDisableRefvar)) {
         if (enemyIndex >= 0) {
           RFDebug(`[Ravager Framework][RavagerFrameworkRefreshEnemies]: Removing ${enemy.name}`)
           KinkyDungeonEnemies.splice(enemyIndex, 1)
@@ -288,7 +241,7 @@ window.RavagerFrameworkSetupSound = function() {
 
 window.RefreshRavagerDataVariables = function(reason) {
   RFDebug("[Ravager Framework][RefreshRavagerDataVariables]: Refreshing variables for reason: ", reason)
-  if (RavagerGetSetting("ravagerEnableNudeOutfit")) {
+  if (RFGetSetting("ravagerEnableNudeOutfit")) {
     if (!RavagerData.Variables.MimicBurstPossibleDress.includes("Nude"))
       RavagerData.Variables.MimicBurstPossibleDress.push("Nude")
   } else {

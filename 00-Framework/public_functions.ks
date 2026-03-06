@@ -1,6 +1,6 @@
 // Shortcut to getting ravager debug
 window.RFDebugEnabled = function() {
-  return RavagerGetSetting('ravagerDebug')
+  return RFGetSetting('ravagerDebug')
 }
 
 // Verbosity function for normal level debugging
@@ -33,6 +33,53 @@ window.RFError = (...args) => {
 window.RFInfo = (...args) => {
   RavagerFrameworkPushToLogBuffer(args, "INFO")
   console.log(...args)
+}
+
+// Function to get a mod setting value
+// If KDModSettings.RavagerFramework is unavailable, we're likely in the middle of initialization, and this will attempt to return the matching value saved in localStorage
+// If there's no setting in localStorage, user hasn't loaded this mod before (or has cleared data from the browser), and this will return the default value defined in RavagerData.ModConfig
+// If there's no matching default value, it'll return undefined
+window.RFGetSetting = function(refvar) {
+  if (refvar == "ravagerDebug" && _RavagerFrameworkDebugEnabled)
+    return true
+  // Mod settings and default config objects
+  const settings = KDModSettings.RavagerFramework
+  var config = RavagerData.ModConfig[refvar]
+  // Helper for getting default value
+  function RFConfigDefault(refvar, config) {
+    // Check for missing default values; signals either a data structure change or (dev) failure to declare default values
+    if (config == undefined) {
+      RFError('[Ravager Framework]: RFGetSetting couldn\'t find ModConfig values for ' + refvar + ' !')
+      return undefined
+    }
+    return config.default
+  }
+  // Helper for checking localStorage, incase the user has set mod settings previously but we're currently in mod initialization, where mod settings aren't available
+  function RFConfigCheckLocalStorage(refvar, config) {
+    // Chain to get the previous setting for the refvar we're looking for
+    if (localStorage.hasOwnProperty('KDModSettings')) {
+      const savedSettings = JSON.parse(localStorage.KDModSettings)
+      if (savedSettings.hasOwnProperty('RavagerFramework') && savedSettings.RavagerFramework[refvar] != undefined) {
+        return savedSettings.RavagerFramework[refvar]
+      }
+    }
+    // Default to returning the default value in ModConfig
+    return RFConfigDefault(refvar, config)
+  }
+  // No settings, return default; probably should never happen, but I believe I've seen it in the past when there's no localData
+  if (!settings) {
+    if (!_RavagerFrameworkInInit)
+      RFWarn('[Ravager Framework]: RFGetSetting couldn\'t get current settings for the framework!')
+    return RFConfigCheckLocalStorage(refvar, config)
+  }
+  // Requested setting isn't set, return default
+  if (settings[refvar] == undefined) {
+    if (!_RavagerFrameworkInInit)
+      RFWarn('[Ravager Framework]: RFGetSetting couldn\'t get the current setting for ' + refvar)
+    return RFConfigCheckLocalStorage(refvar, config)
+  }
+  // Return setting
+  return settings[refvar]
 }
 
 // Verbose, but acturate name. Easy way to create stronger versions of enemies.

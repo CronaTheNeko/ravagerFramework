@@ -384,7 +384,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
       function increasePlayerRavagedCount(range, slot, target, enemy, assumeIncrement) {
         RFDebug('[Ravager Framework][increasePlayerRavagedCount]: range: ', range, '; slot: ', slot, '; target: ', target, '; enemy: ', enemy, '; assumeIncrement: ', assumeIncrement)
         // Bail if use-count-aware mode is disabled
-        if (!RavagerGetSetting('ravEnableUseCount')) {
+        if (!RFGetSetting('ravEnableUseCount')) {
           RFDebug('[Ravager Framework][increasePlayerRavagedCount]: EA mode disabled. Bailing.')
           return
         }
@@ -469,7 +469,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
         }
         function decideToDoExperiencedText(obj, slot, rangeData) {
           // Check that use-count-aware mode is enabled before continuing
-          if (!RavagerGetSetting('ravEnableUseCount')) {
+          if (!RFGetSetting('ravEnableUseCount')) {
             RFDebug('[Ravager Framework][decideToDoExperiencedText]: EA mode disabled. Bailing.')
             return false
           }
@@ -477,10 +477,10 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
           let result = Boolean(obj[1] && obj[1][slot])
           // Helper functions
           function experiencedTextDecideDefault() {
-            return Math.random() < RavagerGetSetting('ravUseCountModeChance')
+            return Math.random() < RFGetSetting('ravUseCountModeChance')
           }
           function experiencedTextDecideUser() {
-            const pref = RavagerGetSetting('ravUseCountMode').toLowerCase()
+            const pref = RFGetSetting('ravUseCountMode').toLowerCase()
             if (pref == 'sometimes') {
               return experiencedTextDecideDefault()
             } else if (pref == 'always') {
@@ -493,9 +493,9 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
           function experiencedTextDecideRavager() {
             return rangeData.experiencedAlways || (rangeData.hasOwnProperty('experiencedChance') ? (Math.random() < rangeData.experiencedChance) : experiencedTextDecideDefault())
           }
-          const tryUser = RavagerGetSetting('ravUseCountMode').toLowerCase() != 'any'
+          const tryUser = RFGetSetting('ravUseCountMode').toLowerCase() != 'any'
           const tryRav = rangeData.hasOwnProperty('experiencedChance') || rangeData.experiencedAlways
-          if (RavagerGetSetting('ravUseCountOverride')) {
+          if (RFGetSetting('ravUseCountOverride')) {
             if (tryUser) {
               result = result && experiencedTextDecideUser()
             } else if (tryRav) {
