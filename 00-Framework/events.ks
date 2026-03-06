@@ -717,9 +717,9 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
           let dmg = KinkyDungeonDealDamage({damage: 1, type: "grope"});
           if (!enemy.ravage.noFallbackNarration) {
             if (enemy.ravage.fallbackNarration) {
-              KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RFGetText("NarrationsFallback"), entity, undefined, undefined, dmg), "#f0f", 4)
+              KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RFGetText(enemy.ravage.fallbackNarration, false), entity, undefined, undefined, dmg), "#f0f", 4)
             } else {
-              KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RFGetText(RavagerData.defaults.fallbackNarration), entity, undefined, undefined, dmg), "#f0f", 4)
+              KinkyDungeonSendTextMessage(10, RavagerData.functions.NameFormat(RFGetText("NarrationsFallback"), entity, undefined, undefined, dmg), "#f0f", 4)
             }
           } else {
             RFDebug('[Ravager Framework] ', enemy.name, ' requests no fallback narration.')
