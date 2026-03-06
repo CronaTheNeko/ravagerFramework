@@ -100,16 +100,6 @@ window.RavagerData = {
     // Checked to make the MimicRavager spoiler only show when the mimic has not ambushed the player
     mimicRavSpoiler: enemy => !enemy.ambushtrigger
   },
-  // Default strings
-  defaults: {
-    releaseMessage: "You feel weak as EnemyCName releases you...",
-    passoutMessage: "Your body is broken and exhausted...",
-    restraintTearMessage: "EnemyCName tears your RestraintName away!",
-    clothingTearMessage: "EnemyCName tears your ClothingName away!",
-    pinMessage: "EnemyCName gets a good grip on you...",
-    addRestraintMessage: "EnemyCName forces you to wear a RestraintName",
-    fallbackNarration: "EnemyCName roughly gropes you! (DamageTaken)",
-  },
   // Default mod settings values
   ModConfig: {
     ravagerDebug: {

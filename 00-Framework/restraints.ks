@@ -149,15 +149,3 @@ KinkyDungeonRestraints.push(
     Model: "RavLiftedSkirt"
   },
 )
-
-// Global "restraints"
-KinkyDungeonAddRestraintText('Stripped', 'Stripped!', 'Your panties got torn away...', 'You can just put them back on, but maybe don\'t worry about that if you\'re currently pinned down...');
-KinkyDungeonAddRestraintText('Pinned', 'Pinned!', 'Something or someone is having their way with you.', 'You can\'t move unless you get them off you! Freeing yourself will stun nearby enemies.');
-
-// These all use the same descriptor, suggesting you fight Pinned instead.
-let slotsArr = ['Mouth', 'Vulva', 'Butt']
-for (var i in slotsArr) {
-  KinkyDungeonAddRestraintText('RavagerOccupied' + slotsArr[i], 'Occupied!', 'Someone or something is having their way with you...', 'Don\'t worry about this restraint. Instead, try to escape "Pinned!"');
-}
-
-KinkyDungeonAddRestraintText('RavagerOccupiedHead', 'Gripped!', 'Someone or something is having their way with you...', 'Don\'t worry about this restraint. Instead, try to escape "Pinned!"');
