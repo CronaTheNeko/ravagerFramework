@@ -93,7 +93,7 @@ window.RFGetSetting = function(refvar) {
     - options.skipTextKeyWarning : Optional. Default false. Skips the warning message about textKeys parameter being empty. If you're intending to handle the text keys yourself, set this to true
     - options.skipEnemyDefinitionDictionaryWarning: Optional. Default false. If you don't want to set enemyDefinitionDictionary, but don't want the related warning message shown, set this to true.
 */
-window.RFPushEnemiesWithStrongVariations = function(enemy, count, textKeys, higherLevelIncrease = true, slowLevelIncreaseAmount = 1, enemyDefinitionDictionary, options = { skipTextKeyWarning: false, skipEnemyDefinitionDictionaryWarning: false }) {
+window.RFPushEnemiesWithStrongVariations = function(enemy, count, textKeys, higherLevelIncrease = true, slowLevelIncreaseAmount = 1, enemyDefinitionDictionary, options = { skipTextKeyWarning: false, skipEnemyDefinitionDictionaryWarning: false, TranslationDictionaryEnemy: false }) {
   RFDebug('[Ravager Framework][RFPushEnemiesWithStrongVariations]: enemy: ', enemy, '; count: ', count, '; textKeys: ', textKeys, '; higherLevelIncrease: ', higherLevelIncrease, '; slowLevelIncreaseAmount: ', slowLevelIncreaseAmount, '; options: { skipTextKeyWarning: ', options?.skipTextKeyWarning, ', skipEnemyDefinitionDictionaryWarning: ', options?.skipEnemyDefinitionDictionaryWarning, ' }')
   if (!enemy) {
     RFError("[Ravager Framework][RFPushEnemiesWithStrongVariations]: 'enemy' parameter is undefined! Cannot continue. Whatever enemy this is supposed to be will not be in the game. If you're using an external ravager mod, report this to that author, otherwise report this to the Ravager Framework")
@@ -136,8 +136,14 @@ window.RFPushEnemiesWithStrongVariations = function(enemy, count, textKeys, high
     KinkyDungeonEnemies.push(currentEnemy)
     enemyDefinitionDictionary[currentEnemy.name] = structuredClone(currentEnemy)
     RFTrace(`[Ravager Framework][RFPushEnemiesWithStrongVariations]: Adding text keys for enemy ${currentEnemy.name}`)
-    for (let key in textKeys)
-      addTextKey(key.replace("EnemyName", currentEnemy.name), textKeys[key])
+    if (options.TranslationDictionaryEnemy) { // Translation update behavior
+      let replacer = textKeys[0]
+      for (let key of textKeys[1])
+        RFAddTextKey(("- " + key).replace(replacer, currentEnemy.name), RFGetText(key))
+    } else { // Normal behavior
+      for (let key in textKeys)
+        addTextKey(key.replace("EnemyName", currentEnemy.name), textKeys[key])
+    }
   }
   return true
 }
