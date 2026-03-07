@@ -95,70 +95,70 @@ let banditRavager = {
 		targets: [ "ItemVulva", "ItemMouth", "ItemButt" ], // Enemy will only pick slots listed here; ItemHead should also work, but is nearly completely untested
 			// NOTE - ItemButt will only be chosen if "Rear Plugs" from aroused mode is active.
 		refractory: 50, // Amount of turns to fall back to groping attack behavior
-		onomatopoeia: [ "CLAP...", "PLAP..." ], // Floating text over enemy's head shown during ravaging (can be unspecified for none)
-		doneTaunts: [ "That was good...", "Give me a minute and we'll go again, okay~?", "Such a good girl~!" ],
+		onomatopoeia: "BanditOnomatopoeia", // Floating text over enemy's head shown during ravaging (can be unspecified for none)
+		doneTaunts: "BanditDoneTaunt",
 		// fallbackNarration: ["The ravager roughly gropes you! (DamageTaken)"], // Going to rework this, but let it be default for now
 		restrainChance: 0.05, // Chance, decimal between 0 and 1
 		// Data of ravaging progress; taunts, narration, stat changes, etc.
 		ranges: [
 			[1, { // Starting, no stat damage yet
-				taunts: ["Relax, girlie...", "Hehe, ready~?"],
+				taunts: "BanditR1Taunts",
 				narration: {
-					ItemVulva: ["EnemyCName lines her intimidating cock up with your pussy..."],
-					ItemButt: ["EnemyCName lines her intimidating cock up with your ass..."],
-					ItemMouth: ["EnemyCName presses her cockhead against your lips..."],
+					ItemVulva: "BanditR1Vulva",
+					ItemButt: "BanditR1Butt",
+					ItemMouth: "BanditR1Mouth",
 				}
 			}],
 			[5, { // Getting started
-				taunts: ["Mmh...", "That's it..."],
+				taunts: "BanditR5Taunts",
 				narration: {
-					ItemVulva: ["Wide hips meet yours as her cock stretches out your pussy..."],
-					ItemButt: ["Wide hips meet your ass as her dick stretches you out..."],
-					ItemMouth: ["Her strong hand guides your head up and down her thick cock..."],
+					ItemVulva: "BanditR5Vulva",
+					ItemButt: "BanditR5Butt",
+					ItemMouth: "BanditR5Mouth",
 				},
 				sp: -0.1,
 				dp: 1,
 				orgasmBonus: 0,
 			}],
 			[12, { // Getting rougher
-				taunts: ["Good girl...", "Take it...", "I'm gonna miss you when we find you a nice master..."],
+				taunts: "BanditR12Taunts",
 				narration: {
-					ItemVulva: ["Strong hands grip your waist as your pussy is pounded..."],
-					ItemButt: ["Your hips are gripped tight as your ass is railed..."],
-					ItemMouth: ["Your face meets her lap, throating her cock over and over..."],
+					ItemVulva: "BanditR12Vulva",
+					ItemButt: "BanditR12Butt",
+					ItemMouth: "BanditR12Mouth",
 				},
 				sp: -0.15,
 				dp: 1.5,
 				orgasmBonus: 1,
 			}],
 			[16, { // Peak intensity
-				taunts: ["Ooh, good girl~!", "Haah!"],
+				taunts: "BanditR16Taunts",
 				narration: {
-					ItemVulva: ["You cry out with each hilting thrust, smothered by soft curves!"],
-					ItemButt: ["Her ferocious thrusts drive pathetic whimpers out of you!"],
-					ItemMouth: ["You feel weak, her dick filling your throat again and again!"],
+					ItemVulva: "BanditR16Vulva",
+					ItemButt: "BanditR16Butt",
+					ItemMouth: "BanditR16Mouth",
 				},
 				sp: -0.2,
 				dp: 2,
 				orgasmBonus: 2,
 			}],
 			[17, { // Preparing to finish
-				taunts: ["Here it comes~~!", "Let's fill you up~~!"],
+				taunts: "BanditR17Taunts",
 				narration: {
-					ItemVulva: ["With a thunderous final thrust, her dick throbs, she's about to--!!"],
-					ItemButt: ["Her hips clap against yours with finality, she's about to--!!"],
-					ItemMouth: ["Your vision fades as her cock pulses in your throat, she's about to--!!"],
+					ItemVulva: "BanditR17Vulva",
+					ItemButt: "BanditR17Butt",
+					ItemMouth: "BanditR17Mouth",
 				},
 				sp: -0.2,
 				dp: 5,
 				orgasmBonus: 3,
 			}],
 			[20, { // Finishing
-				taunts: ["Aaaah~...", "Ooohh~...", "That's a good pet~..."],
+				taunts: "BanditR20Taunts",
 				narration: {
-					ItemVulva: ["You moan loudly as you feel your womb flooded with her hot cum..."],
-					ItemButt: ["Your belly grows warm as she fills you up, pounded powerfully into her lap..."],
-					ItemMouth: ["GLK... GLK... You helplessly swallow wave after wave of her seed..."],
+					ItemVulva: "BanditR20Vulva",
+					ItemButt: "BanditR20Butt",
+					ItemMouth: "BanditR20Mouth",
 				},
 				dp: 10,
 				wp: -1,
@@ -184,16 +184,20 @@ let banditRavager = {
 	guardChance: 0.4, // Chance to spawn as a "Guard" type AI
 	focusPlayer: true,
 }
-// Text keys
-// TODO: Add "AttackBanditRavager" (happens when jailed)
-const keys = {
-	NameEnemyName: "Bandit Ravager",
-	AttackEnemyNameDash: "The bandit charges and captures you in a powerful hug!",
-	AttackEnemyNameBlind: "~~{RavagerFrameworkNoMessageDisplay}~~",
-	KillEnemyName: "The bandit scrambles away, waiting for her next chance..."
-}
+// Text keys and how to manipulate them
+const textKeyInfo = [
+	"BanditRavager",
+	[
+		"NameBanditRavager",
+		"AttackBanditRavager",
+		"AttackBanditRavagerDash",
+		"AttackBanditRavagerBlind",
+		"KillBanditRavager",
+	]
+]
 // Gives the enemy to a function that handles adding stronger variations
-RFPushEnemiesWithStrongVariations(banditRavager, 4, keys)
+// Refer to ravagerDevelopers.md for how to use this function when adding ravagers, as this invocation uses very specific functionality built specifically for the translation update
+RFPushEnemiesWithStrongVariations(banditRavager, 4, textKeyInfo, undefined, undefined, undefined, { TranslationDictionaryEnemy: true })
 // I'd like less bandits on the first floor, and this seems easier than figuring out a way to modify spawn weights based on the current level
 KDEventMapGeneric.postMapgen.RFRemoveExtraBandits = function(e, data) {
 	if (RavagerData.Variables.RFControl.ControlBanditsFirstLevel && MiniGameKinkyDungeonLevel == 1) {
