@@ -4,7 +4,7 @@ MissingFuncPreamble1 = It appears that your game is missing a few functions that
 MissingFuncPreamble2 = This is most likely caused by the game updating and renaming / removing some functions.
 MissingFuncPreamble3 = These functions not being present may result in issues.
 MissingFuncPreamble4 = The severity of these issues can't be known by this message, but can range anywhere between unexpected behavior and full game crashes.
-MissingFuncPreamble5 = While it would be best to report these missing functions as an issue, it may be possible to resolve the issue by enabling Kinky Dungeon's \"Mod Compat Mode\" option.
+MissingFuncPreamble5 = While it would be best to report these missing functions as an issue, it may be possible to resolve the issue by enabling Kinky Dungeon's "Mod Compat Mode" option.
 MissingFuncLabel = Missing functions
 MissingFuncCloseButton = Close
 
