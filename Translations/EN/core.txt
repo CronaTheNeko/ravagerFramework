@@ -76,18 +76,18 @@ ConfigHoverravagerHelpDebug = Turn on heavy debugging mode so that you can provi
 - RestraintPinned = Pinned!
 - RestraintPinnedDesc = Something or someone is having their way with you.
 - RestraintPinnedDesc2 = You can't move unless you get them off you! Freeing yourself will stun nearby enemies.
-- RestraintOccupiedMouth = Occupied!
-- RestraintOccupiedMouthDesc = Someone or something is having their way with you...
-- RestraintOccupiedMouthDesc2 = Don't worry about this restraint. Instead, try to escape "Pinned!"
-- RestraintOccupiedVulva = Occupied!
-- RestraintOccupiedVulvaDesc = Someone or something is having their way with you...
-- RestraintOccupiedVulvaDesc2 = Don't worry about this restraint. Instead, try to escape "Pinned!"
-- RestraintOccupiedButt = Occupied!
-- RestraintOccupiedButtDesc = Someone or something is having their way with you...
-- RestraintOccupiedButtDesc2 = Don't worry about this restraint. Instead, try to escape "Pinned!"
-- RestraintOccupiedHead = Gripped!
-- RestraintOccupiedHeadDesc = Someone or something is having their way with you...
-- RestraintOccupiedHeadDesc2 = Don't worry about this restraint. Instead, try to escape "Pinned!"
+- RestraintRavagerOccupiedMouth = Occupied!
+- RestraintRavagerOccupiedMouthDesc = Someone or something is having their way with you...
+- RestraintRavagerOccupiedMouthDesc2 = Don't worry about this restraint. Instead, try to escape "Pinned!"
+- RestraintRavagerOccupiedVulva = Occupied!
+- RestraintRavagerOccupiedVulvaDesc = Someone or something is having their way with you...
+- RestraintRavagerOccupiedVulvaDesc2 = Don't worry about this restraint. Instead, try to escape "Pinned!"
+- RestraintRavagerOccupiedButt = Occupied!
+- RestraintRavagerOccupiedButtDesc = Someone or something is having their way with you...
+- RestraintRavagerOccupiedButtDesc2 = Don't worry about this restraint. Instead, try to escape "Pinned!"
+- RestraintRavagerOccupiedHead = Gripped!
+- RestraintRavagerOccupiedHeadDesc = Someone or something is having their way with you...
+- RestraintRavagerOccupiedHeadDesc2 = Don't worry about this restraint. Instead, try to escape "Pinned!"
 
 ; Restraint actions
 ; ; Since it's supposed to be impossible to struggle out of "Occupied!", and you have to use debug mode to get one to equip to yourself, you should just use debug mode to give yourself a "Pinned!" and equip it
