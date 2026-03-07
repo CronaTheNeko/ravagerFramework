@@ -1,0 +1,55 @@
+; Base
+MimicOnomatopoeia = [ "*Excited wriggling*", "CLAP...", "PLAP...", "*Heavy pulsating*" ]
+MimicDoneTaunt = [ "*Happy caressing*", "*Satisfied growling*" ]
+MimicFallbackNarration = [ "The Mimic's {tendrils|tentacles} {grope|caress} you roughly! (DamageTaken)", "{Tendrils|Tentacles} {caress|grope} you as they wrap around your body (DamageTaken)" ]
+
+; Ranges
+; ; 1
+MimicR1Taunts = [ "*Preemtive dripping*", "*Wriggling and pulsing*" ]
+MimicR1Vulva = [ "The mimic rubs {a|its} {{slimy|wet} |}{tendril|tentacle} {into|against} your {slit|pussy}...", "A {{slimy|wet} |}{tendril|tentacle} rubs {itself into|against} your {slit|pussy}..." ]
+MimicR1Butt = [ "The mimic probes your butt with a {{slimy|wet} |}{tendril|tentacle}...", "The mimic rubs a {{slimy|wet} |}{tendril|tentacle} between your butt cheeks...", "{A|The mimic's} {{slimy|wet} |}{tendril|tentacle} {rubs itself between your butt cheeks|probes your butt}..." ]
+MimicR1Mouth = [ "The mimic {pushes|presses} a {{slimy|wet} |}{tendril|tentacle} against your lips...", "{A|The mimic's} {{slimy|wet} |}{tendril|tentacle} {{pushes|presses} against your lips|hovers above your face, dripping fluids}..." ]
+; ; 5
+MimicR5Taunts = [ "*Passionate squirming*", "*Wriggling and pulsing*" ]
+MimicR5VulvaTame = The {mimic's |}{tendril|tentacle} {quickly |}{pushes|thrusts} {deep |}into your {slit|pussy}...
+MimicR5ButtTame = [ "The mimic{'s {tendril|tentacle} {quickly|harshly|roughly|suddenly} {pushes|shoves|thrusts}| {{quickly|harshly|roughly|suddenly} |}{pushes|shoves|thrusts} its {tendril|tentacle}} into {and stretches |}your ass...", "You cry out as the {mimic's |}{thick |}{tendril|tentacle} {{harshly|roughly|suddenly|quickly} |}{shoves into|thrusts in{to|} and stretches} your ass..." ]
+MimicR5MouthTame = [ "The mimic {pushes|wiggles} its {tendril|tentacle} past your lips and {into|down} your throat...", "You gag as the {mimic's |}{tendril|tentacle} {wiggles between|pushes past} your lips and {into|down} your throat..." ]
+MimicR5VulvaSpicy = [ "The {mimic's |}{thick |}{tendril|tentacle} {shoves|pushes|thrusts} itself into you{r {tight |}pussy|}...", "Your pussy stretches around the {mimic's |}{thick |}{tendril|tentacle} {thrusting|pushing|plunging} into you{r {tight |}pussy|}...", "Your pussy is stretched as the {mimic's |}{thick |}{tendril|tentacle} {thrusts|pushes|plunges} into you{r {tight |}pussy|}...", "You {cry out|gasp hard} as the {mimic's |}{thick |}{tendril|tentacle} {thrusts|pushes|plunges} into your {tight |}pussy..." ]
+MimicR5ButtSpicy = [ "The {mimic's |}{thick |}{tendril|tentacle} {{quickly|forcefully|roughly|harshly|suddenly} |}{{shoves|pushes} itself|thrusts} deep into your {tight |}ass...", "Your ass stretches around the {mimic's |}{thick |}invading {tendril|tentacle}...", "You{r ass is forced to stretch| {cry out|gasp hard}} as the {mimic's |}{thick |}{tendril|tentacle} {{quickly|forcefully|roughly|harshly|suddenly} |}{pushes|thrusts|plunges|{forces|shoves} itself} into your {tight |}ass..." ]
+MimicR5MouthSpicy = [ "You gag as the {mimic's |}{tendril|tentacle} {wiggles|pushes} {between|past} your lips and down your throat...", "You gag as your throat is filled by the {mimic's |}{tendril|tentacle}...", "The mimic's {tendril|tentacle} {pushes|wiggles} past your lips and fills your throat...", "Your cries are {cut short|silenced} as the invading {tendril|tentacle} {thrusts|pushes} into {and fills |}your throat..." ]
+; ; 12
+MimicR12Taunts = [ "*Rough thrusting*", "*Slow pulsating*" ]
+MimicR12Vulva = [ "The mimic {grips|holds} your legs {firmly|tightly} with more {tendrils|tentacles}...", "The mimic uses its {tendrils|tentacles} to {grip|hold} your legs{ {firmly|tightly}|}...", "More {tendrils|tentacles} emerge {and wrap {tightly |}around|to {firmly |}grip} your legs {while|as} your pussy is pounded..." ]
+MimicR12Butt = [ "The mimic {firmly |}{grips|holds} your waist tightly with more {tendrils|tentacles}...", "The mimic uses its {tendrils|tentacles} to {grip|hold} your waist{ firmly|}...", "More {tendrils|tentacles} emerge to {firmly |}{hold|grip} your waist while your ass is pounded..." ]
+MimicR12Mouth = [ "The mimic {cradles|holds} your head with another {tendril|tentacle} {while|as} your throat is used...", "Another {tendril|tentacle} {{cradles|holds} your head {while|as} your throat is used|emerges to {cradle|hold} your head{ and wrap around your neck|}}..." ]
+; ; 16
+MimicR16Taunts = [ "*Rough thrusting*", "*Deep thrusting*" ]
+MimicR16VulvaTame = [ "You {cry out|whimper} with {each|every} thrust, {smothered by {tendril|tentacle}s|{tendril|tentacle}s smothering you}!", "The {tendril|tentacle}s {caressing|groping} and invading your body drive out {cries|whimpers} from you!" ]
+MimicR16ButtTame = [ "You {whimper pathetically|cry out} with {each|every} {rough|strong|hard|forceful} thrust!", "The {tendril|tentacle}'s {rough|strong|hard|forceful} thrusts drive pathetic {whimpers|cries} out of you!" ]
+MimicR16MouthTame = You{r body grows| feel} weak{, choking| as you choke} on the {thick |}{tendril|tentacle} {filling|invading} your throat!
+MimicR16VulvaSpicy = You {cry out|whimper pathetically} {as the {mimic's |}{thick |}{tendril|tentacle} {invades|abuses} your womb with {every|each} thrust|with {each|every} thrust of the {mimic's |}{thick |}{tendril|tentacle} {invading|abusing} your womb}!
+MimicR16ButtSpicy = You {cry out|whimper pathetically} with {each|every} thrust of the {thick |}{tendril|tentacle} {{pushing|penatrating} deep inside|invading|abusing} your ass!
+MimicR16MouthSpicy = You {choke and feel weak|try to cry out through your choking} as the {mimic's |}thick {tendril|tentacle} {pushes|thrusts} deeper {down|into} your throat!
+; ; 17
+MimicR17Taunts = [ "*Strong pulsating*", "*Pumping cum*" ]
+MimicR17VulvaTame = With {rough|strong} final thrusts, the {mimic's |}{tendril|tentacle} pulsates quickly, it's about to--!!
+MimicR17ButtTame = The {mimic's |}{tendril|tentacle} thrusts {hard|forcefully} into your ass, it's about to--!!
+MimicR17MouthTame = You gag and choke as the {mimic's |}{tendril|tentacle} {pushes|thrusts} deep {into|down} your throat, it's about to--!!
+MimicR17VulvaSpicy = With {strong|deeply penatrating} final thrusts{ into your womb|}, the {tendril|tentacle} {begins |}pulsating{ quickly|}, it's about to--!!
+MimicR17ButtSpicy = The {mimic's |}{tendril|tentacle} {thrusts very deep into your ass|invades your ass to extreme depths} and {begins pulsating|pulsates quickly}, it's about to--!!
+MimicR17MouthSpicy = You {choke|gag} and {struggle|resist} as the {{tendril|tentacle} thrusts|mimic thrusts its {tendril|tentacle}} {towards your stomach|deep into your throat}, it's about to--!!
+; ; 20
+MimicR20Taunts = [ "*Satisfied wriggling*", "*Pumping cum*" ]
+MimicR20VulvaTame = You moan loudly as your womb is {flooded|filled} with the {mimic|tendril|tentacle}'s {cum|seed}...!
+MimicR20ButtTame = Your belly grows warm as you're {filled with|pumped full of} the {mimic|tendril|tentacle}'s {cum|seed}...!
+MimicR20MouthTame = You helplessly swallow {wave after wave|copious amounts} of the {mimic|tendril|tentacle}'s {cum|seed}...!
+MimicR20VulvaSpicy = You {moan loudly|cry out}, your womb {stretching|swelling} as you're {filled with|pumped full of} the {mimic|tendril|tentacle}'s {cum|seed}...!
+MimicR20ButtSpicy = {You {moan loudly|cry out} and your|Your} belly {grows round|swells out} as you're {filled with|pumped full of} the {mimic|tendril|tentacle}'s {cum|seed}...!
+MimicR20MouthSpicy = You {whimper and gag|gag and choke} as the {mimic|tendril|tentacle} {pumps its {cum|seed} down your throat|{pumps|fills} your throat and stomach with its {cum|seed}}...!
+
+; Keys used by game
+- NameMimicRavager = Mimic Ravager
+- KillMimicRavager = The Mimic Ravager spills its moist contents.
+- AttackMimicRavager = ~~{RavagerFrameworkNoMessageDisplay}~~
+- AttackMimicRavagerSlow = The mimic's tentacles swarm your body and cover you in a thick liquid
+- RavagerFrameworkMimicRavBurst = Restraints launched from the mimic's body latch themselves to your body!

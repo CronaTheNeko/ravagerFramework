@@ -22,6 +22,7 @@
 		"Translations/EN/core.txt",
 		"Translations/EN/consumables.txt",
 		"Translations/EN/bandit_ravager.txt",
+		"Translations/EN/mimic_ravager.txt",
 		"Translations/load_translations.ks"
 	]
 }
