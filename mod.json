@@ -20,6 +20,7 @@
 		"00-Framework/restraints.ks",
 		"00-Framework/status.ks",
 		"Translations/EN/core.txt",
+		"Translations/EN/bandit_ravager.txt",
 		"Translations/load_translations.ks"
 	]
 }
