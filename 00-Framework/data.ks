@@ -282,7 +282,6 @@ window.RavagerData = {
     "KinkyDungeonStartNewGame",
     "KinkyDungeonVisionGet",
     "KinkyDungeonWordWrap",
-    "LoadTranslations",
     "LZString.compressToBase64",
     "MouseIn",
     "PIXI.Texture.fromURL",
