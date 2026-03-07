@@ -205,7 +205,7 @@ KDEventMapGeneric.postMapgen.RFRemoveExtraBandits = function(e, data) {
 		let rand = RFArrayRand(bandits)
 		while (bandits.length > RavagerData.Variables.RFControl.MaxStartingBandits) {
 			RFDebug(`[Ravager Framework][RFRemoveExtraBandits]: Removing pre-spawned bandit (ID: ${rand.id})`)
-			KinkyDungeonSendActionMessage(100000, `Removing Bandit ${rand.id}`, "#f6f", 3)
+			RFGetSetting("ravagerDebug") && KinkyDungeonSendActionMessage(100000, `Removing Bandit ${rand.id}`, "#f6f", 3)
 			KDRemoveEntity(rand)
 			bandits = KDNearbyEnemies(0, 0, 10000).filter(v => v.Enemy.name == "BanditRavager")
 			rand = RFArrayRand(bandits)
