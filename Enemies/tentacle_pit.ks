@@ -174,12 +174,6 @@ KDCastConditions['tentaclePitSummon'] = summonCondition
 KinkyDungeonSpellListEnemies.push(summonSpell)
 KinkyDungeonEnemies.push(pit)
 RavagerData.Definitions.Enemies.TentaclePit = structuredClone(pit)
-// Text keys
-addTextKey('NameTentaclePit', 'Tentacle Pit')
-addTextKey('AttackTentaclePitStun', 'A strong tentacle wraps around your torso and pulls you towards the pit')
-addTextKey('KillTentaclePit', 'The tentacles writhe in pain and retreat into the ground')
-addTextKey('AttackTentaclePit', 'A tentacle swings and whips your body')
-addTextKey('KinkyDungeonSummonSingleRavagerTendril', 'An eager tentacle bursts out of the ground nearby')
 // END Tentacle Pit
 
 // BEGIN Ravaging Tendril
@@ -199,19 +193,19 @@ function pitTendrilEffect(enemy, target) {
 			let msg = ''
 			switch (enemy.ravage.slot) {
 			case 'ItemVulva':
-				msg = 'The tendril rubs itself into your lower lips..'
+				msg = "TendrilEventVulva"
 				break;
 			case 'ItemButt':
-				msg = 'The tendril caresses your ass and hips..'
+				msg = "TendrilEventButt"
 				break;
 			case 'ItemMouth':
-				msg = 'The tendril caresses your cheek and rubs under your chin..'
+				msg = "TendrilEventMouth"
 				break;
 			default:
-				msg = 'The tendril delicately caresses your curves..'
+				msg = "TendrilEvent"
 				break;
 			}
-			KinkyDungeonSendActionMessage(20, msg, '#ff00ff', 1)
+			KinkyDungeonSendActionMessage(20, RFGetText(msg), '#ff00ff', 1)
 			KinkyDungeonDealDamage({type: 'grope', damage: 0.4})
 			return true
 		} else {
@@ -333,124 +327,94 @@ let tendril = {
 		targets: [ 'ItemVulva', 'ItemButt', 'ItemMouth' ],
 		refactory: 5, // Tendril is killed on completion, so this really doesn't matter
 		needsEyes: false, // Could try to hypno player to 'addict' them by adding a debuff after a while of not being ravaged by plant; maybe a good use for the ravagerTendrilCum; maybe better done through an aphrodisiac for the plant
-		onomatopoeia: [ '*Excited wriggling*', 'CLAP...', 'PLAP...' ],
-		doneTaunts: [ '*Happy caressing*' ],
-		fallbackNarration: [ 'The tendril caresses your curves (DamageTaken)' ],
+		onomatopoeia: "MimicOnomatopoeia",
+		doneTaunts: "MimicDoneTaunts",
+		fallbackNarration: "MimicFallbackNarration",
 		completionCallback: 'pitTendrilCompletion', // Callback to despawn tendril after ravaging, maybe after ravaging twice
 		effectCallback: 'pitTendrilEffectCallback', // Callback to allow the tendril to caress the player (fallback style) for a bit before using her
 		ranges: [
 			[1, {
-				taunts: [ '*Preemtive dripping*', '*Wriggling and pulsing*' ],
+				taunts: "MimicR1Taunts",
 				narration: {
-					// 'Wild' version
-					SpicyItemVulva: [ 'EnemyCName rubs its\' wet tip against your pussy...' ],
-					SpicyItemButt: [ 'EnemyCName rubs its\' wet tip against your ass...' ],
-					SpicyItemMouth: [ 'EnemyCName presses its\' tip against your lips...' ],
-					// 'Tame' version
-					TameItemVulva: [ 'EnemyCName rubs its\' wet tip against your pussy...' ],
-					TameItemButt: [ 'EnemyCName rubs its\' wet tip against your ass...' ],
-					TameItemMouth: [ 'EnemyCName presses its\' tip against your lips...' ],
-					// Active narration
-					ItemVulva: [ 'EnemyCName rubs its\' wet tip against your pussy...' ],
-					ItemButt: [ 'EnemyCName rubs its\' wet tip against your ass...' ],
-					ItemMouth: [ 'EnemyCName presses its\' tip against your lips...' ],
+					ItemVulva: "MimicR1Vulva",
+					ItemButt: "MimicR1Butt",
+					ItemMouth: "MimicR1Mouth",
 				}
 			}],
 			[5, {
-				taunts: [ '*Passionate squirming*', '*Wriggling and pulsing*' ],
+				taunts: "MimicR5Taunts",
 				narration: {
 					// 'Wild' version
-					SpicyItemVulva: [ 'Your pussy is forced to stretch as the thick tendril plunges inside of you...' ],
-					SpicyItemButt: [ 'Your ass is forced to stretch as the thick tendril plunges inside of you...' ],
-					SpicyItemMouth: [ 'You gag as your throat is filled by the tendril...' ],
+					SpicyItemVulva: "MimicR5VulvaSpicy",
+					SpicyItemButt: "MimicR5ButtSpicy",
+					SpicyItemMouth: "MimicR5MouthSpicy",
 					// 'Tame' version
-					TameItemVulva: [ 'Your pussy is stretched as the thick tendril plunges inside of you...' ],
-					TameItemButt: [ 'Your ass is stretched as the thick tendril plunges inside of you...' ],
-					TameItemMouth: [ 'You gag as your throat is filled by the tendril...' ],
-					// Active narration
-					ItemVulva: [ 'Your pussy is stretched as the thick tendril plunges inside of you...' ],
-					ItemButt: [ 'Your ass is stretched as the thick tendril plunges inside of you...' ],
-					ItemMouth: [ 'You gag as your throat is filled by the tendril...' ],
+					TameItemVulva: "MimicR5VulvaTame",
+					TameItemButt: "MimicR5ButtTame",
+					TameItemMouth: "MimicR5MouthTame"
 				},
 				sp: -0.1,
 				dp: 1,
 				orgasmBonus: 0
 			}],
 			[12, {
-				taunts: [ '*Rough thrusting*', '*Slow pulsating*' ],
+				taunts: "MimicR12Taunts",
 				narration: {
 					// 'Wild' version
-					SpicyItemVulva: [ 'More tendrils emerge to grip your legs while your pussy is pounded...' ],
-					SpicyItemButt: [ 'More tendrils emerge to grip your waist while your ass is abused...' ],
-					SpicyItemMouth: [ 'Another tendril emerges to cradle your head and wrap around your throat...' ],
+					SpicyItemButt: "MimicR12ButtSpicy",
 					// 'Tame' version
-					TameItemVulva: [ 'More tendrils emerge to grip your legs while your pussy is pounded...' ],
-					TameItemButt: [ 'More tendrils emerge to grip your waist while your ass is pounded...' ],
-					TameItemMouth: [ 'Another tendril emerges to cradle your head and wrap around your throat...' ],
+					TameItemButt: "MimicR12ButtTame",
 					// Active narration
-					ItemVulva: [ 'More tendrils emerge to grip your legs while your pussy is pounded...' ],
-					ItemButt: [ 'More tendrils emerge to grip your waist while your ass is pounded...' ],
-					ItemMouth: [ 'Another tendril emerges to cradle your head and wrap around your throat...' ],
+					ItemVulva: "MimicR12Vulva",
+					ItemMouth: "MimicR12Mouth",
 				},
 				sp: -0.15,
 				dp: 1.5,
 				orgasmBonus: 1
 			}],
 			[16, {
-				taunts: [ '*Rough thrusting*', '*Deep thrusting*' ],
+				taunts: "MimicR16Taunts",
 				narration: {
 					// 'Wild' version
-					SpicyItemVulva: [ 'You cry out with each thrust of the tendril invading your womb!' ],
-					SpicyItemButt: [ 'The tendril\'s rough thrusts drive pathetic whimpers out of you!' ],
-					SpicyItemMouth: [ 'You choke and feel weak, the tendril filling your throat with each thrust!' ],
+					SpicyItemVulva: "MimicR16VulvaSpicy",
+					SpicyItemButt: "MimicR16ButtSpicy",
+					SpicyItemMouth: "MimicR16MouthSpicy",
 					// 'Tame' version
-					TameItemVulva: [ 'You cry out with each thrust, smothered by tentacles!' ],
-					TameItemButt: [ 'The tendril\'s rough thrusts drive pathetic whimpers out of you!' ],
-					TameItemMouth: [ 'You feel weak, the tendril filling your throat with each thrust!' ],
-					// Active narration
-					ItemVulva: [ 'You cry out with each thrust, smothered by tentacles!' ],
-					ItemButt: [ 'The tendril\'s rough thrusts drive pathetic whimpers out of you!' ],
-					ItemMouth: [ 'You feel weak, the tendril filling your throat with each thrust!' ],
+					TameItemVulva: "MimicR16VulvaTame",
+					TameItemButt: "MimicR16ButtTame",
+					TameItemMouth: "MimicR16MouthTame"
 				},
 				sp: -0.2,
 				dp: 2,
 				orgasmBonus: 2
 			}],
 			[17, {
-				taunts: [ '*Massively pulsating*', '*Pumping cum*' ],
+				taunts: "MimicR17Taunts",
 				narration: {
 					// 'Wild' version
-					SpicyItemVulva: [ 'With deeply penatrating final thrusts, the tendril pulsates quickly, it\'s about to--!!' ],
-					SpicyItemButt: [ 'The tendril invades your ass to extreme depths, it\'s about to--!!' ],
-					SpicyItemMouth: [ 'You gag and resist as the tendril thrusts deep into your throat, it\'s about to--!!' ],
+					SpicyItemVulva: "MimicR17VulvaSpicy",
+					SpicyItemButt: "MimicR17ButtSpicy",
+					SpicyItemMouth: "MimicR17MouthSpicy",
 					// 'Tame' version
-					TameItemVulva: [ 'With rough final thrusts, the tendril pulsates quickly, it\'s about to--!!' ],
-					TameItemButt: [ 'The tendril thrusts hard into your ass, it\'s about to--!!' ],
-					TameItemMouth: [ 'You gag as the tendril thrusts into your throat, it\'s about to--!!' ],
-					// Active narration
-					ItemVulva: [ 'With rough final thrusts, the tendril pulsates quickly, it\'s about to--!!' ],
-					ItemButt: [ 'The tendril thrusts hard into your ass, it\'s about to--!!' ],
-					ItemMouth: [ 'You gag as the tendril thrusts into your throat, it\'s about to--!!' ],
+					TameItemVulva: "MimicR17VulvaTame",
+					TameItemButt: "MimicR17ButtTame",
+					TameItemMouth: "MimicR17MouthTame"
 				},
 				sp: -0.2,
 				dp: 5,
 				orgasmBonus: 3
 			}],
 			[20, {
-				taunts: [ '*Satisfied pulsing*', '*Pumping cum*' ],
+				taunts: "MimicR20Taunts",
 				narration: {
 					// 'Wild' version
-					SpicyItemVulva: [ 'You moan loudly, your womb stretching as you\'re filled with the tendril\'s seed...!' ],
-					SpicyItemButt: [ 'Your belly grows round as you\'re filled with tentacle seed...' ],
-					SpicyItemMouth: [ 'You helplessly swallow wave after wave of the tendril\'s cum...' ],
+					SpicyItemVulva: "MimicR20VulvaSpicy",
+					SpicyItemButt: "MimicR20ButtSpicy",
 					// 'Tame' version
-					TameItemVulva: [ 'You moan loudly as your womb is flooded with the tendril\'s seed...!' ],
-					TameItemButt: [ 'Your belly grows warm as you\'re filled with tentacle seed...' ],
-					TameItemMouth: [ 'You helplessly swallow wave after wave of the tendril\'s cum...' ],
+					TameItemVulva: "MimicR20VulvaTame",
+					TameItemButt: "MimicR20ButtTame",
 					// Active narration
-					ItemVulva: [ 'You moan loudly as your womb is flooded with the tendril\'s seed...!' ],
-					ItemButt: [ 'Your belly grows warm as you\'re filled with tentacle seed...' ],
-					ItemMouth: [ 'You helplessly swallow wave after wave of the tendril\'s cum...' ],
+					ItemMouth: "MimicR20Mouth",
 				},
 				dp: 10,
 				wp: -1,
@@ -472,10 +436,6 @@ let tendril = {
 }
 KinkyDungeonEnemies.push(tendril)
 RavagerData.Definitions.Enemies.PitTendril = structuredClone(tendril)
-// Text keys
-addTextKey('NameRavagerTendril', 'Dripping Tentacle')
-addTextKey('KillRavagerTendril', 'The tentacle thrashes and vanishes below the ground')
-addTextKey('AttackRavagerTendril', '~~{RavagerFrameworkNoMessageDisplay}~~')
 // END Ravaging Tendril
 // Dedicated event to remove the RavagerTendrils that for some reason get spawned during map generation
 KDEventMapGeneric.postMapgen.RFRemovePrespawnedTendrils = function(e, data) {
