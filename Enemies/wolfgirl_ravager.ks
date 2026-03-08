@@ -7,13 +7,13 @@ function wolfgirlRavagerAllRange(entity, target) {
 	let leashed = KinkyDungeonPlayerTags.get("Item_WolfLeash") || KinkyDungeonPlayerTags.get("Item_BasicLeash")
 	if (collared && moduled && !leashed) {
 		KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName("WolfLeash"), 1, false, "Red", undefined, undefined, undefined, "Nevermere", true);
-		KinkyDungeonSendTextMessage(5, RFStringFormat("EnemyCName clicks a leash onto your collar, pulling you close...", entity), "#ff44ff", 3);
+		KinkyDungeonSendTextMessage(5, RFStringFormat(RFGetText("WolfgirlAllRangeLeash"), entity), "#ff44ff", 3);
 	} else if (collared && !moduled) {
 		KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName("ShockModule"), 1, false, "Red", undefined, undefined, undefined, "Nevermere", true);
-		KinkyDungeonSendTextMessage(5, RFStringFormat("EnemyCName activates your collar's training module...", entity), "#ff44ff", 3);
+		KinkyDungeonSendTextMessage(5, RFStringFormat(RFGetText("WolfgirlAllRangeModule"), entity), "#ff44ff", 3);
 	} else if (!collared) {
 		KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName("WolfCollar"), 1, false, "Red", undefined, undefined, undefined, "Nevermere", true);
-		KinkyDungeonSendTextMessage(5, RFStringFormat("EnemyCName fixes a collar around your neck...", entity), "#ff44ff", 3);
+		KinkyDungeonSendTextMessage(5, RFStringFormat(RFGetText("WolfgirlAllRangeCollar"), entity), "#ff44ff", 3);
 	}
 }
 if (!RFAddCallback('wolfgirlRavagerAllRangeCallback', wolfgirlRavagerAllRange)) {
@@ -22,7 +22,7 @@ if (!RFAddCallback('wolfgirlRavagerAllRangeCallback', wolfgirlRavagerAllRange)) 
 // Increase submission chance if wearing shock module
 function wolfgirlSubmitChanceModifier(entity, target, baseSubmitChance) {
 	if (KinkyDungeonPlayerTags.get("Item_ShockModule")) {
-		KinkyDungeonSendTextMessage(5, "Your shock module gently insists you submit... (+20% Submit Chance)", "#ff44ff", 3);
+		KinkyDungeonSendTextMessage(5, RFGetText("WolfgirlSubmitShock"), "#ff44ff", 3);
 		return baseSubmitChance + 20
 	}
 	return baseSubmitChance
@@ -139,71 +139,71 @@ let wolfRavager = {
 		targets: [ "ItemVulva", "ItemMouth", "ItemButt" ],
 		refractory: 50, 
 		needsEyes: false,
-		onomatopoeia: [ "CLAP...", "PLAP..." ],
-		doneTaunts: [ "That was good...", "Give me a minute and we'll go again, okay~?", "Such a good girl~!" ],
+		onomatopoeia: "WolfgirlOnomatopoeia",
+		doneTaunts: "WolfirlDoneTaunts",
 		effectCallback: 'wolfgirlRavagerEffectCallback',
 		restrainChance: 0.05,
 		allRangeCallback: 'wolfgirlRavagerAllRangeCallback',
 		submitChanceModifierCallback: 'wolfgirlSubmitChanceModifierCallback',
 		ranges: [ 
 			[1, {
-				taunts: [ "Relax, girlie...", "Hehe, ready~?" ],
+				taunts: "WolfgirlR1Taunts",
 				narration: {
-					ItemVulva: [ "EnemyCName lines her intimidating cock up with your pussy..." ],
-					ItemButt: [ "EnemyCName lines her intimidating cock up with your ass..." ],
-					ItemMouth: [ "EnemyCName presses her cockhead against your lips..." ],
+					ItemVulva: "WolfgirlR1Vulva",
+					ItemButt: "WolfgirlR1Butt",
+					ItemMouth: "WolfgirlR1Mouth",
 				}
 			}],
 			[5, {
-				taunts: [ "Mmh...", "That's it..." ],
+				taunts: "WolfgirlR5Taunts",
 				narration: {
-					ItemVulva: [ "Wide hips meet yours as her cock stretches out your pussy..." ],
-					ItemButt: [ "Wide hips meet your ass as her dick stretches you out..." ],
-					ItemMouth: [ "Her strong hand guides your head up and down her thick cock..." ],
+					ItemVulva: "WolfgirlR5Vulva",
+					ItemButt: "WolfgirlR5Butt",
+					ItemMouth: "WolfgirlR5Mouth",
 				},
 				sp: -0.3,
 				dp: 1,
 				orgasmBonus: 0,
 			}],
 			[12, {
-				taunts: [ "Good girl...", "Take it...", "I'm gonna miss you when we find you a nice master..." ],
+				taunts: "WolfgirlR12Taunts",
 				narration: {
-					ItemVulva: [ "Strong hands grip your waist as your pussy is pounded..." ],
-					ItemButt: [ "Your hips are gripped tight as your ass is railed..." ],
-					ItemMouth: [ "Your face meets her lap, throating her cock over and over..." ],
+					ItemVulva: "WolfgirlR12Vulva",
+					ItemButt: "WolfgirlR12Butt",
+					ItemMouth: "WolfgirlR12Mouth",
 				},
 				sp: -0.4,
 				dp: 1.5,
 				orgasmBonus: 1,
 			}],
 			[16, {
-				taunts: [ "Ooh, good girl~!", "Haah!" ],
+				taunts: "WolfgirlR16Taunts",
 				narration: {
-					ItemVulva: [ "You cry out with each hilting thrust, smothered by soft curves!" ],
-					ItemButt: [ "Her ferocious thrusts drive pathetic whimpers out of you!" ],
-					ItemMouth: [ "You feel weak, her dick filling your throat again and again!" ],
+					ItemVulva: "WolfgirlR16Vulva",
+					ItemButt: "WolfgirlR16Butt",
+					ItemMouth: "WolfgirlR16Mouth",
 				},
 				sp: -0.5,
 				dp: 2,
 				orgasmBonus: 2,
 			}],
 			[17, {
-				taunts: [ "Here it comes~~!", "Let's fill you up~~!" ],
+				taunts: "WolfgirlR17Taunts",
 				narration: {
-					ItemVulva: [ "With a thunderous final thrust, her dick throbs, she's about to--!!" ],
-					ItemButt: [ "Her hips clap against yours with finality, she's about to--!!" ],
-					ItemMouth: [ "Your vision fades as her cock pulses in your throat, she's about to--!!" ],
+					ItemVulva: "WolfgirlR17Vulva",
+					ItemButt: "WolfgirlR17Butt",
+					ItemMouth: "WolfgirlR17Mouth",
 				},
 				sp: -0.5,
 				dp: 5,
 				orgasmBonus: 3,
 			}],
 			[20, {
-				taunts: [ "Aaaah~...", "Ooohh~...", "That's a good pet~..." ],
+				taunts: "WolfgirlR20Taunts",
 				narration: {
-					ItemVulva: [ "You moan loudly as you feel your womb flooded with her hot cum..." ],
-					ItemButt: [ "Your belly grows warm as she fills you up, pounded powerfully into her lap..." ],
-					ItemMouth: [ "GLK... GLK... You helplessly swallow wave after wave of her seed..." ],
+					ItemVulva: "WolfgirlR20Vulva",
+					ItemButt: "WolfgirlR20Butt",
+					ItemMouth: "WolfgirlR20Mouth",
 				},
 				dp: 10,
 				wp: -1,
@@ -225,10 +225,13 @@ let wolfRavager = {
 	focusPlayer: true,
 }
 // Text keys
-let keys = {
-	NameEnemyName: "Wolfgirl Alpha",
-	AttackEnemyName: "~{RavagerFrameworkNoMessageDisplay}~~",
-	AttackEnemyNameDash: "The alpha yanks your body against her hard!",
-	KillEnemyName: "The alpha scrambles away, waiting for her next chance...",
-}
-RFPushEnemiesWithStrongVariations(wolfRavager, 4, keys)
+let textKeyInfo = [
+	"WolfgirlRavager",
+	[
+		"NameWolfgirlRavager",
+		"AttackWolfgirlRavager",
+		"AttackWolfgirlRavagerDash",
+		"KillWolfgirlRavager",
+	]
+]
+RFPushEnemiesWithStrongVariations(wolfRavager, 4, textKeyInfo, undefined, undefined, undefined, { TranslationDictionaryEnemy: true })
