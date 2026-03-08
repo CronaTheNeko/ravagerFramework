@@ -1,0 +1,64 @@
+; Base
+SlimeOnomatopoeia = [ "CLAP... ", "PLAP..." ]
+SlimeDoneTaunts = [ "That was good... ", "Give me a minute and we'll go again, okay~? ", "Such a good girl~!" ]
+; Ranges
+; ; 1
+SlimeR1Taunts = [ "Relax, girlie... ", "Hehe, ready~?" ]
+SlimeR1Vulva = EnemyCName lines her intimidating cock up with your pussy...
+SlimeR1Butt = EnemyCName lines her intimidating cock up with your ass...
+SlimeR1Mouth = EnemyCName presses her cockhead against your lips...
+; ; 5
+SlimeR5Taunts = [ "Mmh... ", "That's it..." ]
+SlimeR5Vulva = Wide hips meet yours as her cock stretches out your pussy...
+SlimeR5Butt = Wide hips meet your ass as her dick stretches you out...
+SlimeR5Mouth = Her strong hand guides your head up and down her thick cock...
+; ; 12
+SlimeR12Taunts = [ "Good girl... ", "Take it... ", "I'm gonna miss you when we find you a nice master..." ]
+SlimeR12Vulva = Strong hands grip your waist as your pussy is pounded...
+SlimeR12Butt = Your hips are gripped tight as your ass is railed...
+SlimeR12Mouth = Your face meets her lap, throating her cock over and over...
+; ; 16
+SlimeR16Taunts = [ "Ooh, good girl~! ", "Haah!" ]
+SlimeR16Vulva = You cry out with each hilting thrust, smothered by soft curves!
+SlimeR16Butt = Her ferocious thrusts drive pathetic whimpers out of you!
+SlimeR16Mouth = You feel weak, her dick filling your throat again and again!
+; ; 17
+SlimeR17Taunts = [ "Here it comes~~! ", "Let's fill you up~~!" ]
+SlimeR17Vulva = With a thunderous final thrust, her dick throbs, she's about to--!!
+SlimeR17Butt = Her hips clap against yours with finality, she's about to--!!
+SlimeR17Mouth = Your vision fades as her cock pulses in your throat, she's about to--!!
+; ; 20
+SlimeR20Taunts = [ "Aaaah~... ", "Ooohh~... ", "That's a good pet~..." ]
+SlimeR20Vulva = You moan loudly as you feel your womb flooded with her hot cum...
+SlimeR20Butt = Your belly grows warm as she fills you up, pounded powerfully into her lap...
+SlimeR20Mouth = GLK... GLK... You helplessly swallow wave after wave of her seed...
+
+; Used by game
+NameSlimeRavager = Slimegirl
+AttackSlimeRavager = ~~{RavagerFrameworkNoMessageDisplay}~~
+KillSlimeRavager = The slime girl scrambles away, waiting for her next chance...
+KinkyDungeonRemindJailChaseSlimeAdvCommandAssault = You shouldn't be out here on your own~
+KinkyDungeonRemindJailSlimeAdvHitPlayer = We'll take good care of you~
+KinkyDungeonRemindJailPlaySlimeAdv2 = What's a pretty thing like you doing here?~
+KinkyDungeonRemindJailChaseSlimeAdvDefendHonor2 = You won't get away this time~
+KinkyDungeonRemindJailChaseSlimeAdvAttack0 = Why don't you make this easy?~
+KinkyDungeonRemindJailChaseSlimeAdvAttack1 = Ooh, a feisty one!~
+KinkyDungeonRemindJailChaseSlimeAdvAttack2 = You're gonna get yourself into trouble~
+KinkyDungeonRemindJailChaseSlimeAdvAttack3 = Mmm let's train you to be good~
+; ; Assuming this one will be needed, but hasn't been reported so far
+KinkyDungeonRemindJailChaseSlimeAdvDefend1 = Aww, give in and I'll take good care of you~
+KinkyDungeonRemindJailChaseSlimeAdvDefend2 = That's enough trouble, miss
+KinkyDungeonRemindJailChaseSlimeAdvDefend3 = You're in for it now, honey~
+KinkyDungeonRemindJailSlimeAdvMissedMe = Nuh uh uh, sweetie~
+KinkyDungeonRemindJailSlimeAdvMiss = Playing hard to get?~
+KinkyDungeonRemindJailChaseSlimeAdvCommandBlock = Get back here, sweetie~
+; ; Based on vanilla text entries, 'CommandDefend' seems to be shown when showing up to assist another npc. Might just leave this empty (as Fuuka does)
+KinkyDungeonRemindJailChaseSlimeAdvCommandDefend = 
+; ; Left empty because I'm not sure what to write here
+KinkyDungeonRemindJailChaseSlimeAdvAlert = 
+; ; Only saw this when trying to debug bind her
+KinkyDungeonRemindJailSlimeAdvBlockedMe = I'm too slippery for that~
+; ; TODO: Write something for this; was just found by player
+KinkyDungeonRemindJailChaseSlimeAdvDefendHonor1 = 
+; ; Found when freeing a captive slimegirl in the warden's room
+KinkyDungeonRemindJailSlimeAdvIntro = 

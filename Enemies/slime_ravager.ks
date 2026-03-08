@@ -105,69 +105,69 @@ let slimeRavager = {
 		needsEyes: false,
 		bypassSpecial: [ "Slime", "Rubber", "LiquidMetal" ],
 		
-		onomatopoeia: [ "CLAP...", "PLAP..." ],
-		doneTaunts: [ "That was good...", "Give me a minute and we'll go again, okay~?", "Such a good girl~!" ],
+		onomatopoeia: "SlimeOnomatopoeia",
+		doneTaunts: "SlimeDoneTaunts",
 		// A callback for the slime girl to add slime to the player
 		allRangeCallback: 'slimegirlRavagerAllRangeCallback',
 		ranges: [ 
 			[1, {
-				taunts: [ "Relax, girlie...", "Hehe, ready~?" ],
+				taunts: "SlimeR1Taunts",
 				narration: {
-					ItemVulva: [ "EnemyCName lines her intimidating cock up with your pussy..." ],
-					ItemButt: [ "EnemyCName lines her intimidating cock up with your ass..." ],
-					ItemMouth: [ "EnemyCName presses her cockhead against your lips..." ],
+					ItemVulva: "SlimeR1Vulva",
+					ItemButt: "SlimeR1Butt",
+					ItemMouth: "SlimeR1Mouth",
 				}
 			}],
 			[5, {
-				taunts: ["Mmh...", "That's it..."],
+				taunts: "SlimeR5Taunts",
 				narration: {
-					ItemVulva: [ "Wide hips meet yours as her cock stretches out your pussy..." ],
-					ItemButt: [ "Wide hips meet your ass as her dick stretches you out..." ],
-					ItemMouth: [ "Her strong hand guides your head up and down her thick cock..." ],
+					ItemVulva: "SlimeR5Vulva",
+					ItemButt: "SlimeR5Butt",
+					ItemMouth: "SlimeR5Mouth",
 				},
 				sp: -0.1,
 				dp: 1,
 				orgasmBonus: 0,
 			}],
 			[12, {
-				taunts: [ "Good girl...", "Take it...", "I'm gonna miss you when we find you a nice master..." ],
+				taunts: "SlimeR12Taunts",
 				narration: {
-					ItemVulva: [ "Strong hands grip your waist as your pussy is pounded..." ],
-					ItemButt: [ "Your hips are gripped tight as your ass is railed..." ],
-					ItemMouth: [ "Your face meets her lap, throating her cock over and over..." ],
+					ItemVulva: "SlimeR12Vulva",
+					ItemButt: "SlimeR12Butt",
+					ItemMouth: "SlimeR12Mouth",
 				},
 				sp: -0.15,
 				dp: 1.5,
 				orgasmBonus: 1,
 			}],
 			[16, {
-				taunts: [ "Ooh, good girl~!", "Haah!" ],
+				taunts: "SlimeR16Taunts",
 				narration: {
-					ItemVulva: [ "You cry out with each hilting thrust, smothered by soft curves!" ],
-					ItemButt: [ "Her ferocious thrusts drive pathetic whimpers out of you!" ],
-					ItemMouth: [ "You feel weak, her dick filling your throat again and again!" ],
+					ItemVulva: "SlimeR16Vulva",
+					ItemButt: "SlimeR16Butt",
+					ItemMouth: "SlimeR16Mouth",
 				},
 				sp: -0.2,
 				dp: 2,
 				orgasmBonus: 2,
 			}],
 			[17, {
-				taunts: [ "Here it comes~~!", "Let's fill you up~~!" ],
+				taunts: "SlimeR17Taunts",
 				narration: {
-					ItemVulva: [ "With a thunderous final thrust, her dick throbs, she's about to--!!" ],
-					ItemButt: [ "Her hips clap against yours with finality, she's about to--!!" ],
-					ItemMouth: [ "Your vision fades as her cock pulses in your throat, she's about to--!!" ],
+					ItemVulva: "SlimeR17Vulva",
+					ItemButt: "SlimeR17Butt",
+					ItemMouth: "SlimeR17Mouth",
 				},
 				sp: -0.2,
 				dp: 5,
 				orgasmBonus: 3,
 			}],
 			[20, {
-				taunts: [ "Aaaah~...", "Ooohh~...", "That's a good pet~..." ],
+				taunts: "SlimeR20Taunts",
 				narration: {
-					ItemVulva: [ "You moan loudly as you feel your womb flooded with her hot cum..." ],
-					ItemButt: [ "Your belly grows warm as she fills you up, pounded powerfully into her lap..." ],
-					ItemMouth: [ "GLK... GLK... You helplessly swallow wave after wave of her seed..." ],
+					ItemVulva: "SlimeR20Vulva",
+					ItemButt: "SlimeR20Butt",
+					ItemMouth: "SlimeR20Mouth",
 				},
 				dp: 10,
 				wp: -1,
@@ -206,26 +206,31 @@ let slimeRavager = {
 	noDisplace: true,
 	focusPlayer: true,
 }
-let keys = {
-	NameEnemyName: "Slimegirl",
-	AttackEnemyName: "~~{RavagerFrameworkNoMessageDisplay}~~",
-	KillEnemyName: "The slime girl scrambles away, waiting for her next chance...",
-	KinkyDungeonRemindJailChaseSlimeAdvCommandAssault: "You shouldn\'t be out here on your own~",
-	KinkyDungeonRemindJailSlimeAdvHitPlayer: "We\'ll take good care of you~",
-	KinkyDungeonRemindJailPlaySlimeAdv2: "What\'s a pretty thing like you doing here?~",
-	KinkyDungeonRemindJailChaseSlimeAdvDefendHonor2: "You won\'t get away this time~",
-	KinkyDungeonRemindJailChaseSlimeAdvAttack0: "Why don\'t you make this easy?~",
-	KinkyDungeonRemindJailChaseSlimeAdvAttack1: "Ooh, a feisty one!~",
-	KinkyDungeonRemindJailChaseSlimeAdvAttack2: "You\'re gonna get yourself into trouble~",
-	KinkyDungeonRemindJailChaseSlimeAdvAttack3: "Mmm let\'s train you to be good~",
-	KinkyDungeonRemindJailChaseSlimeAdvDefend1: "Aww, give in and I\'ll take good care of you~", // Assuming this one will be needed, but hasn't been reported so far
-	KinkyDungeonRemindJailChaseSlimeAdvDefend2: "That\'s enough trouble, miss",
-	KinkyDungeonRemindJailChaseSlimeAdvDefend3: "You\'re in for it now, honey~",
-	KinkyDungeonRemindJailSlimeAdvMissedMe: "Nuh uh uh, sweetie~",
-	KinkyDungeonRemindJailSlimeAdvMiss: "Playing hard to get?~",
-	KinkyDungeonRemindJailChaseSlimeAdvCommandBlock: "Get back here, sweetie~",
-	KinkyDungeonRemindJailChaseSlimeAdvCommandDefend: "", // Based on vanilla text entries, 'CommandDefend' seems to be shown when showing up to assist another npc. Might just leave this empty (as Fuuka does)
-	KinkyDungeonRemindJailChaseSlimeAdvAlert: "", // Left empty because I'm not sure what to write here
-	KinkyDungeonRemindJailSlimeAdvBlockedMe: "I\'m too slippery for that~", // Only saw this when trying to debug bind her
-}
-RFPushEnemiesWithStrongVariations(slimeRavager, 5, keys, false)
+let textKeyInfo = [
+	"SlimeRavager",
+	[
+		"NameSlimeRavager",
+		"AttackSlimeRavager",
+		"KillSlimeRavager",
+		"KinkyDungeonRemindJailChaseSlimeAdvCommandAssault",
+		"KinkyDungeonRemindJailSlimeAdvHitPlayer",
+		"KinkyDungeonRemindJailPlaySlimeAdv2",
+		"KinkyDungeonRemindJailChaseSlimeAdvDefendHonor2",
+		"KinkyDungeonRemindJailChaseSlimeAdvAttack0",
+		"KinkyDungeonRemindJailChaseSlimeAdvAttack1",
+		"KinkyDungeonRemindJailChaseSlimeAdvAttack2",
+		"KinkyDungeonRemindJailChaseSlimeAdvAttack3",
+		"KinkyDungeonRemindJailChaseSlimeAdvDefend1",
+		"KinkyDungeonRemindJailChaseSlimeAdvDefend2",
+		"KinkyDungeonRemindJailChaseSlimeAdvDefend3",
+		"KinkyDungeonRemindJailSlimeAdvMissedMe",
+		"KinkyDungeonRemindJailSlimeAdvMiss",
+		"KinkyDungeonRemindJailChaseSlimeAdvCommandBlock",
+		"KinkyDungeonRemindJailChaseSlimeAdvCommandDefend",
+		"KinkyDungeonRemindJailChaseSlimeAdvAlert",
+		"KinkyDungeonRemindJailSlimeAdvBlockedMe",
+		"KinkyDungeonRemindJailChaseSlimeAdvDefendHonor1",
+		"KinkyDungeonRemindJailSlimeAdvIntro",
+	]
+]
+RFPushEnemiesWithStrongVariations(slimeRavager, 5, textKeyInfo, false, undefined, undefined, { TranslationDictionaryEnemy: true })
