@@ -881,119 +881,9 @@ window.RavagerFrameworkCheckAllFunctions = function() {
   // Trim the trailing comma
   missingFunctions = missingFunctions.slice(0, missingFunctions.length - 2)
   RavagerData.Variables.MissingFunctions = missingFunctions.split(", ")
-  // Helper to make the header images
-  function ErrorImage(src, path = "Enemies") {
-    const img = document.createElement("img")
-    img.src = KDModFiles[`Game/${path}/${src}.png`]
-    Object.assign(img.style, {
-      maxWidth: "10vw",
-    })
-    return img
-  }
-  // Creating the popup box
-  // The whole popup box
-  const backdrop = document.createElement("div")
-  backdrop.id = "ravager-framework-missing-functions-popup"
-  Object.assign(backdrop.style, {
-    position: "fixed",
-    inset: 0,
-    backgroundColor: "#000000a0",
-    fontFamily: "'Arial', sans-serif",
-    fontSize: "1.8vmin",
-    lineHeight: 1.6
-  })
-  // The main body
-  const modal = document.createElement("div")
-  Object.assign(modal.style, {
-    position: "absolute",
-    display: "flex",
-    flexFlow: "column nowrap",
-    width: "90vw",
-    maxWidth: "1440px",
-    maxHeight: "90vh",
-    overflow: "hidden",
-    backgroundColor: "#282828",
-    color: "#fafafa",
-    left: "50%",
-    top: "50%",
-    transform: "translate(-50%, -50%)",
-    padding: "1rem",
-    borderRadius: "2px",
-    boxShadow: "1px 1px 40px -8px #ffffff80"
-  })
-  backdrop.appendChild(modal)
-  // The heading with ravager images
-  const heading = document.createElement("h1")
-  Object.assign(heading.style, {
-    display: "flex",
-    flexFlow: "row nowrap",
-    alignItems: "center",
-    justifyContent: "space-around",
-    textAlign: "center"
-  })
-  heading.appendChild(ErrorImage("BanditRavager"))
-  heading.appendChild(ErrorImage("Hearts", "Conditions/RavBubble"))
-  heading.appendChild(ErrorImage("WolfgirlRavager"))
-  heading.appendChild(ErrorImage("Hearts", "Conditions/RavBubble"))
-  heading.appendChild(ErrorImage("SlimeRavager"))
-  heading.appendChild(document.createTextNode(RFGetText("MissingFuncTitle")))
-  heading.appendChild(ErrorImage("SlimeRavager"))
-  heading.appendChild(ErrorImage("Hearts", "Conditions/RavBubble"))
-  heading.appendChild(ErrorImage("WolfgirlRavager"))
-  heading.appendChild(ErrorImage("Hearts", "Conditions/RavBubble"))
-  heading.appendChild(ErrorImage("BanditRavager"))
-  modal.appendChild(heading)
-  // Horizontal line
-  const hr = document.createElement("hr")
-  Object.assign(hr.style, {
-    border: "1px solid #f6f",
-    margin: "0 0 1.5em"
-  })
-  modal.appendChild(hr)
-  // Plain text explaining the popup
-  modal.appendChild(KinkyDungeonErrorPreamble([ RFGetText("MissingFuncPreamble1"), RFGetText("MissingFuncPreamble2") ]))
-  modal.appendChild(KinkyDungeonErrorPreamble([ RFGetText("MissingFuncPreamble3"), RFGetText("MissingFuncPreamble4") ]))
-
-  modal.appendChild(KinkyDungeonErrorPreamble([ RFGetText("MissingFuncPreamble5") ]))
-  // The code-style info box
-  const pre = document.createElement("pre")
-  Object.assign(pre.style, {
-    flex: 1,
-    backgroundColor: "#1a1a1a",
-    border: "1px solid #ffffff40",
-    fontSize: "1.1em",
-    padding: "1em",
-    userSelect: "all",
-    overflowWrap: "anywhere",
-    overflowX: "hidden",
-    overflowY: "auto",
-    color: "#fbf",
-    whiteSpace: "pre-wrap"
-  })
-  // The list of missing functions
-  pre.textContent = RFGetText("MissingFuncLabel") + ": " + missingFunctions
-  modal.appendChild(pre)
-  // Close button
-  const closeButton = document.createElement("button")
-  closeButton.textContent = RFGetText("MissingFuncCloseButton")
-  Object.assign(closeButton.style, {
-    fontSize: "1.25em",
-    padding: "0.5em 1em",
-    backgroundColor: KDButtonColor,
-    border: "2px solid #f6f",
-    color: KDBaseWhite,
-    cursor: "pointer"
-  })
-  closeButton.addEventListener("click", () => { backdrop.remove() })
-  Object.assign(closeButton.style, {
-    display: "flex",
-    flexFlow: "row wrap",
-    justifyContent: "space-around",
-    gap: "1em"
-  })
-  modal.appendChild(closeButton)
-  // Show the popup
-  document.body.appendChild(backdrop)
+  // Show the popup for missing functions
+  RavagerFrameworkShowModal("missing-functions-popup", "MissingFuncTitle", [ [ "MissingFuncPreamble1", "MissingFuncPreamble2" ], [ "MissingFuncPreamble3", "MissingFuncPreamble4" ], [ "MissingFuncPreamble5" ] ], RFGetText("MissingFuncLabel") + ": " + missingFunctions)
+  // If we've made it this far, there are missing functions, so return false
   return false
 }
 
@@ -1069,4 +959,130 @@ window.RavagerFrameworkCheckFunctionOverrides = function() {
   }
   // Trigger the file open dialog
   input.click()
+}
+
+// Show a popup
+window.RavagerFrameworkShowModal = function(id, title = "Ravager Framework", preamble, content) {
+  // Helper to make the header images
+  function ErrorImage(src, path = "Enemies") {
+    const img = document.createElement("img")
+    img.src = KDModFiles[`Game/${path}/${src}.png`]
+    Object.assign(img.style, {
+      maxWidth: "10vw",
+    })
+    return img
+  }
+  // Creating the popup box
+  // The whole popup box
+  const backdrop = document.createElement("div")
+  backdrop.id = "ravager-framework-" + id
+  Object.assign(backdrop.style, {
+    position: "fixed",
+    inset: 0,
+    backgroundColor: "#000000a0",
+    fontFamily: "'Arial', sans-serif",
+    fontSize: "1.8vmin",
+    lineHeight: 1.6
+  })
+  // The main body
+  const modal = document.createElement("div")
+  Object.assign(modal.style, {
+    position: "absolute",
+    display: "flex",
+    flexFlow: "column nowrap",
+    width: "90vw",
+    maxWidth: "1440px",
+    maxHeight: "90vh",
+    overflow: "hidden",
+    backgroundColor: "#282828",
+    color: "#fafafa",
+    left: "50%",
+    top: "50%",
+    transform: "translate(-50%, -50%)",
+    padding: "1rem",
+    borderRadius: "2px",
+    boxShadow: "1px 1px 40px -8px #ffffff80"
+  })
+  backdrop.appendChild(modal)
+  // The heading with ravager images
+  const heading = document.createElement("h1")
+  Object.assign(heading.style, {
+    display: "flex",
+    flexFlow: "row nowrap",
+    alignItems: "center",
+    justifyContent: "space-around",
+    textAlign: "center"
+  })
+  heading.appendChild(ErrorImage("BanditRavager"))
+  heading.appendChild(ErrorImage("Hearts", "Conditions/RavBubble"))
+  heading.appendChild(ErrorImage("WolfgirlRavager"))
+  heading.appendChild(ErrorImage("Hearts", "Conditions/RavBubble"))
+  heading.appendChild(ErrorImage("SlimeRavager"))
+  heading.appendChild(document.createTextNode(RFGetText(title, false)))
+  heading.appendChild(ErrorImage("SlimeRavager"))
+  heading.appendChild(ErrorImage("Hearts", "Conditions/RavBubble"))
+  heading.appendChild(ErrorImage("WolfgirlRavager"))
+  heading.appendChild(ErrorImage("Hearts", "Conditions/RavBubble"))
+  heading.appendChild(ErrorImage("BanditRavager"))
+  modal.appendChild(heading)
+  // Horizontal line
+  const hr = document.createElement("hr")
+  Object.assign(hr.style, {
+    border: "1px solid #f6f",
+    margin: "0 0 1.5em"
+  })
+  modal.appendChild(hr)
+  // Plain text explaining the popup
+  if (Array.isArray(preamble)) {
+    for (let amble of preamble) {
+      console.error(amble)
+      let text = []
+      if (Array.isArray(amble))
+        for (let a of amble)
+          text.push(RFGetText(a, false, true))
+      else
+        text = [ RFGetText(amble, false, true) ]
+      modal.appendChild(KinkyDungeonErrorPreamble(text))
+    }
+  } else
+    modal.appendChild(KinkyDungeonErrorPreamble([ preamble ]))
+  // The code-style info box
+  const pre = document.createElement("pre")
+  Object.assign(pre.style, {
+    flex: 1,
+    backgroundColor: "#1a1a1a",
+    border: "1px solid #ffffff40",
+    fontSize: "1.1em",
+    padding: "1em",
+    userSelect: "all",
+    overflowWrap: "anywhere",
+    overflowX: "hidden",
+    overflowY: "auto",
+    color: "#fbf",
+    whiteSpace: "pre-wrap"
+  })
+  // The list of missing functions
+  pre.textContent = content
+  modal.appendChild(pre)
+  // Close button
+  const closeButton = document.createElement("button")
+  closeButton.textContent = RFGetText("ModalCloseButton")
+  Object.assign(closeButton.style, {
+    fontSize: "1.25em",
+    padding: "0.5em 1em",
+    backgroundColor: KDButtonColor,
+    border: "2px solid #f6f",
+    color: KDBaseWhite,
+    cursor: "pointer"
+  })
+  closeButton.addEventListener("click", () => { backdrop.remove() })
+  Object.assign(closeButton.style, {
+    display: "flex",
+    flexFlow: "row wrap",
+    justifyContent: "space-around",
+    gap: "1em"
+  })
+  modal.appendChild(closeButton)
+  // Show the popup
+  document.body.appendChild(backdrop)
 }
