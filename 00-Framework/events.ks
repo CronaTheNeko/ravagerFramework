@@ -65,6 +65,15 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
     if (!RavagerFrameworkCheckAllFunctions())
       RFError("Found missing functions!", RavagerData.Variables.MissingFunctions)
   }
+  KDEventMapGeneric.afterModSettingsLoad.RavagerOutfitRefresh = (e, data) => {
+    // Check if the appearance has the ravager hairpin
+    if (KinkyDungeonPlayer.Appearance.filter(v => v.Model.Name == "RavLargeHeartHairpin")) {
+      // "Change" the character appearance to the saved appearance
+      CharacterAppearanceRestore(KinkyDungeonPlayer, DecompressB64(localStorage.getItem("kinkydungeonappearance" + KDCurrentOutfit)), false, true)
+      // Tell the game to refresh the players outfit
+      KinkyDungeonDressPlayer()
+    }
+  }
 }
 
 if (KDEventMapGeneric['afterModConfig'] != undefined) {
