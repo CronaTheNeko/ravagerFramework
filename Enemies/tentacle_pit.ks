@@ -327,94 +327,94 @@ let tendril = {
 		targets: [ 'ItemVulva', 'ItemButt', 'ItemMouth' ],
 		refactory: 5, // Tendril is killed on completion, so this really doesn't matter
 		needsEyes: false, // Could try to hypno player to 'addict' them by adding a debuff after a while of not being ravaged by plant; maybe a good use for the ravagerTendrilCum; maybe better done through an aphrodisiac for the plant
-		onomatopoeia: "MimicOnomatopoeia",
-		doneTaunts: "MimicDoneTaunts",
-		fallbackNarration: "MimicFallbackNarration",
+		onomatopoeia: "TendrilOnomatopoeia",
+		doneTaunts: "TendrilDoneTaunts",
+		fallbackNarration: "TendrilFallbackNarration",
 		completionCallback: 'pitTendrilCompletion', // Callback to despawn tendril after ravaging, maybe after ravaging twice
 		effectCallback: 'pitTendrilEffectCallback', // Callback to allow the tendril to caress the player (fallback style) for a bit before using her
 		ranges: [
 			[1, {
-				taunts: "MimicR1Taunts",
+				taunts: "TendrilR1Taunts",
 				narration: {
-					ItemVulva: "MimicR1Vulva",
-					ItemButt: "MimicR1Butt",
-					ItemMouth: "MimicR1Mouth",
+					ItemVulva: "TendrilR1Vulva",
+					ItemButt: "TendrilR1Butt",
+					ItemMouth: "TendrilR1Mouth",
 				}
 			}],
 			[5, {
-				taunts: "MimicR5Taunts",
+				taunts: "TendrilR5Taunts",
 				narration: {
 					// 'Wild' version
-					SpicyItemVulva: "MimicR5VulvaSpicy",
-					SpicyItemButt: "MimicR5ButtSpicy",
-					SpicyItemMouth: "MimicR5MouthSpicy",
+					SpicyItemVulva: "TendrilR5VulvaSpicy",
+					SpicyItemButt: "TendrilR5ButtSpicy",
+					SpicyItemMouth: "TendrilR5MouthSpicy",
 					// 'Tame' version
-					TameItemVulva: "MimicR5VulvaTame",
-					TameItemButt: "MimicR5ButtTame",
-					TameItemMouth: "MimicR5MouthTame"
+					TameItemVulva: "TendrilR5VulvaTame",
+					TameItemButt: "TendrilR5ButtTame",
+					TameItemMouth: "TendrilR5MouthTame"
 				},
 				sp: -0.1,
 				dp: 1,
 				orgasmBonus: 0
 			}],
 			[12, {
-				taunts: "MimicR12Taunts",
+				taunts: "TendrilR12Taunts",
 				narration: {
 					// 'Wild' version
-					SpicyItemButt: "MimicR12ButtSpicy",
+					SpicyItemButt: "TendrilR12ButtSpicy",
 					// 'Tame' version
-					TameItemButt: "MimicR12ButtTame",
+					TameItemButt: "TendrilR12ButtTame",
 					// Active narration
-					ItemVulva: "MimicR12Vulva",
-					ItemMouth: "MimicR12Mouth",
+					ItemVulva: "TendrilR12Vulva",
+					ItemMouth: "TendrilR12Mouth",
 				},
 				sp: -0.15,
 				dp: 1.5,
 				orgasmBonus: 1
 			}],
 			[16, {
-				taunts: "MimicR16Taunts",
+				taunts: "TendrilR16Taunts",
 				narration: {
 					// 'Wild' version
-					SpicyItemVulva: "MimicR16VulvaSpicy",
-					SpicyItemButt: "MimicR16ButtSpicy",
-					SpicyItemMouth: "MimicR16MouthSpicy",
+					SpicyItemVulva: "TendrilR16VulvaSpicy",
+					SpicyItemButt: "TendrilR16ButtSpicy",
+					SpicyItemMouth: "TendrilR16MouthSpicy",
 					// 'Tame' version
-					TameItemVulva: "MimicR16VulvaTame",
-					TameItemButt: "MimicR16ButtTame",
-					TameItemMouth: "MimicR16MouthTame"
+					TameItemVulva: "TendrilR16VulvaTame",
+					TameItemButt: "TendrilR16ButtTame",
+					TameItemMouth: "TendrilR16MouthTame"
 				},
 				sp: -0.2,
 				dp: 2,
 				orgasmBonus: 2
 			}],
 			[17, {
-				taunts: "MimicR17Taunts",
+				taunts: "TendrilR17Taunts",
 				narration: {
 					// 'Wild' version
-					SpicyItemVulva: "MimicR17VulvaSpicy",
-					SpicyItemButt: "MimicR17ButtSpicy",
-					SpicyItemMouth: "MimicR17MouthSpicy",
+					SpicyItemVulva: "TendrilR17VulvaSpicy",
+					SpicyItemButt: "TendrilR17ButtSpicy",
+					SpicyItemMouth: "TendrilR17MouthSpicy",
 					// 'Tame' version
-					TameItemVulva: "MimicR17VulvaTame",
-					TameItemButt: "MimicR17ButtTame",
-					TameItemMouth: "MimicR17MouthTame"
+					TameItemVulva: "TendrilR17VulvaTame",
+					TameItemButt: "TendrilR17ButtTame",
+					TameItemMouth: "TendrilR17MouthTame"
 				},
 				sp: -0.2,
 				dp: 5,
 				orgasmBonus: 3
 			}],
 			[20, {
-				taunts: "MimicR20Taunts",
+				taunts: "TendrilR20Taunts",
 				narration: {
 					// 'Wild' version
-					SpicyItemVulva: "MimicR20VulvaSpicy",
-					SpicyItemButt: "MimicR20ButtSpicy",
+					SpicyItemVulva: "TendrilR20VulvaSpicy",
+					SpicyItemButt: "TendrilR20ButtSpicy",
 					// 'Tame' version
-					TameItemVulva: "MimicR20VulvaTame",
-					TameItemButt: "MimicR20ButtTame",
+					TameItemVulva: "TendrilR20VulvaTame",
+					TameItemButt: "TendrilR20ButtTame",
 					// Active narration
-					ItemMouth: "MimicR20Mouth",
+					ItemMouth: "TendrilR20Mouth",
 				},
 				dp: 10,
 				wp: -1,
