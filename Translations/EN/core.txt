@@ -187,6 +187,7 @@ RFCCategoryWolf = Wolfgirl
 RFCCategorySlime = Slimegirl
 RFCCategoryTent = Tentacle
 RFCCategoryMimic = Mimic
+RFCCategoryTranslate = Translations
 ; ; Ravager Control buttons
 RFCBoolDebugHeavyDebug = Heavy Debugging
 RFCBoolDebugNameFormatDebug = Debug RFStringFormat function
