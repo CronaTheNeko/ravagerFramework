@@ -1,5 +1,22 @@
+window.RavagerFrameworkLoadTranslation = function(content, language) {
+  // Split into lines
+  let lines = content.split("\n")
+  // Loop lines
+  for (let line of lines) {
+    // Skip empty lines and comments
+    if (line.match(/^(\s*$|;)/))
+      continue
+    // Split line into text key and value. Key and value are separated by " = ", and the split regex ensures that " = " is still safe to use within values
+    let [key, val] = line.split(/ = (.*)/s, 2)
+    // Trim leading and trailing spaces
+    key.trim()
+    val.trim()
+    // Add text key
+    RFAddTextKey(key, val, language)
+  }
+}
 // Async function since blob operations are async
-async function LoadTranslations() {
+window.RavagerFrameworkLoadTranslations = async function() {
   // Get available translations
   let translations = Object.keys(KDModFiles).filter(v => v.match(/^Game\/Translations\/[A-Z]{2}\/[a-zA-Z0-9-_]+\.txt/s))
   // Loop available translations
@@ -12,24 +29,10 @@ async function LoadTranslations() {
     let blob2 = await response.blob()
     // Read file text
     let text2 = await blob2.text()
-    // Split into lines
-    let lines2 = text2.split("\n")
     // Free memory used for translation (might as well?)
     URL.revokeObjectURL(KDModFiles[tname])
     delete KDModFiles[tname]
-    // Loop lines
-    for (let line of lines2) {
-      // Skip empty lines and comments
-      if (line.match(/^(\s*$|;)/))
-        continue
-      // Split line into text key and value. Key and value are separated by " = ", and the split regex ensures that " = " is still safe to use within values
-      let [key, val] = line.split(/ = (.*)/s, 2)
-      // Trim leading and trailing spaces
-      key.trim()
-      val.trim()
-      // Add text key
-      RFAddTextKey(key, val, lang)
-    }
+    RavagerFrameworkLoadTranslation(text2, lang)
   }
 }
-LoadTranslations()
+RavagerFrameworkLoadTranslations()
