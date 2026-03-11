@@ -183,7 +183,8 @@ KinkyDungeonRun = function() {
         let mult = KDGetFontMult()
         let descSettings = modConfig.Desc
         let boxSettings = modConfig.Box
-        let textSplit = KinkyDungeonWordWrap(o.hoverDesc, 20 * mult, 40 * mult).split("\n")
+        let textSplit = []
+        KinkyDungeonWordWrap(o.hoverDesc, 20 * mult, 40 * mult).split("\n").forEach(v => { v.split("~{n}").forEach(vv => { textSplit.push(vv) }) })
         let bPadV = boxSettings.PadV
         // Figure out the box size based on the number of description lines and all the padding needed
         let bHeight = (bPadV * 4) + ((descSettings.FontSize + 5) * (textSplit.length - 1))
