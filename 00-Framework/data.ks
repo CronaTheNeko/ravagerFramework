@@ -361,6 +361,50 @@ window.RavagerData = {
           label: "Use old RFControl layout",
           default: false
         },
+        {
+          type: "padding"
+        },
+        {
+          type: "padding"
+        },
+        {
+          type: "padding"
+        },
+        {
+          type: "padding"
+        },
+        {
+          // This just completely breaks when reloading data.ks; it would take a major rework to fix, since this file just fully replaces window.RavagerData, leading to stack overlows, since our function overrides get set to themselves
+          // This is also very dangerous, as it literally just calls eval on any file chosen
+          type: "button",
+          name: "ImportJS",
+          block: () => !(_RavagerFrameworkDebugEnabled && RavagerData.Variables.RFControl.NameFormatDebug && RavagerData.Variables.RFControl.DebugVanillaTextOverrides && RavagerData.Variables.RFControl.AnnounceRavagers),
+          click: () => {
+            let input = document.createElement("input")
+            input.type = "file"
+            input.accept = ".js,.ks"
+            input.multiple = true
+            input.onchange = async function(event) {
+              let files = event.target.files
+              for (let file of files) {
+                if (file) {
+                  try {
+                    console.log("Loading file " + file.name + " ...")
+                    const fileContent = await file.text()
+                    console.log("Executing file " + file.name + " ...")
+                    let evaluated = await eval(fileContent)
+                    console.log(evaluated)
+                  } catch (error) {
+                    console.error("Error reading JS file: ", error)
+                  }
+                }
+              }
+              RavagerData.Variables.State = RavagerData.Variables.PrevState
+              RavagerData.Variables.DrawState = RavagerData.Variables.PrevDrawState
+            }
+            input.click()
+          }
+        },
       ],
       Customize: [
         {
