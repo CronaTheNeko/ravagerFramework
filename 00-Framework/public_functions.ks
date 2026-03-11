@@ -635,3 +635,98 @@ window.RFAddTextKey = function(key, value, lang = "") {
   // Add text key
   RavagerData.Translations[lang][key] = value
 }
+
+// Unravel my in-string-random strings; meant to help translators who may be struggling to understand those complex strings, and primarily meant to be used from RFControl
+// `key` paramater can be either a text key or the string to be unravelled
+window.RFUnravelText = function(key) {
+  let text = RFGetText(key, false, true)
+  if (text.startsWith("[") && text.endsWith("]")) {
+    try {
+      text = JSON.parse(text)
+    } catch {}
+  }
+  function unravel(input, maxDepth = 50, depth = 0) {
+    if (depth > maxDepth) {
+      return input
+    }
+    if (Array.isArray(input)) {
+      let ret = []
+      for (let i of input) {
+        let o = unravel(i, maxDepth, depth + 1)
+        for (let j of o) {
+          ret.push(j)
+        }
+      }
+      return ret
+    } else {
+      if (!input.match(/.*\{.*\|.*\}.*/)) {
+        return [ input ]
+      }
+      function characterCount(input, char) {
+        let count = 0
+        for (let i of input)
+          if (i == char)
+            count++
+        return count
+      }
+      function custSplit(input) {
+        let level = 0
+        let items = [ "" ]
+        while (input.length) {
+          if (input[0] == "{") {
+            level++
+            items[items.length - 1] += input[0]
+            input = input.slice(1)
+          } else if (input[0] == "}") {
+            level--
+            items[items.length - 1] += input[0]
+            input = input.slice(1)
+          } else if (level == 0 && input[0] == "|") {
+            items.push("")
+            input = input.slice(1)
+          } else /*if (currentLevel > 0)*/ {
+            items[items.length - 1] += input[0]
+            input = input.slice(1)
+          }
+        }
+        return items
+      }
+      let currentLevel = 0
+      let begin = ""
+      let end = ""
+      let choice = ""
+      while (input.length) {
+        if (input[0] == "{") {
+          if (currentLevel > 0)
+            choice += "{"
+          currentLevel++
+          input = input.slice(1)
+        } else if (input[0] == "}") {
+          if (currentLevel != 1)
+            choice += "}"
+          currentLevel--
+          input = input.slice(1)
+        } else if (currentLevel > 0) {
+          choice += input[0]
+          input = input.slice(1)
+        } else if (choice.length == 0) {
+          begin += input[0]
+          input = input.slice(1)
+        } else {
+          end = input
+          input = ""
+        }
+      }
+      let options = custSplit(choice)
+      let arr = []
+      for (let i of options) {
+        arr.push(begin + i + end)
+      }
+      if (arr.filter(v => v.match(/.*\{.*\|.*\}.*/)).length) {
+        return unravel(arr, maxDepth, depth + 1)
+      }
+      return arr
+    }
+  }
+  return unravel(text)
+}

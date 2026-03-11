@@ -423,6 +423,50 @@ window.RavagerData = {
           postclick: (val) => { RavagerData.Variables.RFControl.Background = "RFControl" + val }
         },
       ],
+      Translate: [
+        {
+          type: "text",
+          name: "UnravelKey"
+        },
+        {
+          type: "string",
+          refvar: "UnravelKey"
+        },
+        {
+          type: "button",
+          name: "UnravelKeySubmit",
+          click: () => {
+            // console.log(RavagerData.Variables.RFControl.UnravelKey, RFGetText(RavagerData.Variables.RFControl.UnravelKey, undefined, true))
+            let text = (RFHasText(RavagerData.Variables.RFControl.UnravelKey) ? RavagerData.Variables.RFControl.UnravelKey + " = " : "") + JSON.stringify(RFUnravelText(RavagerData.Variables.RFControl.UnravelKey)).replace('["', '[ "').replace('"]', '" ]').replaceAll('","', '", "')
+            RavagerFrameworkShowModal("unravel", "Text Unravelling", [ "Here's the expansion of all possibilities for your requested text.", "You can translate each of these variations individually, just be sure to keep the formatting the same as what is output below." ], text)
+            return true
+          }
+        },
+        {
+          type: "button",
+          name: "Import",
+          click: () => {
+            let input = document.createElement("input")
+            input.type = "file"
+            input.accept = ".txt"
+            input.onchange = async function(event) {
+              RFInfo("Loading translation ...", event)
+              let file = event.target.files[0]
+              if (file) {
+                try {
+                  RFInfo("Loading file " + file.name + " ...")
+                  const fileContent = await file.text()
+                  RavagerFrameworkLoadTranslation(fileContent, localStorage.BondageClubLanguage)
+                } catch (error) {
+                  RFError("Caught error while importing translation: ", error)
+                }
+              }
+            }
+            input.click()
+            return true
+          }
+        },
+      ],
       Band: [
         {
           name: "EnemyApply",
