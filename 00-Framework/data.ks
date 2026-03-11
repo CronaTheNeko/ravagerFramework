@@ -543,6 +543,18 @@ window.RavagerData = {
     },
     // Relating to the ravager control menu
     RFControl: {
+      HoverData: {
+        BoxData: {},
+        Desc: {
+          FontSize: 34,
+          Font: "Once Upon A Time Italic",
+        },
+        Box: {
+          PadV: 25,
+          PadH: 10,
+          XOffset: 68,
+        },
+      },
       Background: "RFControlDark",
       InGameEnabled: false,
       WasEnabledInGame: false,

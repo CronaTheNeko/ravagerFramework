@@ -619,6 +619,20 @@ window.RavagerFrameworkControlRun = function() {
           // When declaring your own on-click function, you'll may not be using a reference variable in the normal refvar location, so you can declare `checked` as a function that returns true or false for the checked value
           let checked = (confEntry.hasOwnProperty('checked') && typeof confEntry.checked == "function") ? confEntry.checked() : RavagerData.Variables.RFControl[confEntry.refvar]
           DrawCheckboxRFEx("RFCToggle_" + name, click, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 64, 64, RFGetText("RFCBool" + currentCategory + name), checked, false, blocking ? "#888" : KDBaseWhite, undefined, { bordercolor: bordercolor })
+          // Setup description popup
+          if (RFHasText("RFCHover" + currentCategory + name) && !RavagerData.Variables.RFControl.HoverData.BoxData[name]) {
+            RavagerData.Variables.RFControl.HoverData.BoxData[name] = {
+              name: name,
+              Left: Xstart + confXOffset + confSecondColumnOffset,
+              Top: Y,
+              Width: 64,
+              Height: 64,
+              Text: RFGetText("RFCBool" + currentCategory + name),
+              hoverDesc: RFGetText("RFCHover" + currentCategory + name),
+              category: currentCategory
+            }
+          }
+          //
           Y += Ystep;
         } else if (confEntry.type == "range") { // Range selection
           // Custom get-value function; don't mind how wasteful this all is :)
@@ -650,14 +664,56 @@ window.RavagerFrameworkControlRun = function() {
               confEntry.postclick(RavagerData.Variables.RFControl[confEntry.refvar])
             return true
           }, !blocking, Xstart + confXOffset + 64 + 360 + 20 + confSecondColumnOffset, Y, 64, 64, ">", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+          // Setup description popup
+          if (RFHasText("RFCHover" + currentCategory + name) && !RavagerData.Variables.RFControl.HoverData.BoxData[name]) {
+            RavagerData.Variables.RFControl.HoverData.BoxData[name] = {
+              name: name,
+              Left: Xstart + confXOffset + confSecondColumnOffset,
+              Top: Y,
+              Width: 500,
+              Height: 64,
+              Text: RFGetText("RFCRange" + currentCategory + name),
+              hoverDesc: RFGetText("RFCHover" + currentCategory + name),
+              category: currentCategory
+            }
+          }
+          //
           Y += Ystep
         } else if (confEntry.type == "button") { // Custom button to run custom code when clicked
           let blocking = (typeof confEntry.block == "function") ? confEntry.block() : undefined
           DrawButtonKDEx(confEntry.name, confEntry.click, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 370, 64, RFGetText("RFCButton" + currentCategory + confEntry.name), blocking ? "#888" : KDBaseWhite, confEntry.image, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+          // Setup description popup
+          if (RFHasText("RFCHover" + currentCategory + confEntry.name) && !RavagerData.Variables.RFControl.HoverData.BoxData[confEntry.name]) {
+            RavagerData.Variables.RFControl.HoverData.BoxData[confEntry.name] = {
+              name: confEntry.name,
+              Left: Xstart + confXOffset + confSecondColumnOffset,
+              Top: Y,
+              Width: 370,
+              Height: 64,
+              Text: RFGetText("RFCButton" + currentCategory + confEntry.name),
+              hoverDesc: RFGetText("RFCHover" + currentCategory + confEntry.name),
+              category: currentCategory
+            }
+          }
+          //
           Y += Ystep
         } else if (confEntry.type == "text") { // Just a label, no settings control
           let blocking = (typeof confEntry.block == "function") ? confEntry.block() : undefined
           DrawTextFitKD(RFGetText("RFCText" + currentCategory + confEntry.name), Xstart + confXOffset + 64 + 190 + confSecondColumnOffset, Y + 32, 480, blocking ? "#888" : KDBaseWhite, undefined, 30)
+          // Setup description popup
+          if (RFHasText("RFCHover" + currentCategory + confEntry.name) && !RavagerData.Variables.RFControl.HoverData.BoxData[confEntry.name]) {
+            RavagerData.Variables.RFControl.HoverData.BoxData[confEntry.name] = {
+              name: confEntry.name,
+              Left: Xstart + confXOffset + confSecondColumnOffset,
+              Top: Y,
+              Width: 480,
+              Height: 64,
+              Text: RFGetText("RFCText" + currentCategory + confEntry.name),
+              hoverDesc: RFGetText("RFCHover" + currentCategory + confEntry.name),
+              category: currentCategory
+            }
+          }
+          //
           Y += Ystep
         } else if (confEntry.type == "string") { // Text input
           // Custom get-value function; don't mind how wasteful this all is :)
@@ -665,6 +721,20 @@ window.RavagerFrameworkControlRun = function() {
             RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.getval()
           let elem = KDTextField(confEntry.refvar, Xstart + confXOffset + confSecondColumnOffset, Y, 480, 64, undefined, RavagerData.Variables.RFControl[confEntry.refvar], 100).Element
           elem.addEventListener("input", () => { RavagerData.Variables.RFControl[confEntry.refvar] = elem.value })
+          // Setup description popup
+          if (RFHasText("RFCHover" + currentCategory + confEntry.refvar) && !RavagerData.Variables.RFControl.HoverData.BoxData[confEntry.refvar]) {
+            RavagerData.Variables.RFControl.HoverData.BoxData[confEntry.refvar] = {
+              name: confEntry.refvar,
+              Left: Xstart + confXOffset + confSecondColumnOffset,
+              Top: Y,
+              Width: 480,
+              Height: 64,
+              Text: RFGetText("RFCString" + currentCategory + confEntry.refvar),
+              hoverDesc: RFGetText("RFCHover" + currentCategory + confEntry.refvar),
+              category: currentCategory
+            }
+          }
+          //
           Y += Ystep
         } else if (confEntry.type == "list") { // List of options; similar to range, but iterating over an array of options and allowing arbitrary types
           // Custom get-value function; don't mind how wasteful this all is :)
@@ -693,6 +763,20 @@ window.RavagerFrameworkControlRun = function() {
               confEntry.postclick(RavagerData.Variables.RFControl[confEntry.refvar])
             return true
           }, !blocking, Xstart + confXOffset + 64 + 360 + 20 + confSecondColumnOffset, Y, 64, 64, ">", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+          // Setup description popup
+          if (RFHasText("RFCHover" + currentCategory + name) && !RavagerData.Variables.RFControl.HoverData.BoxData[name]) {
+            RavagerData.Variables.RFControl.HoverData.BoxData[name] = {
+              name: name,
+              Left: Xstart + confXOffset + confSecondColumnOffset,
+              Top: Y,
+              Width: 500,
+              Height: 64,
+              Text: RFGetText("RFCList" + currentCategory + name),
+              hoverDesc: RFGetText("RFCHover" + currentCategory + name),
+              category: currentCategory
+            }
+          }
+          //
           Y += Ystep
         } else if (confEntry.type == "padding") { // Padding in between entries; does nothing but increment the Y value to push the next config down a row and contribute to the config count
           Y += Ystep
@@ -703,6 +787,80 @@ window.RavagerFrameworkControlRun = function() {
           Y = Ystart
         }
       })
+    }
+    // Draw description popups
+    let hoverblocks = RavagerData.Variables.RFControl.HoverData
+    for (let data in hoverblocks.BoxData) {
+      let o = hoverblocks.BoxData[data]
+      if (o.category != RavagerData.Variables.RFControl._ConfCategory)
+        continue
+      if (MouseIn(o.Left, o.Top, o.Width, o.Height)) {
+        let mult = KDGetFontMult()
+        let descSettings = hoverblocks.Desc
+        let boxSettings = hoverblocks.Box
+        let textSplit = []
+        KinkyDungeonWordWrap(o.hoverDesc, 20 * mult, 40 * mult).split("\n").forEach(v => { v.split("~{n}").forEach(vv => { textSplit.push(vv) }) })
+        let bPadV = boxSettings.PadV
+        let bHeight = (bPadV * 4) + ((descSettings.FontSize + 5) * (textSplit.length - 1))
+        let bWidth = 750
+        let bLeft = (
+          o.Left + boxSettings.XOffset + bWidth < CanvasWidth ?
+          o.Left + boxSettings.XOffset :
+          o.Left - boxSettings.PadH - bWidth
+        )
+        let bTop = (
+          o.Top + bHeight < CanvasHeight - 50 ?
+          o.Top :
+          CanvasHeight - bHeight - 50
+        )
+        let bZIndex = 159
+        let bPadH = boxSettings.PadH
+        FillRectKD(
+          kdcanvas,
+          kdpixisprites,
+          'RFCHover_' + o.name,
+          {
+            Left: bLeft,
+            Top: bTop,
+            Width: bWidth,
+            Height: bHeight,
+            Color: "#200020",
+            zIndex: bZIndex,
+            alpha: 0.85
+          }
+        )
+        DrawTextFitKD(
+          o.Text,
+          bLeft + bPadH,
+          bTop + bPadV,
+          bWidth - bPadH * 2,
+          "#efefef",
+          "#000",
+          38,
+          "left",
+          bZIndex + 1,
+          undefined,
+          undefined,
+          undefined,
+          descSettings.Font
+        )
+        for (let n = 0; n < textSplit.length; n++)
+          DrawTextFitKD(
+            textSplit[n],
+            bLeft + bPadH,
+            bTop + bPadV * 3 + n * (descSettings.FontSize + 5),
+            bWidth - bPadH * 2,
+            "#efefef",
+            "#000",
+            descSettings.FontSize,
+            "left",
+            bZIndex + 1,
+            undefined,
+            undefined,
+            undefined,
+            descSettings.Font
+          )
+      }
     }
   }
 }
