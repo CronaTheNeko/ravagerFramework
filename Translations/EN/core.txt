@@ -192,6 +192,7 @@ RFCCategoryTranslate = Translations
 RFCBoolDebugHeavyDebug = Heavy Debugging
 RFCBoolDebugNameFormatDebug = Debug RFStringFormat function
 RFCBoolDebugDebugVanillaTextOverrides = Debug Text Replacements
+RFCBoolDebugUnravelTextDebug = Debug Text Unravel
 RFCBoolDebugAnnounceRavagers = Announce Ravagers
 RFCButtonDebugSaveFunctionOverrides = Save Overridden Functions
 RFCButtonDebugCheckFunctionOverrides = Check Overridden Functions
