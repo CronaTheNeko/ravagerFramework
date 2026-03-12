@@ -323,6 +323,10 @@ window.RavagerData = {
           type: "boolean",
         },
         {
+          type: "boolean",
+          refvar: "UnravelTextDebug"
+        },
+        {
           refvar: "AnnounceRavagers",
           type: "boolean",
           postclick: (val) => { return RavagerFrameworkSetRavagerCounting(val); },

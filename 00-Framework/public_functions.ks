@@ -639,27 +639,36 @@ window.RFAddTextKey = function(key, value, lang = "") {
 // Unravel my in-string-random strings; meant to help translators who may be struggling to understand those complex strings, and primarily meant to be used from RFControl
 // `key` paramater can be either a text key or the string to be unravelled
 window.RFUnravelText = function(key) {
+  function RFUTTrace(...args) {
+    RavagerData.Variables.RFControl.UnravelTextDebug && RFDebug(...args)
+  }
   let text = RFGetText(key, false, true)
   if (text.startsWith("[") && text.endsWith("]")) {
+    RFUTTrace("parse array")
     try {
       text = JSON.parse(text)
     } catch {}
   }
   function unravel(input, maxDepth = 50, depth = 0) {
     if (depth > maxDepth) {
+      RFUTTrace("max depth")
       return input
     }
     if (Array.isArray(input)) {
+      RFUTTrace("array")
       let ret = []
       for (let i of input) {
         let o = unravel(i, maxDepth, depth + 1)
         for (let j of o) {
+          RFUTTrace("unravel", j)
           ret.push(j)
         }
       }
       return ret
     } else {
+      RFUTTrace("string")
       if (!input.match(/.*\{.*\|.*\}.*/)) {
+        RFUTTrace("no choices", input)
         return [ input ]
       }
       function characterCount(input, char) {
@@ -667,9 +676,11 @@ window.RFUnravelText = function(key) {
         for (let i of input)
           if (i == char)
             count++
+        RFUTTrace(`characterCount "${input}" ${char} ${count}`)
         return count
       }
       function custSplit(input) {
+        RFUTTrace("custSplit", input)
         let level = 0
         let items = [ "" ]
         while (input.length) {
@@ -677,16 +688,20 @@ window.RFUnravelText = function(key) {
             level++
             items[items.length - 1] += input[0]
             input = input.slice(1)
+            RFUTTrace(`lvl+ ${level} "${items[items.length - 1]}" "${input}", `, items)
           } else if (input[0] == "}") {
             level--
             items[items.length - 1] += input[0]
             input = input.slice(1)
+            RFUTTrace(`lvl- ${level} "${items[items.length - 1]}" "${input}", `, items)
           } else if (level == 0 && input[0] == "|") {
             items.push("")
             input = input.slice(1)
+            RFUTTrace(`L0Split "${input}", `, items)
           } else /*if (currentLevel > 0)*/ {
             items[items.length - 1] += input[0]
             input = input.slice(1)
+            RFUTTrace(`psh ${level} "${items[items.length - 1]}" "${input}", `, items)
           }
         }
         return items
@@ -695,36 +710,59 @@ window.RFUnravelText = function(key) {
       let begin = ""
       let end = ""
       let choice = ""
+      RFUTTrace("Looping", input)
       while (input.length) {
+        RFUTTrace(`L begin: "${begin}"(${begin.length}); choice: "${choice}"(${choice.length}); end: "${end}"(${end.length}); lvl: ${currentLevel}`)
+        // Early bail
+        if (choice.length > 0 && currentLevel == 0) {
+          end = input
+          input = ""
+          RFUTTrace("hard break", `end: "${end}"; input: "${input}"`)
+          break
+        }
         if (input[0] == "{") {
-          if (currentLevel > 0)
+          if (currentLevel != 0) {
             choice += "{"
+            RFUTTrace("lvl+ > 0", choice)
+          }
           currentLevel++
           input = input.slice(1)
+          RFUTTrace(`lvl+ ${currentLevel} "${input}" "${choice}" "${begin}" "${end}"`)
         } else if (input[0] == "}") {
-          if (currentLevel != 1)
+          if (currentLevel != 1) {
             choice += "}"
+            RFUTTrace("lvl- > 0", choice)
+          }
           currentLevel--
           input = input.slice(1)
+          RFUTTrace(`lvl- ${currentLevel} "${input}" "${choice}" "${begin}" "${end}"`)
         } else if (currentLevel > 0) {
           choice += input[0]
           input = input.slice(1)
+          RFUTTrace(`choice+ ${currentLevel} "${input}" "${choice}" "${begin}" "${end}"`)
         } else if (choice.length == 0) {
           begin += input[0]
           input = input.slice(1)
+          RFUTTrace(`None ${currentLevel} "${input}" "${choice}" "${begin}" "${end}"`)
         } else {
           end = input
           input = ""
+          RFUTTrace(`base ${currentLevel} "${input}" "${choice}" "${begin}" "${end}"`)
+          break
         }
       }
       let options = custSplit(choice)
+      RFUTTrace("Options available:", options)
       let arr = []
       for (let i of options) {
+        RFUTTrace(`Pushing variation "${begin + i + end}"`)
         arr.push(begin + i + end)
       }
       if (arr.filter(v => v.match(/.*\{.*\|.*\}.*/)).length) {
+        RFUTTrace("Recurse on variations", arr)
         return unravel(arr, maxDepth, depth + 1)
       }
+      RFUTTrace("Returning variations", arr)
       return arr
     }
   }
