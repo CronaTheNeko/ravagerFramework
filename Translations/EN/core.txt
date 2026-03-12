@@ -203,6 +203,7 @@ RFCTextCustomizeBorder = Border Color
 RFCListCustomizeCustomization_Background = Background
 RFCTextTranslateUnravelKey = Unravel variable text
 RFCButtonTranslateUnravelKeySubmit = Unravel
+RFCButtonTranslateUnravelAllKeys = Unravel All Keys
 RFCButtonTranslateImport = Import Language File
 RFCButtonBandEnemyApply = ApplyChanges
 RFCRangeBandBandit_SpawnW8 = Spawn Weight
