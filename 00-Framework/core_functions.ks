@@ -799,7 +799,7 @@ window.RavagerFrameworkControlRun = function() {
         let descSettings = hoverblocks.Desc
         let boxSettings = hoverblocks.Box
         let textSplit = []
-        KinkyDungeonWordWrap(o.hoverDesc, 20 * mult, 40 * mult).split("\n").forEach(v => { v.split("~{n}").forEach(vv => { textSplit.push(vv) }) })
+        o.hoverDesc.split("\n").forEach(v => { KinkyDungeonWordWrap(v, 20 * mult, 40 * mult).split("\n").forEach(vv => { textSplit.push(vv) }) })
         let bPadV = boxSettings.PadV
         let bHeight = (bPadV * 4) + ((descSettings.FontSize + 5) * (textSplit.length - 1))
         let bWidth = 750
