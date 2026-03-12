@@ -445,6 +445,45 @@ window.RavagerData = {
         },
         {
           type: "button",
+          name: "UnravelAllKeys",
+          click: () => {
+            let start = performance.now()
+            let largest = ["", 0]
+            let big = []
+            let data = ""
+            for (let key of Object.keys(RavagerData.Translations[""])) {
+              RFInfo(key)
+              let val = RavagerData.Translations[""][key]
+              let unravelled = RFUnravelText(val)
+              if (unravelled.length < 1) {
+                RFInfo(unravelled.length, "???????????????????????????????")
+              } else if (unravelled.length == 1) {
+                RFInfo(unravelled.length, "single")
+                data += `${key} = ${unravelled[0]}\n`
+              } else {
+                RFInfo(unravelled.length, "multiple")
+                data += `${key} = ${JSON.stringify(unravelled).replace('["', '[ "').replace('"]', '" ]').replaceAll('","', '", "')}\n`
+              }
+              if (unravelled.length > largest[1])
+                largest = [ key, unravelled.length ]
+              if (unravelled.length > 100)
+                big.push(`${unravelled.length} ${key}`)
+            }
+            RFInfo(`Largest: key: ${largest[0]}; count: ${largest[1]}`)
+            RFInfo(big.sort((a, b) => { return Number(a.split(" ")[0]) - Number(b.split(" ")[0]) }))
+            let end = performance.now()
+            RFInfo(`Unravelling took ${((end - start) / 1000).toFixed(5)} seconds`)
+            //
+            let element = document.createElement("a")
+            element.setAttribute("href", window.URL.createObjectURL(new Blob([data], { type: "text/plain" })))
+            element.setAttribute("download", "RavagerFramework_UnravelledTextKeys.txt")
+            element.click()
+            //
+            return true
+          }
+        },
+        {
+          type: "button",
           name: "Import",
           click: () => {
             let input = document.createElement("input")
