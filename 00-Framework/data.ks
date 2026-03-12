@@ -375,14 +375,11 @@ window.RavagerData = {
           type: "padding"
         },
         {
-          type: "padding"
-        },
-        {
           // This just completely breaks when reloading data.ks; it would take a major rework to fix, since this file just fully replaces window.RavagerData, leading to stack overlows, since our function overrides get set to themselves
           // This is also very dangerous, as it literally just calls eval on any file chosen
           type: "button",
           name: "ImportJS",
-          block: () => !(_RavagerFrameworkDebugEnabled && RavagerData.Variables.RFControl.NameFormatDebug && RavagerData.Variables.RFControl.DebugVanillaTextOverrides && RavagerData.Variables.RFControl.AnnounceRavagers),
+          block: () => !(_RavagerFrameworkDebugEnabled && RavagerData.Variables.RFControl.NameFormatDebug && RavagerData.Variables.RFControl.DebugVanillaTextOverrides && RavagerData.Variables.RFControl.UnravelTextDebug && RavagerData.Variables.RFControl.AnnounceRavagers),
           click: () => {
             let input = document.createElement("input")
             input.type = "file"
