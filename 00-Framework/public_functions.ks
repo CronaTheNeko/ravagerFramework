@@ -577,9 +577,9 @@ window.RFToTileTest = function() {
 // This function also handles returning a random value from an array in multiple ways. If key is an array, that array will be passed to RFArrayRand and the result will be returned. If the value found for the text key is surrounded by square brackets ( [ "option1", "option2", ... ] ), this function will attempt to parse it to an array and return the result of RFArrayRand, but will return the unparsed string if parsing fails
 window.RFGetText = function(key, fail = true, skipRandom = false) {
   let ret = undefined
-  if (RavagerData.Translations[localStorage.BondageClubLanguage] && RavagerData.Translations[localStorage.BondageClubLanguage][key])
+  if (RavagerData.Translations[localStorage.BondageClubLanguage] && RavagerData.Translations[localStorage.BondageClubLanguage][key] != undefined)
     ret = RavagerData.Translations[localStorage.BondageClubLanguage][key]
-  else if (RavagerData.Translations[""][key])
+  else if (RavagerData.Translations[""][key] != undefined)
     ret = RavagerData.Translations[""][key]
   else {
     let src = textProvider.getTextFromGroupStrict(textProvider.defaultGroupId, key)
