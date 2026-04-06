@@ -716,22 +716,24 @@ window.RavagerFrameworkControlRun = function() {
           //
           Y += Ystep
         } else if (confEntry.type == "string") { // Text input
-          // Custom get-value function; don't mind how wasteful this all is :)
-          if (RavagerData.Variables.RFControl[confEntry.refvar] == undefined && typeof confEntry.getval == "function")
-            RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.getval()
-          let elem = KDTextField(confEntry.refvar, Xstart + confXOffset + confSecondColumnOffset, Y, 480, 64, undefined, RavagerData.Variables.RFControl[confEntry.refvar], 100).Element
-          elem.addEventListener("input", () => { RavagerData.Variables.RFControl[confEntry.refvar] = elem.value })
-          // Setup description popup
-          if (RFHasText("RFCHover" + currentCategory + confEntry.refvar) && !RavagerData.Variables.RFControl.HoverData.BoxData[confEntry.refvar]) {
-            RavagerData.Variables.RFControl.HoverData.BoxData[confEntry.refvar] = {
-              name: confEntry.refvar,
-              Left: Xstart + confXOffset + confSecondColumnOffset,
-              Top: Y,
-              Width: 480,
-              Height: 64,
-              Text: RFGetText("RFCString" + currentCategory + confEntry.refvar),
-              hoverDesc: RFGetText("RFCHover" + currentCategory + confEntry.refvar),
-              category: currentCategory
+          if (!RavagerData.Variables.RFControl.HoverData.IsHovering) {
+            // Custom get-value function; don't mind how wasteful this all is :)
+            if (RavagerData.Variables.RFControl[confEntry.refvar] == undefined && typeof confEntry.getval == "function")
+              RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.getval()
+            let elem = KDTextField(confEntry.refvar, Xstart + confXOffset + confSecondColumnOffset, Y, 480, 64, undefined, RavagerData.Variables.RFControl[confEntry.refvar], 100).Element
+            elem.addEventListener("input", () => { RavagerData.Variables.RFControl[confEntry.refvar] = elem.value })
+            // Setup description popup
+            if (RFHasText("RFCHover" + currentCategory + confEntry.refvar) && !RavagerData.Variables.RFControl.HoverData.BoxData[confEntry.refvar]) {
+              RavagerData.Variables.RFControl.HoverData.BoxData[confEntry.refvar] = {
+                name: confEntry.refvar,
+                Left: Xstart + confXOffset + confSecondColumnOffset,
+                Top: Y,
+                Width: 480,
+                Height: 64,
+                Text: RFGetText("RFCString" + currentCategory + confEntry.refvar),
+                hoverDesc: RFGetText("RFCHover" + currentCategory + confEntry.refvar),
+                category: currentCategory
+              }
             }
           }
           //
@@ -790,11 +792,13 @@ window.RavagerFrameworkControlRun = function() {
     }
     // Draw description popups
     let hoverblocks = RavagerData.Variables.RFControl.HoverData
+    let isHovering = false
     for (let data in hoverblocks.BoxData) {
       let o = hoverblocks.BoxData[data]
       if (o.category != RavagerData.Variables.RFControl._ConfCategory)
         continue
       if (MouseIn(o.Left, o.Top, o.Width, o.Height)) {
+        isHovering = true
         let mult = KDGetFontMult()
         let descSettings = hoverblocks.Desc
         let boxSettings = hoverblocks.Box
@@ -862,6 +866,7 @@ window.RavagerFrameworkControlRun = function() {
           )
       }
     }
+    RavagerData.Variables.RFControl.HoverData.IsHovering = isHovering
   }
 }
 
