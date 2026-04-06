@@ -572,6 +572,10 @@ window.RavagerFrameworkControlRun = function() {
     DrawButtonKDEx("RFCReturn", () => { RFDebug("[RFC] Leaving ravager control"); RavagerData.Variables.State = RavagerData.Variables.PrevState; RavagerData.Variables.DrawState = RavagerData.Variables.PrevDrawState; return true }, true, 975, 880, 550, 64, RFGetText("RFCReturn"), KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
     // Categories
     let confCategories = Object.keys(RavagerData.Definitions.FrameworkControls).splice(RavagerData.Variables.RFControl._CategoryPage * confRows, confRows) // Select just the page we are on
+    // Categories box
+    DrawBoxKDTo(kdcanvas, Xstart - 10, Ystart - 100, 320, (Ystep * confRows) + 150, KDBaseBlack, false, 0.5, 1, bordercolor)
+    // Categories label
+    DrawTextFitKD(RFGetText("RFCCategories"), Xstart + 150, Ystart - 75, 1000, KDBaseWhite, undefined, 28)
     // Draw category buttons
     confCategories.forEach((currentCategory) => {
       DrawButtonKDEx("RFCCat" + currentCategory, () => { console.log("[RFC] Pressed button for category " + currentCategory); RavagerData.Variables.RFControl._ConfPage = 0; RavagerData.Variables.RFControl._ConfCategory = currentCategory; return true }, true, Xstart, Y, 300, 64, RFGetText("RFCCategory" + currentCategory), KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })

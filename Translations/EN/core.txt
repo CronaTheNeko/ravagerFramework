@@ -179,6 +179,7 @@ ConfigHoverravagerHelpDebug = Turn on heavy debugging mode so that you can provi
 RFCEnter = Ravager Hacking
 RFCTitle = Ravager Controls
 RFCReturn = Return
+RFCCategories = Categories
 ; ; Ravager Control categories
 RFCCategoryDebug = Debugging
 RFCCategoryCustomize = Customization
