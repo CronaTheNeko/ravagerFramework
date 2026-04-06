@@ -716,7 +716,7 @@ window.RavagerFrameworkControlRun = function() {
           //
           Y += Ystep
         } else if (confEntry.type == "string") { // Text input
-          if (!RavagerData.Variables.RFControl.HoverData.IsHovering) {
+          if (!(RavagerData.Variables.RFControl.HoverData.IsHovering || RavagerData.Variables.RFControl.HoverData.InModal)) {
             // Custom get-value function; don't mind how wasteful this all is :)
             if (RavagerData.Variables.RFControl[confEntry.refvar] == undefined && typeof confEntry.getval == "function")
               RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.getval()
@@ -1238,7 +1238,7 @@ window.RavagerFrameworkShowModal = function(id, title = "Ravager Framework", pre
     color: KDBaseWhite,
     cursor: "pointer"
   })
-  closeButton.addEventListener("click", () => { backdrop.remove() })
+  closeButton.addEventListener("click", () => { backdrop.remove(); RavagerData.Variables.RFControl.HoverData.InModal = false })
   Object.assign(closeButton.style, {
     display: "flex",
     flexFlow: "row wrap",
@@ -1247,5 +1247,6 @@ window.RavagerFrameworkShowModal = function(id, title = "Ravager Framework", pre
   })
   modal.appendChild(closeButton)
   // Show the popup
+  RavagerData.Variables.RFControl.HoverData.InModal = true
   document.body.appendChild(backdrop)
 }

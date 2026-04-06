@@ -683,6 +683,7 @@ window.RavagerData = {
           XOffset: 68,
         },
         IsHovering: false,
+        InModal: false,
       },
       Background: "RFControlDark",
       InGameEnabled: false,
