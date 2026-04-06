@@ -346,9 +346,6 @@ window.RavagerData = {
           click: () => { RavagerFrameworkCheckFunctionOverrides(); return true; }
         },
         {
-          type: "padding"
-        },
-        {
           name: "RevertFunctions",
           type: "button",
           click: () => { RavagerFrameworkRevertFunctions(); return true; },
@@ -364,6 +361,9 @@ window.RavagerData = {
           type: "boolean",
           label: "Use old RFControl layout",
           default: false
+        },
+        {
+          type: "padding"
         },
         {
           type: "padding"
