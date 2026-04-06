@@ -724,7 +724,7 @@ window.RavagerFrameworkControlRun = function() {
             // Custom get-value function; don't mind how wasteful this all is :)
             if (RavagerData.Variables.RFControl[confEntry.refvar] == undefined && typeof confEntry.getval == "function")
               RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.getval()
-            let elem = KDTextField(confEntry.refvar, Xstart + confXOffset + confSecondColumnOffset, Y, 480, 64, undefined, RavagerData.Variables.RFControl[confEntry.refvar], 100).Element
+            let elem = KDTextField(confEntry.refvar, Xstart + confXOffset + confSecondColumnOffset, Y, 480, 64, undefined, RavagerData.Variables.RFControl[confEntry.refvar], 10000).Element
             elem.addEventListener("input", () => { RavagerData.Variables.RFControl[confEntry.refvar] = elem.value })
             // Setup description popup
             if (RFHasText("RFCHover" + currentCategory + confEntry.refvar) && !RavagerData.Variables.RFControl.HoverData.BoxData[confEntry.refvar]) {
