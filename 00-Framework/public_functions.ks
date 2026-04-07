@@ -767,3 +767,64 @@ window.RFUnravelText = function(key) {
   }
   return unravel(text)
 }
+
+
+// Adds two hex color values together without rollover. Caps each of R G and B to FF.
+// Doesn't do this mathematically correctly. If you give it #aa0000 and #070000, it'll return #af0000 instead of #b10000
+// Handles strings with or without leading #, as well as 3 or 6 character formats
+window.RFHexPlusHex = function(input, add) {
+  // Remove leading #
+  if (input.startsWith("#"))
+    input = input.substr(1)
+  if (add.startsWith("#"))
+    add = add.substr(1)
+  // Length failure
+  if (input.length != 3 && input.length != 6) {
+    RFError(`[RFHexPlusHex]: Input length incorrect: ${input.length} characters; input: ${input}`)
+    return input
+  }
+  if (add.length != 3 && add.length != 6) {
+    RFError(`[RFHexPlusHex]: Add length incorrect: ${add.length} characters; add: ${add}`)
+    return input
+  }
+  // Expand to full 6 characters
+  if (input.length == 3)
+    input = `${input[0]}${input[0]}${input[1]}${input[1]}${input[2]}${input[2]}`
+  if (add.length == 3)
+    add = `${add[0]}${add[0]}${add[1]}${add[1]}${add[2]}${add[2]}`
+  // Conversions
+  const toInt = { '0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'a': 10, 'b': 11, 'c': 12, 'd': 13, 'e': 14, 'f': 15 }
+  let ia = []
+  for (let char of input) {
+    let t = toInt[char.toLowerCase()]
+    if (t == undefined) {
+      RFError(`[RFHexPlusHex]: Invalid character while looping input: ${char}. Defaulting to 0.`)
+      t = 0
+    }
+    ia.push(t)
+  }
+  if (ia.length > 16) {
+    RFError("[RFHexPlusHex]: Too many array elements for input (SOMEHOW???). Trimming to first 6 entries. Array: ", ia)
+    ia = ia.slice(0, 6)
+  }
+  let aa = []
+  for (let char of add) {
+    let t = toInt[char.toLowerCase()]
+    if (t == undefined) {
+      RFError(`[RFHexPlusHex]: Invalid character while looping add: ${char}. Defaulting to 0.`)
+      t = 0
+    }
+    aa.push(t)
+  }
+  if (aa.length > 16) {
+    RFError("[RFHexPlusHex]: Too many array elements for add (SOMEHOW???). Trimming to first 6 entries. Array: ", ia)
+    aa = aa.slice(0, 6)
+  }
+  // Addition and conversion back to hex
+  const toHex = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' ]
+  let ret = ""
+  for (let i = 0; i < 6; i++)
+    ret += toHex[Math.min(ia[i] + aa[i], 15)]
+  // Return
+  return ret
+}

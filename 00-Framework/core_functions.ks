@@ -565,7 +565,7 @@ window.RavagerFrameworkControlRun = function() {
     const confRows = 8 // Number of options
     const confXOffset = 350
     let bordercolor = "#000"
-    try { bordercolor = string2hex(RavagerData.Variables.RFControl.Customization_BorderColor) } catch {}
+    try { string2hex(RavagerData.Variables.RFControl.Customization_BorderColor); bordercolor = RavagerData.Variables.RFControl.Customization_BorderColor } catch {}
     // Title
     DrawTextFitKD(RFGetText("RFCTitle"), 1250, Ystart - 120, 1000, KDBaseWhite, undefined, 40)
     // Return button
@@ -578,7 +578,7 @@ window.RavagerFrameworkControlRun = function() {
     DrawTextFitKD(RFGetText("RFCCategories"), Xstart + 150, Ystart - 75, 1000, KDBaseWhite, undefined, 28)
     // Draw category buttons
     confCategories.forEach((currentCategory) => {
-      DrawButtonKDEx("RFCCat" + currentCategory, () => { console.log("[RFC] Pressed button for category " + currentCategory); RavagerData.Variables.RFControl._ConfPage = 0; RavagerData.Variables.RFControl._ConfCategory = currentCategory; return true }, true, Xstart, Y, 300, 64, RFGetText("RFCCategory" + currentCategory), KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+      DrawButtonKDEx("RFCCat" + currentCategory, () => { console.log("[RFC] Pressed button for category " + currentCategory); RavagerData.Variables.RFControl._ConfPage = 0; RavagerData.Variables.RFControl._ConfCategory = currentCategory; return true }, true, Xstart, Y, 300, 64, RFGetText("RFCCategory" + currentCategory), KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: (RavagerData.Variables.RFControl._ConfCategory == currentCategory ? RFHexPlusHex(bordercolor, "#666") : bordercolor) })
       Y += Ystep
     })
     if (Object.keys(RavagerData.Definitions.FrameworkControls).length > confRows) {
