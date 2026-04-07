@@ -175,8 +175,7 @@ ConfigHoverravagerHelpDebug = Turn on heavy debugging mode so that you can provi
 
 ; Ravager Control menu
 ; This whole menu is relatively low priority, as it is intended for developing or deeper level debugging / testing.
-; If there's only some things you translate in this section, translate RFCEnter, RFCTitle, RFCReturn, and RFCButtonDebugEndDebugLog
-RFCEnter = Ravager Hacking
+; If there's only some things you translate in this section, translate RFCTitle, RFCReturn, RFCCategoryDebug, and RFCButtonDebugEndDebugLog
 RFCTitle = Ravager Controls
 RFCReturn = Return
 RFCCategories = Categories
