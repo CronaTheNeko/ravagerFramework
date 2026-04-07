@@ -10,6 +10,10 @@ MissingFuncLabel = Missing functions
 ; Modal popup
 ModalCloseButton = Close
 
+; String Format Function
+; ; This is the "the" that will be added by RFStringFormat when substituting "EnemyCName" for an enemy that doesn't have an individual name. This will be used in the form of "The Bandit Ravager does some thing"
+StringFormatEnemyCNamePrefix = the
+
 ; Default narrations
 NarrationsRelease = You feel weak as EnemyCName releases you...
 NarrationsPassout = Your body is broken and exhausted...

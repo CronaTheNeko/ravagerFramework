@@ -425,7 +425,7 @@ window.RFStringFormat = function(string, entity, restraint, clothing, damage, sk
     // Possible custom entity name (no formatting)
     string = string.replace("EnemyCNameBare", KDEnemyName(entity))
     // Possible custom entity name (w/ formatting)
-    string = string.replace("EnemyCName", entity.CustomName || KDGetName(entity.id) || "the " + TextGet("Name" + entity.Enemy.name))
+    string = string.replace("EnemyCName", entity.CustomName || KDGetName(entity.id) || RFGetText("StringFormatEnemyCNamePrefix") + " " + TextGet("Name" + entity.Enemy.name))
     RFNFTrace('[Ravager Framework][DBG][NameFormat]: Transformed to "' + string + '"')
   }
   // Restraint name
