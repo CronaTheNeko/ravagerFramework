@@ -198,6 +198,7 @@ window.RavagerData = {
     ravagerFancyFont: {
       type: "boolean",
       refvar: "ravagerFancyFont",
+      default: true
     },
     ravagerHelpDebug: {
       type: "boolean",
