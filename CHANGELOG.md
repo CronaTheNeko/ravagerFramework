@@ -115,3 +115,27 @@ v6.2.1
 - Added Ravager Control button to track Mimic Ravagers in the console, added because they had a major behavior bug
 - Added Ravager Control button to announce current ravagers to the console, added to assist in balancing spawn weights
 - Made `RavagerGetSetting` able to get settings directly from localStorage, used during framework initialization
+
+v6.3.0
+- Added checks for game functions the framework uses
+- Added a way in Ravager Control to check for changes to overriden functions
+- General code and comment cleanup
+- Rename `ravRandom` to `RFArrayRand` and make it globally accessible
+- Split `00-Framework/ravager_framework.ks` into purpose based files and rename following functions
+	+ `ravagerSettingsRefresh` to `RavagerFrameworkSettingsRefresh`
+	+ `ravagerFrameworkApplySlimeRestrictChance` to `RavagerFrameworkApplySlimeRestrictChance`
+	+ `ravagerFrameworkApplySomeSpice` to `RavagerFrameworkApplySomeSpice`
+	+ `ravagerFrameworkRefreshEnemies` to `RavagerFrameworkRefreshEnemies`
+	+ `ravagerFrameworkSetupSound` to `RavagerFrameworkSetupSound`
+	+ `refreshRavagerDataVariables` to `RefreshRavagerDataVariables`
+	+ `ravagerFreeAndClearAllDataIfNoRavagers` to `RavagerFreeAndClearAllDataIfNoRavagers`
+	+ `ravagerFreeAndClearAllData` to `RavagerFreeAndClearAllData`
+	+ `RavagerGetSetting` to `RFGetSetting`
+- Public intended functions renamed:
+	+ `RavagerAddCallback` to `RFAddCallback`
+	+ `RavagerFrameworkVerifyEAM` to `RFVerifyEAM`
+	+ `RavagerFrameworkAddCondition` to `RFAddCondition`
+- Improve ravager count tracking for debugging spawn rates/conditions
+- Enable click sounds for custom buttons
+- Reworked Ravager Control
+- Added translation capability (see `Translating.md` for translating instructions)
