@@ -12,9 +12,15 @@ MimicR1Mouth = [ "The mimic {pushes|presses} a {{slimy|wet} |}{tendril|tentacle}
 ; ; 5
 MimicR5Taunts = [ "*Passionate squirming*", "*Wriggling and pulsing*" ]
 MimicR5VulvaTame = The {mimic's |}{tendril|tentacle} {quickly |}{pushes|thrusts} {deep |}into your {slit|pussy}...
+; ; ; Simplified MimicR5ButtTame incase you language doesn't work well with complex strings and you're working with the expanded array of possible outcomes:
+;MimicR5ButtTame = The mimic's {tendril|tentacle} {quickly|harshly|roughly|suddenly} {pushes|shoves|thrusts} into {and stretches |}your ass...
 MimicR5ButtTame = [ "The mimic{'s {tendril|tentacle} {quickly|harshly|roughly|suddenly} {pushes|shoves|thrusts}| {{quickly|harshly|roughly|suddenly} |}{pushes|shoves|thrusts} its {tendril|tentacle}} into {and stretches |}your ass...", "You cry out as the {mimic's |}{thick |}{tendril|tentacle} {{harshly|roughly|suddenly|quickly} |}{shoves into|thrusts in{to|} and stretches} your ass..." ]
 MimicR5MouthTame = [ "The mimic {pushes|wiggles} its {tendril|tentacle} past your lips and {into|down} your throat...", "You gag as the {mimic's |}{tendril|tentacle} {wiggles between|pushes past} your lips and {into|down} your throat..." ]
+; ; ; Simplified MimicR5VulvaSpicy incase you language doesn't work well with complex strings and you're working with the expanded array of possible outcomes:
+; MimicR5VulvaSpicy = You {cry out|gasp hard} as the mimic's {thick |}{tendril|tentacle} {thrusts|pushes|plunges} into your {tight |}pussy...
 MimicR5VulvaSpicy = [ "The {mimic's |}{thick |}{tendril|tentacle} {shoves|pushes|thrusts} itself into you{r {tight |}pussy|}...", "Your pussy stretches around the {mimic's |}{thick |}{tendril|tentacle} {thrusting|pushing|plunging} into you{r {tight |}pussy|}...", "Your pussy is stretched as the {mimic's |}{thick |}{tendril|tentacle} {thrusts|pushes|plunges} into you{r {tight |}pussy|}...", "You {cry out|gasp hard} as the {mimic's |}{thick |}{tendril|tentacle} {thrusts|pushes|plunges} into your {tight |}pussy..." ]
+; ; ; Simplified MimicR5ButtSpicy incase you language doesn't work well with complex strings and you're working with the expanded array of possible outcomes:
+;MimicR5ButtSpicy = You {cry out|gasp hard} as the mimic's thick {tendril|tentacle} {forcefully|roughly|harshly|suddenly} {pushes|thrusts|plunges} into your ass...
 MimicR5ButtSpicy = [ "The {mimic's |}{thick |}{tendril|tentacle} {{quickly|forcefully|roughly|harshly|suddenly} |}{{shoves|pushes} itself|thrusts} deep into your {tight |}ass...", "Your ass stretches around the {mimic's |}{thick |}invading {tendril|tentacle}...", "You{r ass is forced to stretch| {cry out|gasp hard}} as the {mimic's |}{thick |}{tendril|tentacle} {{quickly|forcefully|roughly|harshly|suddenly} |}{pushes|thrusts|plunges|{forces|shoves} itself} into your {tight |}ass..." ]
 MimicR5MouthSpicy = [ "You gag as the {mimic's |}{tendril|tentacle} {wiggles|pushes} {between|past} your lips and down your throat...", "You gag as your throat is filled by the {mimic's |}{tendril|tentacle}...", "The mimic's {tendril|tentacle} {pushes|wiggles} past your lips and fills your throat...", "Your cries are {cut short|silenced} as the invading {tendril|tentacle} {thrusts|pushes} into {and fills |}your throat..." ]
 ; ; 12
@@ -27,6 +33,8 @@ MimicR16Taunts = [ "*Rough thrusting*", "*Deep thrusting*" ]
 MimicR16VulvaTame = [ "You {cry out|whimper} with {each|every} thrust, {smothered by {tendril|tentacle}s|{tendril|tentacle}s smothering you}!", "The {tendril|tentacle}s {caressing|groping} and invading your body drive out {cries|whimpers} from you!" ]
 MimicR16ButtTame = [ "You {whimper pathetically|cry out} with {each|every} {rough|strong|hard|forceful} thrust!", "The {tendril|tentacle}'s {rough|strong|hard|forceful} thrusts drive pathetic {whimpers|cries} out of you!" ]
 MimicR16MouthTame = You{r body grows| feel} weak{, choking| as you choke} on the {thick |}{tendril|tentacle} {filling|invading} your throat!
+; ; ; Simplified MimicR16VulvaSpicy incase you language doesn't work well with complex strings and you're working with the expanded array of possible outcomes:
+;MimicR16VulvaSpicy = You {cry out|whimper pathetically} with {each|every} thrust of the mimic's {thick |}{tendril|tentacle} {invading|abusing} your womb!
 MimicR16VulvaSpicy = You {cry out|whimper pathetically} {as the {mimic's |}{thick |}{tendril|tentacle} {invades|abuses} your womb with {every|each} thrust|with {each|every} thrust of the {mimic's |}{thick |}{tendril|tentacle} {invading|abusing} your womb}!
 MimicR16ButtSpicy = You {cry out|whimper pathetically} with {each|every} thrust of the {thick |}{tendril|tentacle} {{pushing|penatrating} deep inside|invading|abusing} your ass!
 MimicR16MouthSpicy = You {choke and feel weak|try to cry out through your choking} as the {mimic's |}thick {tendril|tentacle} {pushes|thrusts} deeper {down|into} your throat!
