@@ -73,7 +73,7 @@ ConfigHoverravUseCountOverride = Overrides ravagers wanting a specific experienc
 ConfigHoverravagerCustomDrop = Allow ravagers to use custom item drop behaviors, which enables dropping random quantaties of multiple items. If enemies stop dropping items, try disabling this, as it may have broken due to a game update.
 ConfigHoverravagerEnableNudeOutfit = Allow ravagers to fully strip you when passing out, instead of leaving you minimally clothed.
 ConfigHoverravagerFancyFont = Who doesn't like a fancy font in their help messages?
-ConfigHoverravagerHelpDebug = Turn on heavy debugging mode so that you can provide a log file to help CTN with tracking down bugs. Turning this on will begin saving all of the framework's console messages to memory. To save the log to a file, return to this menu and disable this setting, or enter the Ravager Hacking menu and click End Debug Log.
+ConfigHoverravagerHelpDebug = Turn on heavy debugging mode so that you can provide a log file to help CTN with tracking down bugs. Turning this on will begin saving all of the framework's console messages to memory. To save the log to a file, return to this menu and disable this setting, or enter the Ravager Controls menu and click End Debug Log.
 
 ; Restraints
 - RestraintStripped = Stripped!
@@ -206,7 +206,7 @@ RFCBoolDebugUseOldRFControl = Use old RFControl layout
 RFCButtonDebugImportJS = Import JS
 RFCTextCustomizeBorder = Border Color
 RFCListCustomizeCustomization_Background = Background
-RFCTextTranslateUnravelKey = Unravel variable text
+RFCTextTranslateUnravelKey = Unravel complex string
 RFCButtonTranslateUnravelKeySubmit = Unravel
 RFCButtonTranslateUnravelAllKeys = Unravel All Keys
 RFCButtonTranslateImport = Import Language File

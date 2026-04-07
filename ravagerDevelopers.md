@@ -799,18 +799,18 @@ While any sections of curly brackets that don't contain a vertical bar will be p
 
 ## Developer Control Screen
 
-Version 6.2.0 adds a more powerful control screen aimed at developers, the "Ravager Hacking" menu.
+Version 6.2.0 adds a more powerful control screen aimed at developers, the "Ravager Controls" menu.
 
 To access this menu, you'll need to enable to button one of two ways:
 
 1) On the main menu:
 	- After mods finish loading, enable, disable, and re-enable the game's debug mode by clicking on the ball gag in the title three times
-	- After doing so, the pink "Ravager Hacking" button will appear near the bottom left corner of the main menu
+	- After doing so, the pink "Ravager Controls" button will appear near the bottom left corner of the main menu
 
 2) On the in-game pause menu:
 
 	- With debug mode enabled on the main menu and the "Debug Mode" checkbox in the pause menu enabled, headpat your character twice
-	- After doing so, the pink "Ravager Hacking" button will appear in the bottom right above the "See Perks" button
+	- After doing so, the pink "Ravager Controls" button will appear in the bottom right above the "See Perks" button
 
 Currently, it doesn't have a way for external mods to add more settings, but that is a planned feature. If you're reading this, you want to use this menu for your own ravagers, and there isn't an issue open on GitHub, please open an issue. Can you believe how many things I can forget at once?
 
