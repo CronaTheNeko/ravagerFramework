@@ -36,6 +36,9 @@ From community:
 	- Ruined makeup after being ravaged would need a model as some sort of makeup that can't be hidden by blindfolds that cover a smaller area than the makeup - https://discord.com/channels/938203644023685181/1183991709768622090/1316222771453235221
 	- Add sound effects to ravaging - use `Object.values(KDAllModFiles).map((mod) => mod.filename).includes('GirlSound.ks')` to check if the current Sound Effect mod is loaded in order to avoid playing multiple sound effects (also check for 'girlsound.ks' to check for death_comsos' old sound effect mod) - https://discord.com/channels/938203644023685181/1183991709768622090/1329505099705487411
 
+	---------- some mold or maid ravager to fit into maidforce+mold-infestation floors
+	---------- bast/ancient tombs ravager?
+
 
 Known Issues:
 	- V6.0.3-beta1 - Ravager outfits don't show the hair pin until the second time it is viewed
