@@ -541,7 +541,6 @@ window.RFPlayerCanSeeEnemy = function(entity) {
 }
 
 // Conditions helper
-// TODO: Rename to RFAddCondition
 window.RFAddCondition = function(key, func) {
   if (!RavagerData.conditions) {
     RavagerData.conditions = {}
