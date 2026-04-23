@@ -74,6 +74,15 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
       KinkyDungeonDressPlayer()
     }
   }
+  KDEventMapGeneric.afterModSettingsLoad.RavagerDevMode = () => {
+    // Determine dev mode
+    const devmode = localStorage.hasOwnProperty("RavagerDefaultDevMode") && (localStorage.RavagerDefaultDevMode == "true" ? true : false)
+    RavagerData.Variables.DebugWasTurnedOff ||= devmode
+    RavagerData.Variables.DebugWasTurnedOn ||= devmode
+    RavagerData.Variables.RFControl.InGameEnabled ||= devmode
+    TestMode ||= devmode
+    KDDebugMode ||= devmode
+  }
 }
 
 if (KDEventMapGeneric['afterModConfig'] != undefined) {

@@ -384,7 +384,17 @@ window.RavagerData = {
           default: false
         },
         {
-          type: "padding"
+          type: "boolean",
+          name: "LoadDevMode",
+          onclick: () => {
+            // localStorage.RavagerDefaultDevMode = !(localStorage.hasOwnProperty("RavagerDefaultDevMode") && localStorage.RavagerDefaultDevMode);
+            if (!localStorage.hasOwnProperty("RavagerDefaultDevMode") || localStorage.RavagerDefaultDevMode == "false")
+              localStorage.RavagerDefaultDevMode = true
+            else
+              localStorage.RavagerDefaultDevMode = false
+            return true
+          },
+          checked: () => localStorage.hasOwnProperty("RavagerDefaultDevMode") && localStorage.RavagerDefaultDevMode == "true",
         },
         {
           type: "padding"
