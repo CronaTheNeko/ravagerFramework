@@ -639,7 +639,7 @@ window.RavagerData = {
           name: "EnemyApply",
           type: "button",
           click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
-          block: () => RFGetSetting('ravagerDisableWolfgirl')
+          block: () => RFGetSetting('ravagerDisableMimic')
         },
         {
           refvar: "Mimic_SpawnW8",
