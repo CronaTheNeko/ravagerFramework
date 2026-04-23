@@ -138,6 +138,7 @@ window.RavagerData = {
       rangelow: 0,
       rangehigh: 1,
       stepcount: 0.01,
+      block: () => RFGetSetting("ravagerDisableSlimegirl"),
     },
     ravagerEnableSound: {
       type: 'boolean',
@@ -152,6 +153,7 @@ window.RavagerData = {
       rangelow: 0,
       rangehigh: 1,
       stepcount: 0.05,
+      block: () => !RFGetSetting("ravagerEnableSound"),
     },
     ravagerSoundVolume: {
       type: 'range',
@@ -160,6 +162,7 @@ window.RavagerData = {
       rangelow: 0,
       rangehigh: 2,
       stepcount: 0.05,
+      block: () => !RFGetSetting("ravagerEnableSound"),
     },
     ravEnableUseCount: {
       type: 'boolean',
@@ -172,6 +175,7 @@ window.RavagerData = {
       refvar: 'ravUseCountMode',
       options: [ 'Any', 'Sometimes', 'Always' ],
       default: 'Any',
+      block: () => !RFGetSetting("ravEnableUseCount"),
     },
     ravUseCountModeChance: {
       type: 'range',
@@ -181,10 +185,12 @@ window.RavagerData = {
       rangelow: 0,
       rangehigh: 1,
       stepcount: 0.05,
+      block: () => !RFGetSetting("ravEnableUseCount"),
     },
     ravUseCountOverride: {
       type: 'boolean',
       refvar: 'ravUseCountOverride',
+      block: () => !RFGetSetting("ravEnableUseCount"),
     },
     ravagerCustomDrop: {
       type: "boolean",
