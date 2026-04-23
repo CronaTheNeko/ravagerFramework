@@ -328,23 +328,43 @@ window.RavagerData = {
           refvar: "UnravelTextDebug"
         },
         {
+          type: "padding"
+        },
+        {
           refvar: "AnnounceRavagers",
           type: "boolean",
           postclick: (val) => { return RavagerFrameworkSetRavagerCounting(val); },
           block: () => RFGetSetting("ravagerDisableBandit") && RFGetSetting("ravagerDisableWolfgirl") && RFGetSetting("ravagerDisableSlimegirl") && RFGetSetting("ravagerDisableTentaclePit") && RFGetSetting("ravagerDisableMimic")
         },
         {
-          type: "padding"
+          type: "boolean",
+          refvar: "AnnounceTracking",
+          block: () => !RavagerData.Variables.RFControl.AnnounceRavagers
         },
         {
-          name: "SaveFunctionOverrides",
           type: "button",
-          click: () => { RavagerFrameworkSaveFunctionOverrides(); return true; }
-        },
-        {
-          name: "CheckFunctionOverrides",
-          type: "button",
-          click: () => { RavagerFrameworkCheckFunctionOverrides(); return true; }
+          name: "ExportAnnounceData",
+          click: () => {
+            let out = JSON.stringify(RavagerData.Variables.RavagerCountData, (k, v) => {
+              if (Array.isArray(v))
+                return JSON.stringify(v)
+              return v
+            }, 2)
+            .replace(/\"\[/g, '[ ')
+            .replace(/\]\"/g, ' ]')
+            .replace(/\\"/g, '"')
+            .replace(/,(?!$)/gm, ', ')
+            //
+            console.log(out)
+            const element = document.createElement("a")
+            const now = new Date()
+            element.setAttribute("href", window.URL.createObjectURL(new Blob([out], {type: "application/json" })))
+            element.setAttribute("download", `RavagerSpawnTracking_${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, "0")}_${String(now.getDate()).padStart(2, "0")}-${Intl.DateTimeFormat("en-US", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(now)}.json`)
+            element.click()
+            //
+            return true
+          },
+          block: () => RavagerData.Variables.RavagerCountData == undefined
         },
         {
           name: "RevertFunctions",
@@ -370,10 +390,14 @@ window.RavagerData = {
           type: "padding"
         },
         {
-          type: "padding"
+          name: "SaveFunctionOverrides",
+          type: "button",
+          click: () => { RavagerFrameworkSaveFunctionOverrides(); return true; }
         },
         {
-          type: "padding"
+          name: "CheckFunctionOverrides",
+          type: "button",
+          click: () => { RavagerFrameworkCheckFunctionOverrides(); return true; }
         },
         {
           // This just completely breaks when reloading data.ks; it would take a major rework to fix, since this file just fully replaces window.RavagerData, leading to stack overlows, since our function overrides get set to themselves

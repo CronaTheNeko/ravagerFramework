@@ -972,7 +972,7 @@ TY: ${enemy.ty}`
 // Sets ravager count messages enabled/disabled
 window.RavagerFrameworkSetRavagerCounting = function(enabled) {
   RFDebug(`[Ravager Framework][RFControl][SetAnnounceRavagers]: Setting ravager announcement to ${enabled} ...`)
-  let enemies = KinkyDungeonEnemies.filter(enemy => enemy.addedByMod == "RavagerFramework")
+  let enemies = KinkyDungeonEnemies.filter(enemy => enemy.addedByMod == "RavagerFramework" || enemy.RFTracking)
   if (enabled) {
     KDEventMapGeneric.tick.RavagerFrameworkTrackPlayer = function(e, data) { RFDebug(`[Ravager Framework][TrackPlayer]: Player at (${KinkyDungeonPlayerEntity.x}, ${KinkyDungeonPlayerEntity.y})`); }
     KDEventMapGeneric.before
@@ -1004,9 +1004,54 @@ window.RavagerFrameworkCountRavager = function(e, enemy, data) {
 }
 
 // Wrapper for KinkyDungeonAdvanceTime to add post-tick ravager count messages
+// Apparently this doesn't run in-between levels (where the mana recharge, perks, etc are). Learned this while making ExportAnnounceData
 window.RavagerFrameworkAdvanceTime = function(...args) {
   RavagerData.functions.KinkyDungeonAdvanceTime(...args)
   if (RavagerData.Variables.RavagerCount && Object.keys(RavagerData.Variables.RavagerCount).length) {
+    //
+    if (RavagerData.Variables.RFControl.AnnounceTracking) {
+      if (!RavagerData.Variables.RavagerCountData)
+        RavagerData.Variables.RavagerCountData = {}
+      if (!RavagerData.Variables.RavagerCountData.tick)
+        RavagerData.Variables.RavagerCountData.tick = []
+      RavagerData.Variables.RavagerCountData.tick.push(KinkyDungeonCurrentTick)
+      if (!RavagerData.Variables.RavagerCountData.lvl)
+        RavagerData.Variables.RavagerCountData.lvl = []
+      RavagerData.Variables.RavagerCountData.lvl.push(MiniGameKinkyDungeonLevel)
+      if (!RavagerData.Variables.RavagerCountData.seed)
+        RavagerData.Variables.RavagerCountData.seed = []
+      RavagerData.Variables.RavagerCountData.seed.push(KinkyDungeonSeed)
+      if (!RavagerData.Variables.RavagerCountData.total)
+        RavagerData.Variables.RavagerCountData.total = []
+      const ravs = KinkyDungeonEnemies.filter(enemy => enemy.addedByMod == "RavagerFramework" || enemy.RFTracking)
+      let names = []
+      let snames = []
+      for (let r of ravs) {
+        const name = r.name
+        if (!RavagerData.Variables.RavagerCountData.hasOwnProperty(name))
+          RavagerData.Variables.RavagerCountData[name] = []
+        RavagerData.Variables.RavagerCountData[name].push(RavagerData.Variables.RavagerCount.hasOwnProperty(name) ? RavagerData.Variables.RavagerCount[name] : 0)
+        names.push(name)
+        const sname = name.replace(/Ravager[0-9]*/, "")
+        if (!snames.includes(sname))
+          snames.push(sname)
+        // if (!RavagerData.Variables.RavagerCountData.hasOwnProperty(sname))
+        //   RavagerData.Variables.RavagerCountData[sname] = []
+        // RavagerData.Variables.RavagerCountData[sname].push(RavagerData.Variables.RavagerCount.hasOwnProperty(sname) ? RavagerData.Variables.RavagerCount[sname] : 0)
+      }
+      for (let name of snames) {
+        let count = 0
+        names.filter(v => v.includes(name)).forEach(v => { if (RavagerData.Variables.RavagerCount.hasOwnProperty(v)) count += RavagerData.Variables.RavagerCount[v] })
+        if (!RavagerData.Variables.RavagerCountData.hasOwnProperty(name))
+          RavagerData.Variables.RavagerCountData[name] = []
+        // Prevent extra pushes for enemies that don't contain "Ravager" in them and end up pushing the the same array both here and above (aka the TentaclePit)
+        // if (names.length > 0 && names[0].includes("Ravager"))
+        // Checking lengths *should* be a good enough check
+        if (RavagerData.Variables.RavagerCountData[name].length != RavagerData.Variables.RavagerCountData.tick.length)
+        RavagerData.Variables.RavagerCountData[name].push(count)
+      }
+    }
+    //
     var count = {}
     for (var e of Object.entries(RavagerData.Variables.RavagerCount)) {
       var [k, v] = e
@@ -1017,8 +1062,12 @@ window.RavagerFrameworkAdvanceTime = function(...args) {
         count[name] += v
     }
     var totalEn = KDNearbyEnemies(0, 0, 10000).length
-    var actionMsg = `Total: ${totalEn}, `
-    var consoleMsg = `[Ravager Count]: { Total: ${totalEn}, `
+    //
+    if (RavagerData.Variables.RFControl.AnnounceTracking)
+      RavagerData.Variables.RavagerCountData.total.push(totalEn)
+    //
+    var actionMsg = `[T:${KinkyDungeonCurrentTick},L:${MiniGameKinkyDungeonLevel},S:${KinkyDungeonSeed}] Total: ${totalEn}, `
+    var consoleMsg = `[Ravager Count][ Tick: ${KinkyDungeonCurrentTick}, Level: ${MiniGameKinkyDungeonLevel}, Seed: ${KinkyDungeonSeed} ]: { Total: ${totalEn}, `
     for (var e of Object.entries(count)) {
       var [k, v] = e
       actionMsg += `${k.substring(0, 4)}: ${v}(${Math.floor(v / totalEn * 100)}%), `
