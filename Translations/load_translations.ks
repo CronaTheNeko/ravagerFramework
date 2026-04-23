@@ -9,8 +9,8 @@ window.RavagerFrameworkLoadTranslation = function(content, language) {
     // Split line into text key and value. Key and value are separated by " = ", and the split regex ensures that " = " is still safe to use within values
     let [key, val] = line.split(/ = (.*)/s, 2)
     // Trim leading and trailing spaces
-    key.trim()
-    val.trim()
+    key = key.trim()
+    val = val.trim()
     // Add text key
     RFAddTextKey(key, val, language)
   }
