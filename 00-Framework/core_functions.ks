@@ -871,6 +871,11 @@ window.RavagerFrameworkControlRun = function() {
       }
     }
     RavagerData.Variables.RFControl.HoverData.IsHovering = isHovering
+    // Action popups
+    if (RavagerData.Variables.RFControl.Notifications.length && CommonTime() > (KDMusicUpdateTime + KDMusicUpdateDuration + 500)) {
+      let msg = RavagerData.Variables.RFControl.Notifications.splice(0, 1)
+      KDSendMusicToast(msg, -(Math.floor(KDMusicUpdateDuration / 2)))
+    }
   }
 }
 
@@ -1302,4 +1307,9 @@ window.RavagerFrameworkShowModal = function(id, title = "Ravager Framework", pre
   // Show the popup
   RavagerData.Variables.RFControl.HoverData.InModal = true
   document.body.appendChild(backdrop)
+}
+
+// Queue RFC action notification
+window.RavagerFrameworkRFCNotify = function(msg) {
+  RavagerData.Variables.RFControl.Notifications.push(msg)
 }

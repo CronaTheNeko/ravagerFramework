@@ -366,6 +366,7 @@ window.RavagerData = {
             const now = new Date()
             element.setAttribute("href", window.URL.createObjectURL(new Blob([out], {type: "application/json" })))
             element.setAttribute("download", `RavagerSpawnTracking_${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, "0")}_${String(now.getDate()).padStart(2, "0")}-${Intl.DateTimeFormat("en-US", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(now)}.json`)
+            RavagerFrameworkRFCNotify("Saving file ...")
             element.click()
             //
             return true
@@ -380,7 +381,7 @@ window.RavagerData = {
         {
           name: "EndDebugLog",
           type: "button",
-          click: () => { KDModSettings.RavagerFramework.ravagerHelpDebug = false; RavagerFrameworkIWantToHelpDebug('Finish'); return true; },
+          click: () => { RavagerFrameworkRFCNotify("Saving debug log ..."); KDModSettings.RavagerFramework.ravagerHelpDebug = false; RavagerFrameworkIWantToHelpDebug('Finish'); return true; },
           block: () => !KDModSettings?.RavagerFramework?.ravagerHelpDebug
         },
         {
@@ -393,11 +394,9 @@ window.RavagerData = {
           type: "boolean",
           name: "LoadDevMode",
           onclick: () => {
-            // localStorage.RavagerDefaultDevMode = !(localStorage.hasOwnProperty("RavagerDefaultDevMode") && localStorage.RavagerDefaultDevMode);
-            if (!localStorage.hasOwnProperty("RavagerDefaultDevMode") || localStorage.RavagerDefaultDevMode == "false")
-              localStorage.RavagerDefaultDevMode = true
-            else
-              localStorage.RavagerDefaultDevMode = false
+            let devmode = !localStorage.hasOwnProperty("RavagerDefaultDevMode") || localStorage.RavagerDefaultDevMode == "false"
+            localStorage.RavagerDefaultDevMode = devmode
+            RavagerFrameworkRFCNotify((devmode ? "Enabled" : "Disabled") + " loading into dev mode.")
             return true
           },
           checked: () => localStorage.hasOwnProperty("RavagerDefaultDevMode") && localStorage.RavagerDefaultDevMode == "true",
@@ -408,12 +407,12 @@ window.RavagerData = {
         {
           name: "SaveFunctionOverrides",
           type: "button",
-          click: () => { RavagerFrameworkSaveFunctionOverrides(); return true; }
+          click: () => { RavagerFrameworkRFCNotify("Saving function overrides to file ..."); RavagerFrameworkSaveFunctionOverrides(); return true; }
         },
         {
           name: "CheckFunctionOverrides",
           type: "button",
-          click: () => { RavagerFrameworkCheckFunctionOverrides(); return true; }
+          click: () => { RavagerFrameworkRFCNotify("Loading saved function overrides from file ..."); RavagerFrameworkCheckFunctionOverrides(); return true; }
         },
         {
           // This just completely breaks when reloading data.ks; it would take a major rework to fix, since this file just fully replaces window.RavagerData, leading to stack overlows, since our function overrides get set to themselves
@@ -444,6 +443,7 @@ window.RavagerData = {
               RavagerData.Variables.State = RavagerData.Variables.PrevState
               RavagerData.Variables.DrawState = RavagerData.Variables.PrevDrawState
             }
+            RavagerFrameworkRFCNotify("You better know what you're opening ...")
             input.click()
           }
         },
@@ -478,6 +478,7 @@ window.RavagerData = {
           type: "button",
           name: "UnravelKeySubmit",
           click: () => {
+            RavagerFrameworkRFCNotify("Unravelling text ...")
             // console.log(RavagerData.Variables.RFControl.UnravelKey, RFGetText(RavagerData.Variables.RFControl.UnravelKey, undefined, true))
             let text = (RFHasText(RavagerData.Variables.RFControl.UnravelKey) ? RavagerData.Variables.RFControl.UnravelKey + " = " : "") + JSON.stringify(RFUnravelText(RavagerData.Variables.RFControl.UnravelKey)).replace('["', '[ "').replace('"]', '" ]').replaceAll('","', '", "')
             RavagerFrameworkShowModal("unravel", "Text Unravelling", [ "Here's the expansion of all possibilities for your requested text.", "You can translate each of these variations individually, just be sure to keep the formatting the same as what is output below." ], text)
@@ -488,6 +489,7 @@ window.RavagerData = {
           type: "button",
           name: "UnravelAllKeys",
           click: () => {
+            RavagerFrameworkRFCNotify("Unravelling all text. Please wait ...")
             let start = performance.now()
             let largest = ["", 0]
             let big = []
@@ -532,6 +534,7 @@ window.RavagerData = {
             input.accept = ".txt"
             input.onchange = async function(event) {
               RFInfo("Loading translation ...", event)
+              RavagerFrameworkRFCNotify("Loading translation file ...")
               let file = event.target.files[0]
               if (file) {
                 try {
@@ -740,7 +743,9 @@ window.RavagerData = {
       _ConfCategory: "Main", // Hold the current RFControl tab we're in
       _CategoryPage: 0, // Operates as KDModListPage, for scrolling through category tabs in RFControl
       _ConfPage: 0, // The page of the current RFControl category we're on
-      Customization_BorderColor: "#6100cf"
+      Customization_BorderColor: "#6100cf",
+      // Notification buffer
+      Notifications: [],
     },
     DebugWasTurnedOn: false,
     DebugWasTurnedOff: false,
