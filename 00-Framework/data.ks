@@ -355,11 +355,11 @@ window.RavagerData = {
               if (Array.isArray(v))
                 return JSON.stringify(v)
               return v
-            }, 2)
-            .replace(/\"\[/g, '[ ')
+            }, 2) // Stringify while keeping arrays on a single line
+            .replace(/\"\[/g, '[ ') // Remove quotes around arrays the get added during replacer
             .replace(/\]\"/g, ' ]')
-            .replace(/\\"/g, '"')
-            .replace(/,(?!$)/gm, ', ')
+            .replace(/\\"/g, '"') // Remove escaped quotes that got added in during replacer
+            .replace(/,(?!$)/gm, ', ') // Add spaces between array elements
             //
             console.log(out)
             const element = document.createElement("a")
