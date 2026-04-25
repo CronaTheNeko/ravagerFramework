@@ -3,7 +3,7 @@ window._RavagerFrameworkInInit = true;
 // Check for heavy debugging during initialization
 window._RavagerFrameworkDebugEnabled = false;
 if (localStorage.hasOwnProperty('RavagerFrameworkTraceMessages')) {
-  _RavagerFrameworkDebugEnabled = localStorage.RavagerFrameworkTraceMessages
+  _RavagerFrameworkDebugEnabled = localStorage.RavagerFrameworkTraceMessages == 'true'
 }
 window.RavagerData = {
   // To be (maybe) added at KDEventMapGeneric
