@@ -494,9 +494,9 @@ window.RavagerData = {
             let largest = ["", 0]
             let big = []
             let data = ""
-            for (let key of Object.keys(RavagerData.Translations[""])) {
+            for (let key of Object.keys(RavagerData.Translations.raw)) {
               RFInfo(key)
-              let val = RavagerData.Translations[""][key]
+              let val = RavagerData.Translations.raw[key]
               let unravelled = RFUnravelText(val)
               if (unravelled.length < 1) {
                 RFInfo(unravelled.length, "???????????????????????????????")
@@ -753,7 +753,9 @@ window.RavagerData = {
     IWantToHelpDebug: false,
     IWantToHelpDebugBuffer: []
   },
-  Translations: {}
+  Translations: {
+    raw: {}
+  }
 }
 
 // Slots that need to be stripped to occupy a given slot; slots to clear are in order

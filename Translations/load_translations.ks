@@ -13,6 +13,9 @@ window.RavagerFrameworkLoadTranslation = function(content, language) {
     val = val.trim()
     // Add text key
     RFAddTextKey(key, val, language)
+    // Save unmodified text keys for "unravel all" functionality in Ravager Controls, since RFPushEnemiesWithStrongVariations adds many additional text keys that will just get overridden
+    if (language == "EN")
+      RavagerData.Translations.raw[key] = val
   }
 }
 // Async function since blob operations are async
