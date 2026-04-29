@@ -146,8 +146,8 @@ window.RavagerFrameworkApplySomeSpice = function(reason) {
   RFDebug('[Ravager Framework] Spicy Dialogue set to ', spice)
   // Filter enemies to ravagers that have Spice options
   const spiceable = KinkyDungeonEnemies.filter(enemy =>
-    // Added by me
-    enemy.addedByMod == 'RavagerFramework' &&
+    // Added by me / specified wanting this functionality
+    (enemy.addedByMod == 'RavagerFramework' || enemy.ravage?.spiceable) &&
     // Has ravage settings
     enemy.ravage &&
     // Has ranges
