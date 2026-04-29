@@ -64,7 +64,6 @@ window.RavagerFrameworkIWantToHelpDebug = function(reason) {
     // Set my own variables to track debugging
     RavagerData.Variables.IWantToHelpDebug = true
     RavagerFrameworkToggleDebug(true)
-    KDModSettings.RavagerFramework.ravagerDebug = true
     // Reset ravagerHelpDebug in localStorage, as we don't want this to be persistent
     let j = JSON.parse(localStorage.KDModSettings)
     j.RavagerFramework.ravagerHelpDebug = false
