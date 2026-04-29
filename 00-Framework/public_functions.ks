@@ -828,3 +828,64 @@ window.RFHexPlusHex = function(input, add) {
   // Return
   return ret
 }
+
+// Save a file
+//
+// Params:
+//   - data : The data to be saved
+//   - fileName : The file name to use
+//   - options : An optional dictionary of additional parameters
+//   - options.isJSON : Whether or not to use JSON.stringify on data; Default: true
+//   - options.LZCompress : Whether or not to compress data via LZString.compressToBase64; Default: false
+//   - options.addVersionInfoToName : Whether or not to insert the game and mod version info into the file name just before the file extension; Default: true
+//   - options.addDateToName : Whether or not to insert the current time into the file name just before the file extension; Date is inserted after version info if that is also enabled; Default: true
+//   - options.MIMEType : Override the MIME type determined by this function. This is only useful if you're saving data that is not JSON and will not be compressed. When options.isJSON is true and options.LZCompress is false, MIME type is determined as "application/json". For all other scenarios where options.MIMEType is not provided, it is set to "text/plain".
+window.RFSaveFile = function(data, fileName, options = {}) {
+  // Sets defaults for options
+  const baseOptions = {
+    isJSON: true,
+    LZCompress: false,
+    addVersionInfoToName: true,
+    addDateToName: true,
+    MIMEType: undefined,
+  }
+  options = Object.assign({}, baseOptions, options)
+  // Construct file name
+  let fname = fileName.slice(0, fileName.lastIndexOf("."))
+  if (options.addVersionInfoToName) {
+    fname += "_KD" + TextGetKD("KDVersionStr") + "_RF" + RavagerData.ModInfo.modbuild
+  }
+  if (options.addDateToName) {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, "0")
+    const day = String(now.getDate()).padStart(2, "0")
+    const hour = String(now.getHours()).padStart(2, "0")
+    const minute = String(now.getMinutes()).padStart(2, "0")
+    const seconds = String(now.getSeconds()).padStart(2, "0")
+    fname += `_${year}-${month}-${day}_${hour}-${minute}-${seconds}`
+  }
+  fname += fileName.slice(fileName.lastIndexOf("."))
+  // Handle JSON object
+  if (options.isJSON) {
+    if (!options.LZCompress) {
+      // When not compressing data later, set MIME type to JSON and setup data without using blob
+      data = "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, undefined, '  '))
+      if (!options.MIMEType)
+        options.MIMEType = "application/json"
+    } else // When compressing data later, just stringify
+      data = JSON.stringify(data)
+  }
+  // Default MIME type to plain text
+  if (!options.MIMEType)
+    options.MIMEType = "text/plain"
+  if (options.LZCompress) // When compressing, create a new blob and a URL to that blob, just in case the data is very large
+    data = window.URL.createObjectURL(new Blob([LZString.compressToBase64(data)], { type: options.MIMEType }))
+  if (!(options.isJSON || options.LZCompress)) // For all other data, create a blob and URL
+    data = window.URL.createObjectURL(new Blob([data], { type: options.MIMEType }))
+  // Create and "click" the element that will save the file
+  const element = document.createElement("a")
+  element.setAttribute("href", data)
+  element.setAttribute("download", fname)
+  element.click()
+}

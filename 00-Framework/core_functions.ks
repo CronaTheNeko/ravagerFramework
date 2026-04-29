@@ -80,11 +80,7 @@ window.RavagerFrameworkIWantToHelpDebug = function(reason) {
     }
     RavagerData.Variables.IWantToHelpDebugBuffer = [ logLine, ...RavagerData.Variables.IWantToHelpDebugBuffer ]
     // Save the buffer to a file
-    const element = document.createElement("a");
-    const now = new Date()
-    element.setAttribute("href", window.URL.createObjectURL(new Blob([LZString.compressToBase64(JSON.stringify(RavagerData.Variables.IWantToHelpDebugBuffer))], { type: "text/plain" })))
-    element.setAttribute("download", `RavagerDebug_${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, "0")}_${String(now.getDate()).padStart(2, "0")}-${Intl.DateTimeFormat("en-US", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(now)}.txt`); // Disgusting chain
-    element.click()
+    RFSaveFile(RavagerData.Variables.IWantToHelpDebugBuffer, "RavagerDebug.txt", { LZCompress: true })
   }
 }
 
@@ -1119,10 +1115,7 @@ window.RavagerFrameworkGetFunctionOverrides = function() {
 // Save current function overrides
 window.RavagerFrameworkSaveFunctionOverrides = function() {
   let funcs = RavagerFrameworkGetFunctionOverrides()
-  const element = document.createElement("a")
-  element.setAttribute("href", `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(funcs, undefined, '  '))}`)
-  element.setAttribute("download", `RavagerFramework_FunctionOverrides_KD${TextGetKD("KDVersionStr")}_RF${RavagerData.ModInfo.modbuild}.json`)
-  element.click()
+  RFSaveFile(funcs, "RavagerFramework_FunctionOverrides.json", { addDateToName: false })
 }
 
 // Check for missing or mismatched function overrides
@@ -1167,10 +1160,7 @@ window.RavagerFrameworkCheckFunctionOverrides = function() {
         }
         // Found mismatches (either mismatching key lists, or mismatching function content); save a report file
         if (mismatches.savedKeys.length || mismatches.currentKeys.length || Object.keys(mismatches.savedFuncs).length || Object.keys(mismatches.currentFuncs).length) {
-          const element = document.createElement("a")
-          element.setAttribute("href", `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(mismatches, undefined, '  '))}`)
-          element.setAttribute("download", `RavagerFramework_FunctionOverrides_Report_KD${TextGetKD("KDVersionStr")}_RF${RavagerData.ModInfo.modbuild}.json`)
-          element.click()
+          RFSaveFile(mismatches, "RavagerFramework_FunctionOverrides_Report.json", { addDateToName: false })
         }
       } catch (error) {
         console.error("Error reading or parsing JSON file:", error)

@@ -362,12 +362,7 @@ window.RavagerData = {
             .replace(/,(?!$)/gm, ', ') // Add spaces between array elements
             //
             console.log(out)
-            const element = document.createElement("a")
-            const now = new Date()
-            element.setAttribute("href", window.URL.createObjectURL(new Blob([out], {type: "application/json" })))
-            element.setAttribute("download", `RavagerSpawnTracking_${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, "0")}_${String(now.getDate()).padStart(2, "0")}-${Intl.DateTimeFormat("en-US", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(now)}.json`)
-            RavagerFrameworkRFCNotify("Saving file ...")
-            element.click()
+            RFSaveFile(out, "RavagerSpawnTracking.json", { isJSON: false, addVersionInfoToName: false, MIMEType: "application/json" })
             //
             return true
           },
@@ -517,10 +512,7 @@ window.RavagerData = {
             let end = performance.now()
             RFInfo(`Unravelling took ${((end - start) / 1000).toFixed(5)} seconds`)
             //
-            let element = document.createElement("a")
-            element.setAttribute("href", window.URL.createObjectURL(new Blob([data], { type: "text/plain" })))
-            element.setAttribute("download", "RavagerFramework_UnravelledTextKeys.txt")
-            element.click()
+            RFSaveFile(data, "RavagerFramework_UnravelledTextKeys.txt", { isJSON: false, addVersionInfoToName: false, addDateToName: false })
             //
             return true
           }
