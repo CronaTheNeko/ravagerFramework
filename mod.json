@@ -16,7 +16,6 @@
 		"00-Framework/function_overrides.ks",
 		"00-Framework/events.ks",
 		"00-Framework/init.ks",
-		"00-Framework/text_keys.ks",
 		"00-Framework/restraints.ks",
 		"00-Framework/status.ks",
 		"Translations/EN/core.txt",
