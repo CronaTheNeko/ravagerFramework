@@ -552,11 +552,11 @@ const playerEffect = (_target, damage, playerEffect, spell, faction, bullet, _en
           "TrapPlug5"
         ],
         {
-          "MasterworkBlindfold": 1e-3,
-          "MasterworkCorset": 1e-3,
-          "MasterworkHeels": 1e-3,
-          "MasterworkGloves": 1e-3,
-          "MasterworkCollar": 1e-3
+          "MasterworkBlindfold": 1e-4,
+          "MasterworkCorset": 1e-4,
+          "MasterworkHeels": 1e-4,
+          "MasterworkGloves": 1e-4,
+          "MasterworkCollar": 2e-6
         }
       ) // Don't really like the feel of insertions // Also excluding chastity until I figure out re-applying them after use // Also modifying the chances for the Masterwork set, as they're being chosen more often than I want
       if (restraintAdd) {
