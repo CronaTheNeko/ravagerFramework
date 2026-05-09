@@ -43,3 +43,5 @@ for (var key in debugCallbacks) {
 // Add Ravager Control to the game's custom screen list
 // The game will look in KDRender for a key matching the value of KinkyDungeonState, and run the function in that key as the draw function
 KDRender.RavagerControl = RavagerFrameworkControlRun
+//
+window.RFButtonsCache = {}

@@ -54,6 +54,16 @@ KDDropItems = function(enemy, mapData) {
 
 // Here so I can have a colored button in mod config and description popups for my mod configs
 DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options) {
+  // Record Ravager Control entrance buttons and all buttons drawn within Ravager Control for the purpose of making sound on click
+  if (KinkyDungeonState == "RavagerControl" || name == "ravagerControl") {
+    RFButtonsCache[name] = {
+      Left,
+      Top,
+      Width,
+      Height,
+      enabled
+    }
+  }
   if (KinkyDungeonState == "ModConfig") {
     if (name == "Ravager Framework") {
       // Change the color of my mod config button
@@ -138,6 +148,9 @@ KinkyDungeonRun = function() {
       delete RavagerData.Variables.State
     else
       KinkyDungeonState = RavagerData.Variables.State
+  // Clear custom buttons cache
+  if (window.RFButtonsCache)
+    RFButtonsCache = {}
   // Run the original KinkyDungeonRun
   const ret = RavagerData.functions.KinkyDungeonRun()
   // Turn off the in-init flag when the player interacts with anything other than mod config
@@ -287,12 +300,13 @@ KinkyDungeonHandleClick = function(event) {
   }
   // Enable sounds for my custom buttons
   if (!ret) {
-    for (let b of Object.keys(KDButtonsCache).filter(v => v.startsWith("RFControl") || v.startsWith("ravager"))) {
-      let btn = KDButtonsCache[b]
+    for (let b of Object.keys(RFButtonsCache)) {
+      let btn = RFButtonsCache[b]
       if (
         btn &&
         btn.enabled &&
-        MouseIn(btn.Left, btn.Top, btn.Width, btn.Height)
+        MouseIn(btn.Left, btn.Top, btn.Width, btn.Height) &&
+        KDSoundEnabled()
       ) {
         RFTrace(`[RF][KinkyDungeonHandleClick]: Clicked on button ${b}. Sound will be made.`)
         ret = true

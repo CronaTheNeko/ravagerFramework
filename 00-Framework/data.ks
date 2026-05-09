@@ -318,7 +318,7 @@ window.RavagerData = {
         {
           name: "HeavyDebug",
           type: "boolean",
-          onclick: () => { RavagerFrameworkToggleDebug(); return true },
+          onclick: () => { RavagerFrameworkToggleDebug() },
           checked: () => { return _RavagerFrameworkDebugEnabled },
         },
         {
@@ -363,20 +363,18 @@ window.RavagerData = {
             //
             console.log(out)
             RFSaveFile(out, "RavagerSpawnTracking.json", { isJSON: false, addVersionInfoToName: false, MIMEType: "application/json" })
-            //
-            return true
           },
           block: () => RavagerData.Variables.RavagerCountData == undefined
         },
         {
           name: "RevertFunctions",
           type: "button",
-          click: () => { RavagerFrameworkRevertFunctions(); return true; },
+          click: () => { RavagerFrameworkRevertFunctions() },
         },
         {
           name: "EndDebugLog",
           type: "button",
-          click: () => { RavagerFrameworkRFCNotify("Saving debug log ..."); KDModSettings.RavagerFramework.ravagerHelpDebug = false; RavagerFrameworkIWantToHelpDebug('Finish'); return true; },
+          click: () => { RavagerFrameworkRFCNotify("Saving debug log ..."); KDModSettings.RavagerFramework.ravagerHelpDebug = false; RavagerFrameworkIWantToHelpDebug('Finish') },
           block: () => !KDModSettings?.RavagerFramework?.ravagerHelpDebug
         },
         {
@@ -392,7 +390,6 @@ window.RavagerData = {
             let devmode = !localStorage.hasOwnProperty("RavagerDefaultDevMode") || localStorage.RavagerDefaultDevMode == "false"
             localStorage.RavagerDefaultDevMode = devmode
             RavagerFrameworkRFCNotify((devmode ? "Enabled" : "Disabled") + " loading into dev mode.")
-            return true
           },
           checked: () => localStorage.hasOwnProperty("RavagerDefaultDevMode") && localStorage.RavagerDefaultDevMode == "true",
         },
@@ -402,12 +399,12 @@ window.RavagerData = {
         {
           name: "SaveFunctionOverrides",
           type: "button",
-          click: () => { RavagerFrameworkRFCNotify("Saving function overrides to file ..."); RavagerFrameworkSaveFunctionOverrides(); return true; }
+          click: () => { RavagerFrameworkRFCNotify("Saving function overrides to file ..."); RavagerFrameworkSaveFunctionOverrides() }
         },
         {
           name: "CheckFunctionOverrides",
           type: "button",
-          click: () => { RavagerFrameworkRFCNotify("Loading saved function overrides from file ..."); RavagerFrameworkCheckFunctionOverrides(); return true; }
+          click: () => { RavagerFrameworkRFCNotify("Loading saved function overrides from file ..."); RavagerFrameworkCheckFunctionOverrides() }
         },
         {
           // This just completely breaks when reloading data.ks; it would take a major rework to fix, since this file just fully replaces window.RavagerData, leading to stack overlows, since our function overrides get set to themselves
@@ -477,7 +474,6 @@ window.RavagerData = {
             // console.log(RavagerData.Variables.RFControl.UnravelKey, RFGetText(RavagerData.Variables.RFControl.UnravelKey, undefined, true))
             let text = (RFHasText(RavagerData.Variables.RFControl.UnravelKey) ? RavagerData.Variables.RFControl.UnravelKey + " = " : "") + JSON.stringify(RFUnravelText(RavagerData.Variables.RFControl.UnravelKey)).replace('["', '[ "').replace('"]', '" ]').replaceAll('","', '", "')
             RavagerFrameworkShowModal("unravel", "Text Unravelling", [ "Here's the expansion of all possibilities for your requested text.", "You can translate each of these variations individually, just be sure to keep the formatting the same as what is output below." ], text)
-            return true
           }
         },
         {
@@ -513,8 +509,6 @@ window.RavagerData = {
             RFInfo(`Unravelling took ${((end - start) / 1000).toFixed(5)} seconds`)
             //
             RFSaveFile(data, "RavagerFramework_UnravelledTextKeys.txt", { isJSON: false, addVersionInfoToName: false, addDateToName: false })
-            //
-            return true
           }
         },
         {
@@ -539,7 +533,6 @@ window.RavagerData = {
               }
             }
             input.click()
-            return true
           }
         },
       ],
@@ -547,7 +540,7 @@ window.RavagerData = {
         {
           name: "EnemyApply",
           type: "button",
-          click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
+          click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache() },
           block: () => RFGetSetting('ravagerDisableBandit')
         },
         {
@@ -579,7 +572,7 @@ window.RavagerData = {
         {
           name: "EnemyApply",
           type: "button",
-          click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
+          click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache() },
           block: () => RFGetSetting('ravagerDisableWolfgirl')
         },
         {
@@ -597,7 +590,7 @@ window.RavagerData = {
         {
           name: "EnemyApply",
           type: "button",
-          click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
+          click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache() },
           block: () => RFGetSetting('ravagerDisableSlimegirl')
         },
         {
@@ -615,7 +608,7 @@ window.RavagerData = {
         {
           name: "EnemyApply",
           type: "button",
-          click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
+          click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache() },
           block: () => RFGetSetting('ravagerDisableWolfgirl')
         },
         {
@@ -633,7 +626,7 @@ window.RavagerData = {
         {
           name: "EnemyApply",
           type: "button",
-          click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache(); return true },
+          click: () => { RFInfo("[RFC] Refreshing enemy cache..."); KinkyDungeonRefreshEnemiesCache() },
           block: () => RFGetSetting('ravagerDisableMimic')
         },
         {
