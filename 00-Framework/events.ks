@@ -80,6 +80,7 @@ if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
     RavagerData.Variables.DebugWasTurnedOff ||= devmode
     RavagerData.Variables.DebugWasTurnedOn ||= devmode
     RavagerData.Variables.RFControl.InGameEnabled ||= devmode
+    RavagerData.Variables.RFControl.WasEnabledInGame ||= devmode
     TestMode ||= devmode
     KDDebugMode ||= devmode
     KinkyDungeonSeeAll ||= devmode
