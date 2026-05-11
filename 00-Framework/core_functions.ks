@@ -564,7 +564,7 @@ window.RavagerFrameworkControlRun = function() {
     // Title
     DrawTextFitKD(RFGetText("RFCTitle"), 1250, Ystart - 120, 1000, KDBaseWhite, undefined, 40)
     // Return button
-    DrawButtonKDEx("RFCReturn", () => { RFDebug("[RFC] Leaving ravager control"); RavagerData.Variables.State = RavagerData.Variables.PrevState; RavagerData.Variables.DrawState = RavagerData.Variables.PrevDrawState }, true, 975, 900, 550, 64, RFGetText("RFCReturn"), KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+    DrawButtonKDEx("RFCReturn", () => { RFDebug("[RFC] Leaving ravager control"); RavagerData.Variables.State = RavagerData.Variables.PrevState; RavagerData.Variables.DrawState = RavagerData.Variables.PrevDrawState; RavagerData.Variables.MaybeDrawDebugTextBoxes = true }, true, 975, 900, 550, 64, RFGetText("RFCReturn"), KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
     // Categories
     let confCategories = Object.keys(RavagerData.Definitions.FrameworkControls).splice(RavagerData.Variables.RFControl._CategoryPage * confRows, confRows) // Select just the page we are on
     // Categories box

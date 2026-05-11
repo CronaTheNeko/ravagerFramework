@@ -105,6 +105,25 @@ KinkyDungeonDrawGame = function() {
       delete RavagerData.Variables.DrawState
     else
       KinkyDungeonDrawState = RavagerData.Variables.DrawState
+  // Fix the extra bug where exiting Ravager Control to the in-game pause menu causes the enemy and item spawning text boxes to be gone, thus spamming the console with 2 warnings and 2 errors on every draw frame until the pause menu is closed
+  if (RavagerData.Variables.MaybeDrawDebugTextBoxes) {
+    if (
+      TestMode &&
+      KDDebugMode &&
+      KinkyDungeonState == 'Game' &&
+      KinkyDungeonDrawState == 'Restart'
+    ) {
+      if (!document.getElementById("DebugEnemy")) {
+        ElementCreateTextArea("DebugEnemy");
+        ElementValue("DebugEnemy", "Ravager");
+      }
+      if (!document.getElementById("DebugItem")) {
+        ElementCreateTextArea("DebugItem");
+        ElementValue("DebugItem", "Cookie");
+      }
+    }
+    delete RavagerData.Variables.MaybeDrawDebugTextBoxes
+  }
   // Call original function
   const ret = RavagerData.functions.KinkyDungeonDrawGame()
   // Draw my own button in the in-game pause screen
