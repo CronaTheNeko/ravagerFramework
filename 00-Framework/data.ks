@@ -743,6 +743,7 @@ window.RavagerData = {
   },
   // Feature killswitches
   Killswitches: {
+    FullNude: true, // Mimic burst is crashing game with full nude enabled; TODO: Fix crash
   }
 }
 

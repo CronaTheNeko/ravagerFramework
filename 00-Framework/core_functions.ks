@@ -236,7 +236,7 @@ window.RavagerFrameworkSetupSound = function() {
 
 window.RefreshRavagerDataVariables = function(reason) {
   RFDebug("[Ravager Framework][RefreshRavagerDataVariables]: Refreshing variables for reason: ", reason)
-  if (RFGetSetting("ravagerEnableNudeOutfit")) {
+  if (RFGetSetting("ravagerEnableNudeOutfit") && RFAllowFeature("FullNude")) {
     if (!RavagerData.Variables.MimicBurstPossibleDress.includes("Nude"))
       RavagerData.Variables.MimicBurstPossibleDress.push("Nude")
   } else {
