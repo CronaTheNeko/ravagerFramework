@@ -82,6 +82,13 @@ window.RFGetSetting = function(refvar) {
   return settings[refvar]
 }
 
+// Check killswitch; Returns true for feature enabled
+window.RFAllowFeature = function(killswitch) {
+  if (!RavagerData.Killswitches.hasOwnProperty(killswitch))
+    RFError(`[RFAllowFeature]: Killswitch "${killswitch}" not found. Defaulting to allowing feature.`)
+  return !RavagerData.Killswitches[killswitch]
+}
+
 // Verbose, but acturate name. Easy way to create stronger versions of enemies.
 /* Params:
     - enemy : The enemy definition to use

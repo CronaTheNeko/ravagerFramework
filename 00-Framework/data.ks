@@ -740,6 +740,9 @@ window.RavagerData = {
   },
   Translations: {
     raw: {}
+  },
+  // Feature killswitches
+  Killswitches: {
   }
 }
 
