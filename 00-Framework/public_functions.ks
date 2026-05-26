@@ -896,3 +896,27 @@ window.RFSaveFile = function(data, fileName, options = {}) {
   element.setAttribute("download", fname)
   element.click()
 }
+
+// Get a value that *might* be in a condition callback
+window.RFGetConditionValue = function(val, func_args = [], condition_dict = RavagerData.conditions) {
+  if (val == undefined || !condition_dict.hasOwnProperty(val))
+    return val
+  if (typeof condition_dict[val] == "function")
+    return condition_dict[val](...func_args)
+  return condition_dict[val]
+}
+
+// Check a boolean that *might* be a condition callback
+window.RFCheckConditionBool = function(val, func_args = [], condition_dict = RavagerData.conditions) {
+  return Boolean(RFGetConditionValue(val, func_args, condition_dict))
+}
+
+// Roll chance on a value that *might* be a condition callback
+window.RFRollConditionChance = function(val, func_args = [], condition_dict = RavagerData.conditions) {
+  if (typeof val == "number")
+    return Math.random() < val
+  let condval = RFGetConditionValue(val, func_args, condition_dict)
+  if (typeof condval == "number")
+    return Math.random() < condval
+  return false
+}
