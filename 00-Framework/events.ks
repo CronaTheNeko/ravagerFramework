@@ -577,7 +577,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
             return entity.ravage.narMod
           }
           if (!RFCheckConditionBool(nmod.condition, Object.assign({}, fparams, { caller: "NarrMod.condition" }))) {
-            RFTrace("[Effect][NarMod]: Modifier condition did not pass: ", nmod.condition)
+            RFTrace("[RF][Effect][NarMod]: Modifier condition did not pass: ", nmod.condition)
             return
           }
           let modchance = (nmod.hasOwnProperty("chance") ? nmod.chance : 1.0)
@@ -591,7 +591,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
         }
         let didModifiedNarration = false
         let narModPfx = decideToDoModifiedNarration()
-        RFTrace("[Effect][NarMod]: decideToDoModifiedNarration returned: ", narModPfx)
+        RFTrace("[RF][Effect][NarMod]: decideToDoModifiedNarration returned: ", narModPfx)
         if (narModPfx && rangeData.narration.hasOwnProperty(narModPfx + slotOfChoice)) {
           pRav.narrationBuffer.push(RFStringFormat(RFGetText(rangeData.narration[narModPfx + slotOfChoice], false), entity))
           entity.ravage.narMod = narModPfx
