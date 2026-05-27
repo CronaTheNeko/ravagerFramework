@@ -469,6 +469,117 @@ Valid values: A string which matches the key of a callback added to the framewor
 
 Note: See [Callback functions](#callback-functions) for specifics on callbacks
 
+### Narration modifiers
+Narration modifiers let you add as many additional trees of narration as you want, controlled by multiple conditions. Just about any changes you want to make to your narrations can be achieved through the values defined in this object.
+
+Property path: `enemy.ravage.narrationModifier`
+
+Required?: No
+
+Type: Dictionary
+
+Expected keys:
+  - `condition` - Boolean - Required - Whether or not to allow narration modification
+  - `chance` - Number - Optional - The chance that narration will be modified
+  - `linePrefix` - String - Optional - The prefix added to the slot name when using modified narration (see [Narration Mod Line Prefix](#narration-mod-line-prefix) for more details)
+  - `sporadic` - Boolean - Optional - Whether or not modified narration can be randomly chosen throughout ravaging
+
+Notes:
+  - While all these keys have an expected value, they can also be the string name of a condition function (see [RFAddCondition helper](#rfaddcondition-helper) for adding condition functions)
+    + If you use condition functions for narration modifiers, the returned value should be of the same type as what the key is listed with above
+  - More specific details about these keys, the condition functions, and what happens with different types of return values are given in the following sections:
+    + [Narration Mod Condition](#narration-mod-condition)
+    + [Narration Mod Chance](#narration-mod-chance)
+    + [Narration Mod Line Prefix](#narration-mod-line-prefix)
+    + [Narration Mod Sporadic](#narration-mod-sporadic)
+  - The framework provides as much information as possible to these condition functions. For specific details on all given parameters, see [Narration Mod Conditions Parameters](#narration-mod-conditions-parameters) below
+
+#### Narration Mod Conditions Parameters
+All condition functions called by the narration modifier code are given three parameters: `entity`, `target`, `data`
+
+`entity` is the enemy entity performing the ravaging. As this will be a ravager entity, this entity's current ravage state data is in `entity.ravage`. As this is still a normal game entity, the enemy definition is at `entity.Enemy`.
+
+`target` is the entity that `entity` is attacking. In the framework's current state, the target should always be the player (`KinkyDungeonPlayerEntity`).
+
+`data` contains nearly all other variables available to the ravaging function at the point when these functions are called. The following keys are available within `data`:
+  - `damage` : The damage being done to the target in this turn
+  - `playerEffect` : The effect this is being called from. Currently, this will always be "Ravage", but is included here for possible future expansion
+  - `spell` : The spell cast by the entity that is hitting the target, if there is a spell
+  - `faction` : The faction of the attacking entity. For enemies that do not define a faction, this value will be "Enemy"
+  - `bullet` : The bullet hitting the target, if there is one
+  - `stripOptions` : A dictionary that lists all clothing, equipment, and restraints equipped in each ravage slot of the target
+  - `uncovered` : A dictionary listing each ravage slot and if it has no items in the way of ravaging; Note that there can be items listed in a slot in `stripOptions` and that slot can still be counted as uncovered, if the enemy bypasses the items that are equipped
+  - `range` : The range (from `enemy.ranges`) that is being used in this turn. This is in an array of the format `[ progression value, range data]`, just as defined when making your ravager
+  - `slot` : The slot the entity is using. This is also available at `entity.ravage.slot`, but this value comes directly from the ravage function's slot choice variable
+  - `caller` : An identifier for what part of the code is calling your function. Each of the expected keys in `enemy.ravage.narrationModifier` has its own `caller` value; see the related section for identifier
+
+#### Narration Mod Condition
+The narration modifier condition controls whether or not the modifier should have a chance to happen
+
+Property path: `enemy.ravage.narrationModifier.condition`
+
+Required?: Yes (Only when `enemy.ravage.narrationModifier` is defined)
+
+Type: Boolean
+
+When using a condition function for this value:
+1) The function's return value should be a Boolean, as it will be passed into `Boolean()`
+2) The value of the `data.caller` parameter will be "NarrMod.condition"
+
+#### Narration Mod Chance
+The chance that modified narration will be used, when allowed to happen by [Narration Mod Condition](#narration-mod-condition)
+
+Property path: `enemy.ravage.narrationModifier.chance`
+
+Required?: No
+
+Type: Number
+
+Default: `1.0`
+
+When using a condition function for this value:
+1) The function's return value should be a Number, as all other types will result in the chance failing and modified narration not being used
+2) The value of the `data.caller` parameter will be "NarrMod.chance"
+
+#### Narration Mod Line Prefix
+The prefix added to the narration key when using the modifier.
+
+For example: If the line prefix is "Mod" and the slot being ravaged is "ItemMouth", the narration that will be used is "ModItemMouth"
+
+Property path: `enemy.ravage.narrationModifier.linePrefix`
+
+Required?: No
+
+Type: String
+
+Default: `Mod`
+
+When using a condition function for this value:
+1) The return value *should* be a string, but any value that can be added with a string will still work
+2) The value of the `data.caller` parameter will be "NarrMod.linePrefix"
+3) If your function returns nothing (`undefined`), narration modification will not be used on the current turn
+
+Note: If the current range does not contain a key for `<Prefix><Current Slot>`, modified narration will not happen. If this happens at the beginning of a ravaging session and [Narration Mod Sporadic](#narration-mod-sporadic) is false, modified narration will not be used for the whole ravaging session.
+
+#### Narration Mod Sporadic
+Whether or not modified narration can be chosen throughout a ravaging session.
+
+When true, the chance for your narration mod will be rolled during each turn of the ravaging session.
+
+When false, the chance will be rolled at the beginning of the ravaging session and that result will be reused throughout the rest of the current ravaging session.
+
+Property path: `enemy.ravage.narrationModifier.sporadic`
+
+Required?: No
+
+Type: Boolean
+
+Default: `false`
+
+When using a condition function for this value:
+1) The function's return value should be a Boolean, as it will be passed into `Boolean()`
+2) The value of the `data.caller` parameter will be "NarrMod.sporadic"
+
 ### Callback functions
 By far the most powerful, and most potentially complicated, feature of the framework is the callback functions that can be called at various stages throughout the ravaging process.
 
@@ -855,3 +966,28 @@ The random text function loops every character individually, so you'll likely se
 - A line starting with "Final Output" signals the end of loop and shows what string is being returned now that all the random choices have been decided. Be aware that there may a number of these lines in the middle of the output if the function has to recurse for nested choices.
 
 There are two possible errors for this section, in the case that the input string has a mismatch between the number of opening brackets and closing brackets. In the case of either of these errors, the string returned will be the input string with "[ERROR]" added onto the beginning.
+
+# Functions
+
+## RFAddCondition helper
+When adding condition functions, it is recommended to use the function `RFAddCondition`
+
+Parameters:
+1) `key` - The name your condition function will be referenced by. This needs to match the value of the corresponding property used in your ravager.
+2) `func` - The function to be executed. Can either be defined as a separate function and have the function name given, or directly declared used the `(parameter1, parameter2) => { code }` syntax.
+
+Returns: True if the condition function was successfully added, false otherwise.
+
+Recommended usage:
+```
+function myCondition(x, y, z) {
+  ...
+}
+if (!RFAddCondition('exampleConditionName', myCondition)) {
+  // Print an error about your condition or do something to handle its absence
+}
+```
+
+Note 1: It is recommended to ensure your condition keys are sufficiently unique, as to avoid overwriting another ravager's conditions unintentionally.
+
+Note 2: This helper function does some checks to ensure the keys can be stored correctly. If you encounter the framework throwing an error when you call this function, please report the issue, as an error reading "Failed to initialize Ravager Conditions" indicates something is going terribly wrong with the framework's condition functionality.
