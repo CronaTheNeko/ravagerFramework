@@ -198,7 +198,7 @@ Notes:
   1) All the slots the ravager can use (defined in [Targets](#targets)) are currently occupied by other ravagers
   2) The ravager has recently finished a session with the player and is in their [refractory period](#refractory-period)
 - With this being optional, if you do not declare your own narration, the framework's default narration will be used.
-  + If your desired behvior is to not have fallback narration, see [No fallback narration](#no-fallback-narration).
+  + If your desired behavior is to not have fallback narration, see [No fallback narration](#no-fallback-narration).
 
 ### No fallback narration
 Tell the framework not to use fallback narration. Useful if you don't want fallback narration, as the framework has a default narration
@@ -211,7 +211,7 @@ Type: Boolean
 
 Default value: False
 
-Note: As of fixing [Issue #6](https://github.com/CronaTheNeko/ravagerFramework/issues/6), the framework provides default fallback narration. When `enemy.ravage.fallbackNarration` is empty or not defined and this property is not set to true, the default narration will be used. This property provides a way to not use fallback narration, if that is the desired behvior.
+Note: As of fixing [Issue #6](https://github.com/CronaTheNeko/ravagerFramework/issues/6), the framework provides default fallback narration. When `enemy.ravage.fallbackNarration` is empty or not defined and this property is not set to true, the default narration will be used. This property provides a way to not use fallback narration, if that is the desired behavior.
 
 ### Restrain chance
 The chance that a ravager will add a restraint to the player when doing a fallback action. If this chance succeeds on a turn, a restraint will be added instead of dealing the normal grope damage.
@@ -595,7 +595,7 @@ For security, the callback functions cannot be declared directly in the enemy de
 
 To add a callback, define your function and add it via the [RFAddCallback helper](#rfaddcallback-helper) function, and set the corresponding callback property in your ravager to the callback name you gave to `RFAddCallback`.
 
-Note: The parameters given to each callback are not set in stone. Incase of any changes to the parameter list, I will attempt to ensure the following:
+Note: The parameters given to each callback are not set in stone. In case of any changes to the parameter list, I will attempt to ensure the following:
 1) Do not remove any parameters without notice in some form.
 2) If a value provided as a parameter is no longer in use/available to the framework, provide an empty/default value of the same type, which will hopefully avoid breakages
 3) Any new parameters added will be added to the end of the parameter list
@@ -793,9 +793,9 @@ Required?: No
 Type: String
 
 Notes:
-- The currentl parts of the code where this value is checked to be "RavagerFramework" are:
+- The current parts of the code where this value is checked to be "RavagerFramework" are:
   + Enabling/disabling enemies
-  + Determining if the framework will use its custom item drop behvior (see [ravagerCustomDrop](#ravagercustomdrop) for enabling this behavior for your own ravagers)
+  + Determining if the framework will use its custom item drop behavior (see [ravagerCustomDrop](#ravagercustomdrop) for enabling this behavior for your own ravagers)
   + Modifying the Slimegirl's "add slime restraint" chance
   + Modifying the "spiciness" of relevant enemy's narration (currently just the RavagerTendril and MimicRavager)
     - I do plan to change this behavior to allow spiciness of external ravagers to be handled by the framework. If you are seeing this and that behavior has not been changed and there is not an issue open for the plan to do so, please open an issue on GitHub. I am very forgetful.
@@ -820,7 +820,7 @@ Type: Boolean
 Notes:
 - When enabled, `enemy.maxDrops` is also required. If `enemy.maxDrops` is missing, item drops will be handled by the game's original functionality
 - Even when enabled for your enemy, multi-item drops will only be enabled when the `ravagerCustomDrop` ("Enable multi-item drops") mod setting is enabled by the user (this setting is enabled by default)
-- This functionality prevents dropping the same item multiple times. Because of this, I recommend keeping your `enemy.maxDrops` low relative to the length of your dropTable, as too high a number of drops can cause your enemy's drops to be nearly or entirely constant (except for the amounts of any applicable items). If you'd like to see this behavior changed, feel free to open an issue on Github.
+- This functionality prevents dropping the same item multiple times. Because of this, I recommend keeping your `enemy.maxDrops` low relative to the length of your dropTable, as too high a number of drops can cause your enemy's drops to be nearly or entirely constant (except for the amounts of any applicable items). If you'd like to see this behavior changed, feel free to open an issue on GitHub.
 
 ### maxDrops
 
@@ -950,7 +950,7 @@ Every message for the randomized text starts with "[Ravager Framework][DBG][InSt
 The random text function loops every character individually, so you'll likely see at least one of the following lines for every character in the string.
 
 - The line "Input string doesn't contain any selections. Skipping." indicates that the input string is missing at least one of "{", "}", or "|" and will no be processed for random choices.
-- A line starting with "Found a total of" is coming from the internal helper function for counting characters within a substring. This helper function is used to detect nested random choices. If you're using nested random choices, the relavant line for your nested choices should show a count of at least 2 for the character "|".
+- A line starting with "Found a total of" is coming from the internal helper function for counting characters within a sub-string. This helper function is used to detect nested random choices. If you're using nested random choices, the relevant line for your nested choices should show a count of at least 2 for the character "|".
 - A line starting with "(L) Level" is stating the current number of random choices the code is currently looking at. When at a part of the string that doesn't have a random choice, this line should state level 0. While parsing a choice, the level should be at least 1.
 - A line starting with "(L+) Holding" means that the loop has found the opening bracket that signals the beginning of a random choice, the level has been incremented, and shows the text that is being held so that the random choice can actually be chosen when it finds the closing bracket.
 - A line starting with "(L-) Holding" means that the loop has found the closing bracket that signals the end of a random choice, the level has been decremented, and shows the text that is about to be used to decide on the random choice
