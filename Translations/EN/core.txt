@@ -188,6 +188,7 @@ RFCCategories = Categories
 ; ; Ravager Control categories
 RFCCategoryDebug = Debugging
 RFCCategoryCustomize = Customization
+RFCCategoryKillswitches = Kill switches
 RFCCategoryBand = Bandit
 RFCCategoryWolf = Wolfgirl
 RFCCategorySlime = Slimegirl

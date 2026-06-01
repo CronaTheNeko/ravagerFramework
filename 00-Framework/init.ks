@@ -45,3 +45,14 @@ for (var key in debugCallbacks) {
 KDRender.RavagerControl = RavagerFrameworkControlRun
 //
 window.RFButtonsCache = {}
+
+// Dynamically add kill switches to framework controls
+for (let s in RavagerData.Killswitches) {
+  RavagerData.Definitions.FrameworkControls.Killswitches.push({
+    name: s,
+    type: "boolean",
+    onclick: () => { RavagerData.Killswitches[s] = !RavagerData.Killswitches[s] },
+    checked: () => RavagerData.Killswitches[s]
+  })
+  RFAddTextKey("RFCBoolKillswitches" + s, s)
+}

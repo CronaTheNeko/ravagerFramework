@@ -541,6 +541,7 @@ window.RavagerData = {
           }
         },
       ],
+      Killswitches: [],
       Band: [
         {
           name: "EnemyApply",
