@@ -127,7 +127,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
     // Clothing targts
     let clothingTargetsPelvis = KDGetDressList()[KinkyDungeonCurrentDress].filter(article=> {
       // Working around a function override for PureWind'sTools outfits
-      if (["InnocentDesireSuit", "NightCatSuit", "MikosSuitLV1", "MikosSuitLV2", "MikosSuitLV3", "Nake", "EtherMageSuit"].some(str => KinkyDungeonCurrentDress == str))
+      if (window.PureWindOutfitsList?.includes(KinkyDungeonCurrentDress))
         return false
       // Seems to not be called before stripping; but it's working as it is now, so I'll come back to this later
       if (enemy.ravage.bypassAll)
@@ -144,7 +144,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
     RFTrace('[Ravager Framework DBG]: PlayerEffect clothingTargetsPelvis: ', clothingTargetsPelvis)
     let clothingTargetsMouth = KDGetDressList()[KinkyDungeonCurrentDress].filter(article=> {
       // Working around a function override for PureWind'sTools outfits
-      if (["InnocentDesireSuit", "NightCatSuit", "MikosSuitLV1", "MikosSuitLV2", "MikosSuitLV3", "Nake", "EtherMageSuit"].some(str => KinkyDungeonCurrentDress == str))
+      if (window.PureWindOutfitsList?.includes(KinkyDungeonCurrentDress))
         return false
       // Seems to not be called before stripping; but it's working as it is now, so I'll come back to this later
       if (enemy.ravage.bypassAll)
@@ -157,7 +157,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
     })
     let clothingTargetsHead = KDGetDressList()[KinkyDungeonCurrentDress].filter(article=> {
       // Working around a function override for PureWind'sTools outfits
-      if (["InnocentDesireSuit", "NightCatSuit", "MikosSuitLV1", "MikosSuitLV2", "MikosSuitLV3", "Nake", "EtherMageSuit"].some(str => KinkyDungeonCurrentDress == str))
+      if (window.PureWindOutfitsList?.includes(KinkyDungeonCurrentDress))
         return false
       // Seems to not be called before stripping; but it's working as it is now, so I'll come back to this later
       if (enemy.ravage.bypassAll)

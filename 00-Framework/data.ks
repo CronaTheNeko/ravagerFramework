@@ -192,6 +192,11 @@ window.RavagerData = {
       refvar: 'ravUseCountOverride',
       block: () => !RFGetSetting("ravEnableUseCount"),
     },
+    ravagerPWTCompat: {
+      type: "boolean",
+      refvar: "ravagerPWTCompat",
+      default: false,
+    },
     ravagerCustomDrop: {
       type: "boolean",
       refvar: "ravagerCustomDrop",
@@ -659,6 +664,7 @@ window.RavagerData = {
         },
       ],
     },
+    PureWindKnownOutfits: [ "InnocentDesireSuit", "NightCatSuit", "MikosSuitLV1", "MikosSuitLV2", "MikosSuitLV3", "Nake", "EtherMageSuit" ],
   },
   // Variable, general purpose data
   Variables: {

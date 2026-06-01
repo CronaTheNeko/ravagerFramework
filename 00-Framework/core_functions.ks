@@ -236,12 +236,22 @@ window.RavagerFrameworkSetupSound = function() {
 
 window.RefreshRavagerDataVariables = function(reason) {
   RFDebug("[Ravager Framework][RefreshRavagerDataVariables]: Refreshing variables for reason: ", reason)
+  // Full nude mode; currently just mimic burst
   if (RFGetSetting("ravagerEnableNudeOutfit") && RFAllowFeature("FullNude")) {
     if (!RavagerData.Variables.MimicBurstPossibleDress.includes("Nude"))
       RavagerData.Variables.MimicBurstPossibleDress.push("Nude")
   } else {
     if (RavagerData.Variables.MimicBurstPossibleDress.includes("Nude"))
       RavagerData.Variables.MimicBurstPossibleDress.splice(RavagerData.Variables.MimicBurstPossibleDress.findIndex(v => v == "Nude"), 1)
+  }
+  // PureWind'sTools outfit compatibility
+  if (RFGetSetting("ravagerPWTCompat")) {
+    if (window.PureWindOutfitsList != undefined)
+      RavagerData.Variables.PureWindOutfitsListBackup = window.PureWindOutfitsList
+    window.PureWindOutfitsList = RavagerData.Definitions.PureWindKnownOutfits
+  } else {
+    window.PureWindOutfitsList = RavagerData.Variables.PureWindOutfitsListBackup
+    delete RavagerData.Variables.PureWindOutfitsListBackup
   }
 }
 
