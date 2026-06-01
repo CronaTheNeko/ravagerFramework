@@ -801,11 +801,7 @@ Notes:
     - I do plan to change this behavior to allow spiciness of external ravagers to be handled by the framework. If you are seeing this and that behavior has not been changed and there is not an issue open for the plan to do so, please open an issue on GitHub. I am very forgetful.
 - Modifying one of the framework's ravagers:
   + To allow your modifications to persist across the framework unloading and reloading its enemies, you should modify the root definitions of ravagers
-  + As of writing, ravager definitions are across a two data structures:
-    - The BanditRavager, WolfgirlRavager, SlimeRavager, TentaclePit, and RavagerTendril definitions are stored in `KDEventMapEnemy['ravagerCallbacks']['definition{EnemyName}']`
-    - The MimicRavager definition is stored in `RavagerData.definitions.mimic`
-    - This split in locations is from the in-progress change from using a data structure inherent to the game to my own data structure, which took me a while to figure out how to make it globally accessible.
-    - If you are reading this, I have not yet moved all framework enemy definitions to `RavagerData.definitions`, and there is not an issue open for this on Github, please open an issue. My curse is forgetfulness.
+  + All of the framework's enemies are stored in `RavagerData.Definitions.Enemies`
 
 ### ravagerCustomDrop
 
