@@ -399,7 +399,9 @@ window.RavagerData = {
           checked: () => localStorage.hasOwnProperty("RavagerDefaultDevMode") && localStorage.RavagerDefaultDevMode == "true",
         },
         {
-          type: "padding"
+          type: "button",
+          name: "PIXIClearCache",
+          click: () => { PIXI.Cache.reset(); RavagerFrameworkRFCNotify("Cleared PIXI cache"); },
         },
         {
           name: "SaveFunctionOverrides",
