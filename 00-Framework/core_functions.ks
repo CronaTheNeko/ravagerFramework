@@ -1263,23 +1263,25 @@ window.RavagerFrameworkShowModal = function(id, title = "Ravager Framework", pre
   } else
     modal.appendChild(KinkyDungeonErrorPreamble([ preamble ]))
   // The code-style info box
-  const pre = document.createElement("pre")
-  Object.assign(pre.style, {
-    flex: 1,
-    backgroundColor: "#1a1a1a",
-    border: "1px solid #ffffff40",
-    fontSize: "1.1em",
-    padding: "1em",
-    userSelect: "all",
-    overflowWrap: "anywhere",
-    overflowX: "hidden",
-    overflowY: "auto",
-    color: "#fbf",
-    whiteSpace: "pre-wrap"
-  })
-  // The list of missing functions
-  pre.textContent = content
-  modal.appendChild(pre)
+  if (content) {
+    const pre = document.createElement("pre")
+    Object.assign(pre.style, {
+      flex: 1,
+      backgroundColor: "#1a1a1a",
+      border: "1px solid #ffffff40",
+      fontSize: "1.1em",
+      padding: "1em",
+      userSelect: "all",
+      overflowWrap: "anywhere",
+      overflowX: "hidden",
+      overflowY: "auto",
+      color: "#fbf",
+      whiteSpace: "pre-wrap"
+    })
+    // The list of missing functions
+    pre.textContent = content
+    modal.appendChild(pre)
+  }
   // Close button
   const closeButton = document.createElement("button")
   closeButton.textContent = RFGetText("ModalCloseButton")
