@@ -382,7 +382,20 @@ window.RavagerData = {
           refvar: "UnravelTextDebug"
         },
         {
-          type: "padding"
+          type: "button",
+          name: "CheckStructure",
+          click: () => {
+            RavagerFrameworkRFCNotify("Checking structure errors ...")
+            let foundProblems = false
+            for (let key in RavagerData.PossibleStructuralErrors) {
+              if (RavagerData.PossibleStructuralErrors[key].length) {
+                foundProblems = true
+                break
+              }
+            }
+            if (foundProblems)
+              RavagerFrameworkShowModal("structure-error-modal", "Structure Errors", "Below is a list of possible structural errors. None of these are guaranteed to cause a problem, but they should be checked.", JSON.stringify(RavagerData.PossibleStructuralErrors, undefined, 2))
+          }
         },
         {
           refvar: "AnnounceRavagers",
@@ -801,6 +814,9 @@ window.RavagerData = {
   Killswitches: {
     FullNude: true, // Mimic burst is crashing game with full nude enabled; TODO: Fix crash
     ForceStrip: false, // Prevent new Stripped events. If a uniform outfit item contains "Panties" layers and does not have Group set to "Uniform", the new behavior will strip the entire uniform. This hasn't happened with the player effect stripping code, so I'm not expecting this to be needed, but this killswitch is a fallback
+  },
+  PossibleStructuralErrors: {
+    MissingEventDictionaries: [],
   },
 }
 

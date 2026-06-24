@@ -1,3 +1,8 @@
+if (!KDEventMapEnemy.tick) {
+  RFWarn("[RF][Events]: KDEventMapEnemy.tick does not exist. We'll create it and hope the game will still call it.")
+  KDEventMapEnemy.tick = {}
+  RavagerData.PossibleStructuralErrors.MissingEventDictionaries.push("Enemy/tick")
+}
 // Game tick side of ravager bubbles
 KDEventMapEnemy['tick']['ravagerBubble'] = (e, entity, data) => {
   const enemy = entity.Enemy
@@ -38,57 +43,67 @@ KDEventMapEnemy['tick']['ravagerBubble'] = (e, entity, data) => {
   }
 }
 
-if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
-  KDEventMapGeneric['afterModSettingsLoad']['RavagerFramework'] = (e, data) => {
-    if (KDModSettings == null) {
-      KDModSettings = {}
-      RFDebug('[Ravager Framework] KDModSettings was null.')
-    }
-    if (KDModConfigs != undefined) {
-      let settingsarr = []
-      for (let conf in RavagerData.ModConfig) {
-        settingsarr.push(Object.assign({}, RavagerData.ModConfig[conf]))
-      }
-      KDModConfigs['RavagerFramework'] = settingsarr
-    }
-    let settingsobject = (KDModSettings.hasOwnProperty('RavagerFramework') == false) ? {} : Object.assign({}, KDModSettings['RavagerFramework'])
-    for (var i of KDModConfigs['RavagerFramework']) {
-      if (settingsobject[i.refvar] == undefined) {
-        RFDebug('Setting default value for ' + i.refvar + ' ...')
-        settingsobject[i.refvar] = i.default
-      }
-    }
-    KDModSettings['RavagerFramework'] = settingsobject
-    RavagerFrameworkSettingsRefresh('load')
-    RavagerFrameworkSetupSound()
-    // Check for any missing functions
-    if (!RavagerFrameworkCheckAllFunctions())
-      RFError("Found missing functions!", RavagerData.Variables.MissingFunctions)
+if (!KDEventMapGeneric.afterModSettingsLoad) {
+  RFWarn("[RF][Events]: KDEventMapGeneric.afterModSettingsLoad does not exist. We'll create it and hope the game will still call it.")
+  KDEventMapGeneric.afterModSettingsLoad = {}
+  RavagerData.PossibleStructuralErrors.MissingEventDictionaries.push("Generic/afterModSettingsLoad")
+}
+// Initial settings setup
+KDEventMapGeneric.afterModSettingsLoad.RavagerFramework = () => {
+  if (KDModSettings == null) {
+    KDModSettings = {}
+    RFDebug('[Ravager Framework] KDModSettings was null.')
   }
-  KDEventMapGeneric.afterModSettingsLoad.RavagerOutfitRefresh = (e, data) => {
-    // "Change" the character appearance to the saved appearance
-    CharacterAppearanceRestore(KinkyDungeonPlayer, localStorage.getItem("kinkydungeonappearance" + KDCurrentOutfit), false, true)
-    // Tell the game to refresh the players outfit
-    KinkyDungeonDressPlayer()
+  if (KDModConfigs != undefined) {
+    let settingsarr = []
+    for (let conf in RavagerData.ModConfig) {
+      settingsarr.push(Object.assign({}, RavagerData.ModConfig[conf]))
+    }
+    KDModConfigs['RavagerFramework'] = settingsarr
   }
-  KDEventMapGeneric.afterModSettingsLoad.RavagerDevMode = () => {
-    // Determine dev mode
-    const devmode = localStorage.hasOwnProperty("RavagerDefaultDevMode") && (localStorage.RavagerDefaultDevMode == "true" ? true : false)
-    RavagerData.Variables.DebugWasTurnedOff ||= devmode
-    RavagerData.Variables.DebugWasTurnedOn ||= devmode
-    RavagerData.Variables.RFControl.InGameEnabled ||= devmode
-    RavagerData.Variables.RFControl.WasEnabledInGame ||= devmode
-    TestMode ||= devmode
-    KDDebugMode ||= devmode
-    KinkyDungeonSeeAll ||= devmode
+  let settingsobject = (KDModSettings.hasOwnProperty('RavagerFramework') == false) ? {} : Object.assign({}, KDModSettings['RavagerFramework'])
+  for (var i of KDModConfigs['RavagerFramework']) {
+    if (settingsobject[i.refvar] == undefined) {
+      RFDebug('Setting default value for ' + i.refvar + ' ...')
+      settingsobject[i.refvar] = i.default
+    }
   }
+  KDModSettings['RavagerFramework'] = settingsobject
+  RavagerFrameworkSettingsRefresh('load')
+  RavagerFrameworkSetupSound()
+  // Check for any missing functions
+  if (!RavagerFrameworkCheckAllFunctions())
+    RFError("Found missing functions!", RavagerData.Variables.MissingFunctions)
+}
+// Refresh outfit incases player is wearing heart hairpin
+KDEventMapGeneric.afterModSettingsLoad.RavagerOutfitRefresh = () => {
+  // "Change" the character appearance to the saved appearance
+  CharacterAppearanceRestore(KinkyDungeonPlayer, localStorage.getItem("kinkydungeonappearance" + KDCurrentOutfit), false, true)
+  // Tell the game to refresh the players outfit
+  KinkyDungeonDressPlayer()
+}
+// Check for and enable dev mode
+KDEventMapGeneric.afterModSettingsLoad.RavagerDevMode = () => {
+  // Determine dev mode
+  const devmode = localStorage.hasOwnProperty("RavagerDefaultDevMode") && (localStorage.RavagerDefaultDevMode == "true" ? true : false)
+  RavagerData.Variables.DebugWasTurnedOff ||= devmode
+  RavagerData.Variables.DebugWasTurnedOn ||= devmode
+  RavagerData.Variables.RFControl.InGameEnabled ||= devmode
+  RavagerData.Variables.RFControl.WasEnabledInGame ||= devmode
+  TestMode ||= devmode
+  KDDebugMode ||= devmode
+  KinkyDungeonSeeAll ||= devmode
 }
 
-if (KDEventMapGeneric['afterModConfig'] != undefined) {
-  KDEventMapGeneric['afterModConfig']['RavagerFramework'] = (e, data) => {
-    RavagerFrameworkSettingsRefresh('refresh')
-    _RavagerFrameworkInInit = false
-  }
+if (!KDEventMapGeneric.afterModConfig) {
+  RFWarn("[RF][Events]: KDEventMapGeneric.afterModConfig does not exist. We'll create it and hope the game will still call it.")
+  KDEventMapGeneric.afterModConfig = {}
+  RavagerData.PossibleStructuralErrors.MissingEventDictionaries.push("Generic/afterModConfig")
+}
+// Refresh settings
+KDEventMapGeneric.afterModConfig.RavagerFramework = () => {
+  RavagerFrameworkSettingsRefresh('refresh')
+  _RavagerFrameworkInInit = false
 }
 
 // This whole nightmare references KinkyDungeonPlayerEntity all over the place, instead of just using target. Changing this would need testing to make sure nothing goes wrong, but could allow ravagers to go after other entities, or stay player targetted (with an early exit if target != KinkyDungeonPlayerEntity) while being easier to read
@@ -799,6 +814,11 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
   return {sfx: "Struggle", effect: true};
 }
 
+if (!KDEventMapInventory.tickAfter) {
+  RFWarn("[RF][Events]: KDEventMapInventory.tickAfter does not exist. We'll create it and hope the game will still call it.")
+  KDEventMapInventory.tickAfter = {}
+  RavagerData.PossibleStructuralErrors.MissingEventDictionaries.push("Inventory/tickAfter")
+}
 // Handles preventing enemies from interfering with ravaging, with some narration included
 KDEventMapInventory["tickAfter"]["ravagerSitDownAndShutUp"] = (e, item, data) => {
   RFDebug("[RavagerFramework] [ravagerSitDownAndShutUp]\ne: ", e, "\nitem: ", item, "\ndata: ", data)
@@ -914,8 +934,11 @@ KDEventMapInventory["tickAfter"]["ravagerNarration"] = (e, item, data) => {
 }
 
 // In case the player passes out for unrelated reasons
-if (!KDEventMapInventory["passout"])
-  KDEventMapInventory["passout"] = {}
+if (!KDEventMapInventory.passout) {
+  RFWarn("[RF][Events]: KDEventMapInventory.passout does not exist. We'll create it and hope the game will still call it.")
+  KDEventMapInventory.passout = {}
+  RavagerData.PossibleStructuralErrors.MissingEventDictionaries.push("Inventory/passout")
+}
 KDEventMapInventory.passout.ravagerRemove = (_event, item, data) => {
   RFTrace('[Ravager Framework][passout/ravagerRemove]: _event: ', _event, '; item: ', item, '; data: ', data, ';')
   for (let enemy of KDMapData.Entities) {
@@ -930,6 +953,11 @@ KDEventMapInventory.passout.ravagerRemove = (_event, item, data) => {
   delete KinkyDungeonPlayerEntity.ravage
 }
 
+if (!KDEventMapInventory.remove) {
+  RFWarn("[RF][Events]: KDEventMapInventory.remove does not exist. We'll create it and hope the game will still call it.")
+  KDEventMapInventory.remove = {}
+  RavagerData.PossibleStructuralErrors.MissingEventDictionaries.push("Inventory/remove")
+}
 // If pin is broken: resets ravage, clears leash, and stuns ravagers
 KDEventMapInventory.remove.ravagerRemove = (_event, item, data) => {
   RFTrace('[RF][Inventory/remove/ravagerRemove]: _event: ', _event, '; item: ', item, '; data: ', data)
@@ -975,6 +1003,11 @@ KDEventMapInventory.remove.ravagerRemove = (_event, item, data) => {
   }
 }
 
+if (!KDEventMapEnemy.death) {
+  RFWarn("[RF][Events]: KDEventMapEnemy.death does not exist. We'll create it and hope the game will still call it.")
+  KDEventMapEnemy.death = {}
+  RavagerData.PossibleStructuralErrors.MissingEventDictionaries.push("Enemy/death")
+}
 // Remove pin if this enemy was the last one ravaging on death
 KDEventMapEnemy.death.ravagerRemove = (_event, enemy, data) => {
   if (enemy.id != data.enemy.id)
@@ -1024,13 +1057,21 @@ KDEventMapEnemy.death.ravagerRemove = (_event, enemy, data) => {
 } 
 
 // Remove refractory on ravagers each turn
-if (!KDEventMapEnemy["tickAfter"])
-  KDEventMapEnemy["tickAfter"] = {}
+if (!KDEventMapEnemy["tickAfter"]) {
+  RFWarn("[RF][Events]: KDEventMapEnemy.tickAfter does not exist. We'll create it and hope the game will still call it.")
+  KDEventMapEnemy.tickAfter = {}
+  RavagerData.PossibleStructuralErrors.MissingEventDictionaries.push("Enemy/tickAfter")
+}
 KDEventMapEnemy["tickAfter"]["ravagerRefractory"] = (e, enemy, data) => {
   if (enemy?.ravageRefractory > 0)
     enemy.ravageRefractory--
 }
 
+if (!KDEventMapInventory.postRemoval) {
+  RFWarn("[RF][Events]: KDEventMapInventory.postRemoval does not exist. We'll create it and hope the game will still call it.")
+  KDEventMapInventory.postRemoval = {}
+  RavagerData.PossibleStructuralErrors.MissingEventDictionaries.push("Inventory/postRemoval")
+}
 // Make sure clothing is un-hidden when stripped is removed
 KDEventMapInventory.postRemoval.RFStrip = function(_event, item, _data) {
   if (!RFAllowFeature("ForceStrip"))
@@ -1046,6 +1087,11 @@ KDEventMapInventory.postRemoval.RFStrip = function(_event, item, _data) {
   dress.forEach(item => {
     item.Lost = false
   })
+}
+if (!KDEventMapInventory.afterDress) {
+  RFWarn("[RF][Events]: KDEventMapInventory.afterDress does not exist. We'll create it and hope the game will still call it.")
+  KDEventMapInventory.afterDress = {}
+  RavagerData.PossibleStructuralErrors.MissingEventDictionaries.push("Inventory/afterDress")
 }
 // Make sure clothing is hidden while stripped is equipped
 KDEventMapInventory.afterDress.RFStrip = function(_e, _item, data) {

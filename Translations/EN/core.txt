@@ -203,6 +203,7 @@ RFCBoolDebugHeavyDebug = Heavy Debugging
 RFCBoolDebugNameFormatDebug = Debug RFStringFormat function
 RFCBoolDebugDebugVanillaTextOverrides = Debug Text Replacements
 RFCBoolDebugUnravelTextDebug = Debug Text Unravel
+RFCButtonDebugCheckStructure = Structure Check
 RFCBoolDebugAnnounceRavagers = Announce Ravagers
 RFCBoolDebugAnnounceTracking = Track Ravager Counts
 RFCButtonDebugExportAnnounceData = Export Ravager Counts
