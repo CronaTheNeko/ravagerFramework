@@ -119,7 +119,27 @@ window.RavagerFrameworkSettingsRefresh = function(reason) {
   RefreshRavagerDataVariables(reason)
   RavagerFrameworkRefreshFonts(reason)
   RavagerFrameworkIWantToHelpDebug(reason)
+  RavagerFrameworkUpdateCompat(reason)
   RFInfo('[Ravager Framework] Finished running settings functions')
+}
+
+//
+window.RavagerFrameworkUpdateCompat = function(reason) {
+  RFDebug("[RF] RavagerFrameworkUpdateCompat(" + reason + ")")
+  const enable = RFGetSetting("RFCompat")
+  for (let func of Object.keys(RavagerData.CompatFuncs)) {
+    if (enable) {
+      if (window[func])
+        RavagerData.functions[func] = window[func]
+      window[func] = RavagerData.CompatFuncs[func]
+    } else {
+      if (RavagerData.functions[func]) {
+        window[func] = RavagerData.functions[func]
+        delete RavagerData.functions[func]
+      } else
+        delete window[func]
+    }
+  }
 }
 
 // Change slime girl's chance to add slime to the player

@@ -96,6 +96,9 @@ window.RavagerData = {
     // Compatibility reference to RFGetRestraint
     GetRandomRestraint: (...args) => { return RFGetRestraint(...args); },
   },
+  // Compat functions
+  CompatFuncs: {
+  },
   // Currently just used for the MimicRavager spoiler
   conditions: {
     // Checked to make the MimicRavager spoiler only show when the mimic has not ambushed the player
@@ -197,6 +200,10 @@ window.RavagerData = {
       type: "boolean",
       refvar: "ravagerPWTCompat",
       default: false,
+    },
+    RFCompat: {
+      type: "boolean",
+      refvar: "RFCompat"
     },
     ravagerCustomDrop: {
       type: "boolean",
