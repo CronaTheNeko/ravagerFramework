@@ -98,6 +98,41 @@ window.RavagerData = {
   },
   // Compat functions
   CompatFuncs: {
+    // Copies for compatibility. "Will" be removed in a few updates (written in 6.3)
+    RavagerFreeAndClearAllDataIfNoRavagers: (showMessage = true) => {
+      RFWarn("[RF] Compatibility: RavagerFreeAndClearAllDataIfNoRavagers is legacy behavior and should not be used.")
+      RFTrace('[Ravager Framework][RavagerFreeAndClearAllDataIfNoRavagers]: showMessage: ', showMessage)
+      let nearby = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 2)
+      RFTrace('[Ravager Framework][RavagerFreeAndClearAllDataIfNoRavagers]: nearby: ', nearby)
+      let cleared = false
+      nearby.forEach(enemy => {
+        enemy.stun = 5
+        if (enemy.ravage)
+          cleared = true
+      })
+      if (cleared) {
+        if (showMessage && KinkyDungeonPlayerEntity.ravage)
+          KinkyDungeonSendTextMessage(30, RFGetText("NarrationsPinBreakFree"), "#ff0000", 4)
+        RavagerFreeAndClearAllData()
+        KDBreakTether(KinkyDungeonPlayerEntity)
+      }
+    },
+    RavagerFreeAndClearAllData: () => {
+      RFWarn("[RF] Compatibility: RavagerFreeAndClearAllData is legacy behavior and should not be used.")
+      for (const enemy of KDMapData.Entities) {
+        if (enemy.ravage)
+          delete enemy.ravage
+        else {
+          delete enemy.witnessedRavaging
+          enemy.witnessedRavagingJustDeleted = true
+        }
+      }
+      for (const slot in ravageEquipmentSlotTargets) {
+        KinkyDungeonRemoveRestraintsWithName(`${slot.replace("Item", "RavagerOccupied")}`)
+      }
+      delete KinkyDungeonPlayerEntity.ravage
+      KinkyDungeonRemoveRestraintsWithName("Pinned")
+    },
   },
   // Currently just used for the MimicRavager spoiler
   conditions: {

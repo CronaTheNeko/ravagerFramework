@@ -275,47 +275,6 @@ window.RefreshRavagerDataVariables = function(reason) {
   }
 }
 
-// Verbose? Perhaps. Accurate? Yes...
-// TODO: This'll need to be changed if we're going to make ravaging able to happen to npcs
-window.RavagerFreeAndClearAllDataIfNoRavagers = function(showMessage = true) {
-  RFTrace('[Ravager Framework][RavagerFreeAndClearAllDataIfNoRavagers]: showMessage: ', showMessage)
-  let nearby = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 2)
-  RFTrace('[Ravager Framework][RavagerFreeAndClearAllDataIfNoRavagers]: nearby: ', nearby)
-  let cleared = false
-  nearby.forEach(enemy => {
-    enemy.stun = 5
-    if (enemy.ravage)
-      cleared = true
-  })
-  if (cleared) {
-    if (showMessage && KinkyDungeonPlayerEntity.ravage)
-      KinkyDungeonSendTextMessage(30, RFGetText("NarrationsPinBreakFree"), "#ff0000", 4)
-    RavagerFreeAndClearAllData()
-    KDBreakTether(KinkyDungeonPlayerEntity)
-  }
-}
-
-// Util to remove player and enemy ravager data
-window.RavagerFreeAndClearAllData = function() {
-  // Clear all enemies
-  for (const enemy of KDMapData.Entities) { // TODO: This'll need to be changed if we're going to make ravaging able to happen to npcs
-    if (enemy.ravage)
-      delete enemy.ravage
-    else {
-      // Clear the witness property from any enemies that witnessed this session
-      delete enemy.witnessedRavaging
-      enemy.witnessedRavagingJustDeleted = true
-    }
-  }
-  // Clear all "occupied" restraints
-  for (const slot in ravageEquipmentSlotTargets) {
-    KinkyDungeonRemoveRestraintsWithName(`${slot.replace("Item", "RavagerOccupied")}`)    
-  }
-  // Clear player data
-  delete KinkyDungeonPlayerEntity.ravage
-  KinkyDungeonRemoveRestraintsWithName("Pinned")
-}
-
 // Draws the ravager control menu
 window.RavagerFrameworkControlRun = function() {
   // Draw custom background
