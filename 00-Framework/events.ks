@@ -614,8 +614,6 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
         // Status effect application/precautions
         KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, KDRavaged) // Blinds player
         KinkyDungeonApplyBuffToEntity(entity, KDRavaging) // Keeps enemy in one place
-        if (!entity.Enemy.ravage.bypassAll)
-          KinkyDungeonAddRestraintIfWeaker("Stripped") // Stay stripped
 
         if(pRav.submitting) { // When submitting, offset the "self-play" cost associated with doTryOrgasm
           if(KinkyDungeonStatStamina > 3)
@@ -840,24 +838,33 @@ KDEventMapInventory["tickAfter"]["ravagerSitDownAndShutUp"] = (e, item, data) =>
 }
 
 // Each tick, check to see if the player is still pinned by anyone
-KDEventMapInventory["tickAfter"]["ravagerPinCheck"] = (e, item, data) => {
-  RFTrace('[Ravager Framework][ravagerPinCheck]: e: ', e, '; item: ', item, '; data: ', data)
+KDEventMapInventory.tickAfter.ravagerPinCheck = (e, item, data) => {
+  RFTrace('[RF][Inventory/tickAfter/ravagerPinCheck]: e: ', e, '; item: ', item, '; data: ', data)
   let nearby = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 4)
   let cleared = true
-  RFTrace('[Ravager Framework][ravagerPinCheck]: nearby: ', nearby)
-  nearby.forEach(enemy=>{
-    RFTrace('[Ravager Framework][ravagerPinCheck]: enemy: ', enemy, '; ravage: ', enemy.ravage, '; stun: ', enemy.stun, '; ravageRefractory: ', enemy.ravageRefractory)
+  RFTrace('[RF][Inventory/tickAfter/ravagerPinCheck]: nearby: ', nearby)
+  nearby.forEach(enemy => {
+    RFTrace('[RF][Inventory/tickAfter/ravagerPinCheck]: enemy: ', enemy, '; ravage: ', enemy.ravage, '; stun: ', enemy.stun, '; ravageRefractory: ', enemy.ravageRefractory)
     if (enemy.ravage && !enemy.stun && !enemy.ravageRefractory) {
-      RFTrace(`[Ravager Framework][ravagerPinCheck]: Found enemy playing with player! (${enemy.id})`)
+      RFTrace(`[RF][Inventory/tickAfter/ravagerPinCheck]: Found enemy playing with player! (${enemy.id})`)
       cleared = false
       enemy.playWithPlayer = 5 // Keep them playing until they're done
     }
   })
   if (cleared) {
-    RFTrace('[Ravager Framework][ravagerPinCheck]: Player is free, clearing all data ...')
-    RavagerFreeAndClearAllData();
+    RFTrace('[RF][Inventory/tickAfter/ravagerPinCheck]: Player is free, clearing all data ...')
+    // RavagerFreeAndClearAllData();
+    for (const enemy of KDMapData.Entities) {
+      if (enemy.ravage)
+        delete enemy.ravage
+      else if (enemy.witnessedRavaging) {
+        delete enemy.witnessedRavaging
+        enemy.witnessedRavagingJustDeleted = true
+      }
+    }
+    KinkyDungeonRemoveRestraintsWithName("Pinned")
   } else {
-    RFTrace('[Ravager Framework][ravagerPinCheck]: Player is NOT free, applying block and evasion penalties ...')
+    RFTrace('[RF][Inventory/tickAfter/ravagerPinCheck]: Player is NOT free, applying block and evasion penalties ...')
     KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
       id: "RavagerNoDodge",
       duration: 1,
@@ -874,14 +881,24 @@ KDEventMapInventory["tickAfter"]["ravagerPinCheck"] = (e, item, data) => {
 }
 
 // For occupied, make sure pinned is still there; if pinned is gone, occupied should be too
-KDEventMapInventory["tickAfter"]["RavagerCheckForPinned"] = (e, item, data) => {
-  let remove = false
-  for (const inv of KinkyDungeonAllRestraint()) {
-    if (inv.name == "Pinned")
-      remove = true
+KDEventMapInventory.tickAfter.RavagerCheckForPinned = (_event, item, data) => {
+  RFTrace('[RF][Inventory/tickAfter/RavagerCheckForPinned]: _event: ', _event, '; item: ', item, '; data: ', data)
+  let wearingThis = false
+  let pinned = false
+  KinkyDungeonAllRestraint().forEach(restraint => {
+    if (restraint.name == item.name)
+      wearingThis = true
+    else if (restraint.name == "Pinned")
+      pinned = true
+  })
+  if (!wearingThis) {
+    RFTrace('[RF][Inventory/tickAfter/RavagerCheckForPinned]: ' + item.name + ' is not being worn, exiting.')
+    return
   }
-  if (remove)
+  if (!pinned) {
+    RFTrace('[RF][Inventory/tickAfter/RavagerCheckForPinned]: Removing ' + item.name, item)
     KDRemoveThisItem(item)
+  }
 }
 
 // We handle narration in an event since it's easier to get everything across multiple enemies grouped nicely this way
@@ -899,37 +916,110 @@ KDEventMapInventory["tickAfter"]["ravagerNarration"] = (e, item, data) => {
 // In case the player passes out for unrelated reasons
 if (!KDEventMapInventory["passout"])
   KDEventMapInventory["passout"] = {}
-KDEventMapInventory["passout"]["ravagerRemove"] = (e, item, data) => {
-  RFTrace('[Ravager Framework][passout/ravagerRemove]: e: ', e, '; item: ', item, '; data: ', data, '; Calling RavagerFreeAndClearAllData')
-  RavagerFreeAndClearAllData()
-  // Keep panties gone as a souvenir
-  setTimeout(() =>
-    KDGetDressList()[KinkyDungeonCurrentDress].forEach(article => {
-      if (["Panties"].some(str => article.Item.includes(str))) {
-        article.Lost = true
-      }
-    }), 1)
+KDEventMapInventory.passout.ravagerRemove = (_event, item, data) => {
+  RFTrace('[Ravager Framework][passout/ravagerRemove]: _event: ', _event, '; item: ', item, '; data: ', data, ';')
+  for (let enemy of KDMapData.Entities) {
+    if (enemy.ravage) // Only works when player is the only entity that can be ravaged
+      delete enemy.ravage
+    else if (enemy.witnessedRavaging) {
+      delete enemy.witnessedRavaging
+      enemy.witnessedRavagingJustDeleted = true
+    }
+  }
+  // Clear player data
+  delete KinkyDungeonPlayerEntity.ravage
 }
 
 // If pin is broken: resets ravage, clears leash, and stuns ravagers
-KDEventMapInventory["remove"]["ravagerRemove"] = (e, item, data) => {
-  RFTrace('[Ravager Framework][remove/ravagerRemove]: e: ', e, '; item: ', item, '; data: ', data)
-  if (data.item.name == item.name) { // To make sure the item being removed is Pinned
-    RFTrace(`[Ravager Framework][remove/ravagerRemove]: data.item.name (${data.item.name}) == item.name (${item.name}). Calling RavagerFreeAndClearAllDataIfNoRavagers`)
-    RavagerFreeAndClearAllDataIfNoRavagers()
+KDEventMapInventory.remove.ravagerRemove = (_event, item, data) => {
+  RFTrace('[RF][Inventory/remove/ravagerRemove]: _event: ', _event, '; item: ', item, '; data: ', data)
+  RFTrace(`[RF][Inventory/remove/ravagerRemove]: data.item.name (${data.item.name}) == item.name (${item.name})`)
+  // To make sure the item being removed is Pinned
+  if (data.item.name == item.name) {
+    const easy = RFHasPerk("RFEasyEscape")
+    const nearby = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, (easy ? 2 : 10))
+    let cleared = false
+    let breakLeash = false
+    for (let entity of nearby) {
+      if (easy)
+        entity.stun = 5
+      // Occupying ravagers
+      if (entity.ravage && entity.ravage.isRavaging) {
+        if (KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] == entity)
+          KinkyDungeonPlayerEntity.ravage.slots[entity.ravage.slot] = false
+        delete entity.ravage
+        entity.stun = 5
+        cleared = true
+        if (KinkyDungeonPlayerEntity.leash?.entity == entity.id)
+          breakLeash = true
+      }
+      // Witnesses
+      else if (entity.witnessedRavaging) {
+        delete entity.witnessedRavaging
+        entity.witnessedRavagingJustDeleted = true
+        entity.stun = Math.max(entity.stun, 2)
+      }
+      // Playing ravagers
+      else if (entity.Enemy.ravage && entity.playWithPlayer > 1)
+        entity.stun = 5
+    }
+    if (cleared) {
+      KinkyDungeonSendTextMessage(30, RFGetText("NarrationsPinBreakFree"), "#f00")
+      if (breakLeash)
+        KDBreakTether(KinkyDungeonPlayerEntity)
+      if (RFHasPerk("RFQuickRun") && KDGameData.MovePoints < 0) {
+        // KDGameData.MovePoints = 0
+        RavagerData.Variables.ForceMovePoints = 0
+      }
+    }
   }
 }
 
 // Remove pin if this enemy was the last one ravaging on death
-KDEventMapEnemy["death"]["ravagerRemove"] = (e, enemy, data) => {
-  RFTrace('[Ravager Framework][death/ravagerRemove]: e: ', e, '; enemy: ', enemy, '; data: ', data)
+KDEventMapEnemy.death.ravagerRemove = (_event, enemy, data) => {
+  if (enemy.id != data.enemy.id)
+    return
+  RFTrace('[Ravager Framework][death/ravagerRemove]: _event: ', _event, '; enemy: ', enemy, '; data: ', data)
   if (enemy.hp > 0) {
-    RFTrace('[Ravager Framework][death/ravagerRemove]: Enemy NOT dead! GTFO (' + enemy.Enemy.name + ')')
+    RFTrace('[Ravager Framework][death/ravagerRemove]: Enemy NOT dead! GTFO (' + enemy.Enemy.name + " " + enemy.id + ')')
     return
   }
   if (enemy.ravage && KinkyDungeonPlayerEntity.ravage) {
     RFTrace('[Ravager Framework][death/ravagerRemove]: enemy.ravage && KinkyDungeonPlayerEntity.ravage passed, calling RavagerFreeAndClearAllDataIfNoRavagers')
-    RavagerFreeAndClearAllDataIfNoRavagers()
+    const easy = RFHasPerk("RFEasyEscape")
+    if (easy) {
+      let cleared = false
+      let nearby = KDNearbyEnemies(KDPlayer().x, KDPlayer().y, 2)
+      nearby.forEach(entity => {
+        entity.stun = 5
+        if (entity.ravage)
+          cleared = true
+      })
+      if (cleared) {
+        if (KDPlayer().ravage)
+          KinkyDungeonSendTextMessage(30, RFGetText("NarrationsPinBreakFree"), "#ff0000", 4)
+        for (const en of KDMapData.Entities) {
+          if (en.ravage)
+            delete en.ravage
+          else if (en.witnessedRavaging) {
+            delete en.witnessedRavaging
+            en.witnessedRavagingJustDeleted = true
+          }
+        }
+        for (const slot in ravageEquipmentSlotTargets)
+          KinkyDungeonRemoveRestraintsWithName(slot.replace("Item", "RavagerOccupied"))
+        delete KDPlayer().ravage
+        KinkyDungeonRemoveRestraintsWithName("Pinned")
+        KDBreakTether(KDPlayer())
+      }
+    } else {
+      if (KDPlayer().ravage.slots && KDPlayer().ravage.slots[enemy.ravage.slot]) {
+        KDPlayer().ravage.slots[enemy.ravage.slot] = false
+        if (KinkyDungeonAllRestraint().filter(item => item.name == enemy.ravage.slot.replace("Item", "RavagerOccupied"))) {
+          KinkyDungeonRemoveRestraintsWithName(enemy.ravage.slot.replace("Item", "RavagerOccupied"))
+        }
+      }
+    }
   }
 } 
 
@@ -939,4 +1029,64 @@ if (!KDEventMapEnemy["tickAfter"])
 KDEventMapEnemy["tickAfter"]["ravagerRefractory"] = (e, enemy, data) => {
   if (enemy?.ravageRefractory > 0)
     enemy.ravageRefractory--
+}
+
+// Make sure clothing is un-hidden when stripped is removed
+KDEventMapInventory.postRemoval.RFStrip = function(_event, item, _data) {
+  if (!RFAllowFeature("ForceStrip"))
+    return
+  let dress = KDGetDressList()[KinkyDungeonCurrentDress].filter(
+    item => item.Group != "Uniform" && item.Lost && RavagerData.Variables.PassoutStripLayers.some(
+      str => GetModelLayers(item.Item).some(
+        layer => layer.Layer == str
+      )
+    )
+  )
+  RFTrace("[RF][Inventory/postRemoval/RFStrip]: Filtered clothing: ", dress)
+  dress.forEach(item => {
+    item.Lost = false
+  })
+}
+// Make sure clothing is hidden while stripped is equipped
+KDEventMapInventory.afterDress.RFStrip = function(_e, _item, data) {
+  if (data.Character != KinkyDungeonPlayer)
+    return
+  if (!RFAllowFeature("ForceStrip"))
+    return
+  // Check if player is being ravaged
+  let isRavaging = false
+  KDNearbyEnemies(KDPlayer().x, KDPlayer().y, 3).forEach(en => {
+    if (!en.stun && !en.ravageRefractory && en.ravage) {
+      isRavaging = true
+    }
+  })
+  // Only hide clothing when not being ravaged; doing otherwise causes the stripping phase to strip ALL clothes in the pelvis slot instantly instead of over one turn per clothing item
+  if (!isRavaging) {
+    RFTrace("[RF][Inventory/afterDress/RFStrip]: Looping items ...")
+    let dress = KDGetDressList()[KinkyDungeonCurrentDress].filter(
+      item => item.Group != "Uniform" && !item.Lost && RavagerData.Variables.PassoutStripLayers.some(
+        str => GetModelLayers(item.Item).some(
+          layer => layer.Layer == str
+        )
+      )
+    )
+    RFTrace("[RF][Inventory/afterDress/RFStrip]: Filtered clothing: ", dress)
+    dress.forEach(item => {
+      RFTrace("[RF][Inventory/afterDress/RFStrip]: Stripping item " + item.Item, item)
+      item.Lost = true
+    })
+  }
+}
+
+// Dynamically add perk toggles to framework controls
+KDEventMapGeneric.afterModSettingsLoad.PerkSwitchesSetup = () => {
+  for (let name of Object.keys(KinkyDungeonStatsPresets).filter(p => KinkyDungeonStatsPresets[p].category == "RFPreferences")) {
+    RavagerData.Definitions.FrameworkControls.PerkSwitches.push({
+      name,
+      type: "boolean",
+      onclick: () => { RavagerData.Variables.RFControl.PerkSwitches[name] = !RavagerData.Variables.RFControl.PerkSwitches[name] },
+      checked: () => RavagerData.Variables.RFControl.PerkSwitches[name]
+    })
+    RFAddTextKey("RFCBoolPerkSwitches" + name, TextGet("KinkyDungeonStat" + name))
+  }
 }

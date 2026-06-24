@@ -99,7 +99,7 @@ ConfigHoverravagerHelpDebug = Turn on heavy debugging mode so that you can provi
 
 ; Restraint actions
 ; ; Since it's supposed to be impossible to struggle out of "Occupied!", and you have to use debug mode to get one to equip to yourself, you should just use debug mode to give yourself a "Pinned!" and equip it
-- KinkyDungeonSelfBondageRavagerOccupied = You shouldn't have done that~ Equip "Pinned" to yourself to fix it~
+- KinkyDungeonSelfBondageRavagerOccupied = Doing some testing here?~
 ; ; Pinned struggle fails
 - KinkyDungeonStruggleStruggleFailRavagerPinned = You try to break free...
 - KinkyDungeonStruggleStruggleFailRavagerPinnedAroused = You try to break free, but you're quickly put back in your place...
@@ -188,6 +188,7 @@ RFCCategories = Categories
 ; ; Ravager Control categories
 RFCCategoryDebug = Debugging
 RFCCategoryCustomize = Customization
+RFCCategoryPerkSwitches = Perk switches
 RFCCategoryKillswitches = Kill switches
 RFCCategoryBand = Bandit
 RFCCategoryWolf = Wolfgirl

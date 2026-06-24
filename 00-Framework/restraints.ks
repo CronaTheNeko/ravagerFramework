@@ -13,7 +13,7 @@ KinkyDungeonRestraints.push(
     weight: 20, 
     alwaysStruggleable: true,
     alwaysEscapable: ["Struggle"],
-    escapeChance: {"Struggle": -0.1, "Remove": 0.2, "Cut": 0.75},
+    escapeChance: {"Struggle": 0.35, "Remove": 0.2, "Cut": 0.75},
     struggleMinSpeed: {"Struggle": 0.2},
     playerTags: {"ItemArmsFull":2},
     enemyTags: {},
@@ -53,7 +53,10 @@ KinkyDungeonRestraints.push(
     removeOnLeash:false,
     removeOnPrison:false,
     shrine: [],
-    events: [],
+    events: [
+      { trigger: "postRemoval", type: "RFStrip" },
+      { trigger: "afterDress", type: "RFStrip" },
+    ],
     failSuffix: {'Remove': 'RavagerStripped', 'Struggle': 'RavagerStripped'},
     customEquip: 'RavagerStripped',
     customEscapeSucc: 'RavagerStripped'
@@ -77,7 +80,7 @@ KinkyDungeonRestraints.push(
     bypass: true,
     gag: 1,
     events: [
-      {trigger: "tick", type: "ravagerCheckForPinned", power: -1},
+      {trigger: "tickAfter", type: "RavagerCheckForPinned", power: -1},
     ],
     failSuffix: {"Remove": "RavagerOccupied", "Struggle": "RavagerOccupied", "Cut": "RavagerOccupied"},
     customEquip: 'RavagerOccupied',
@@ -99,7 +102,7 @@ KinkyDungeonRestraints.push(
     removeOnPrison:true,
     bypass: true,
     events: [
-      {trigger: "tick", type: "ravagerCheckForPinned", power: -1},
+      {trigger: "tickAfter", type: "RavagerCheckForPinned", power: -1},
     ],
     failSuffix: {"Remove": "RavagerOccupied", "Struggle": "RavagerOccupied", "Cut": "RavagerOccupied"},
     customEquip: 'RavagerOccupied'
@@ -120,7 +123,7 @@ KinkyDungeonRestraints.push(
     removeOnPrison:true,
     bypass: true,
     events: [
-      {trigger: "tick", type: "ravagerCheckForPinned", power: -1},
+      {trigger: "tickAfter", type: "RavagerCheckForPinned", power: -1},
     ],
     failSuffix: {"Remove": "RavagerOccupied", "Struggle": "RavagerOccupied", "Cut": "RavagerOccupied"},
     customEquip: 'RavagerOccupied',
@@ -142,7 +145,7 @@ KinkyDungeonRestraints.push(
     removeOnPrison:true,
     bypass: true,
     events: [
-      {trigger: "tick", type: "ravagerCheckForPinned", power: -1},
+      {trigger: "tickAfter", type: "RavagerCheckForPinned", power: -1},
     ],
     failSuffix: {"Remove": "RavagerOccupied", "Struggle": "RavagerOccupied", "Cut": "RavagerOccupied"},
     customEquip: 'RavagerOccupied',

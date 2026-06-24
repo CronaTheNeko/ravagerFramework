@@ -11,6 +11,7 @@
 	"fileorder": [
 		"mod.json",
 		"00-Framework/data.ks",
+		"00-Framework/perks.ks",
 		"00-Framework/core_functions.ks",
 		"00-Framework/public_functions.ks",
 		"00-Framework/function_overrides.ks",
@@ -20,6 +21,7 @@
 		"00-Framework/status.ks",
 		"Translations/EN/core.txt",
 		"Translations/EN/consumables.txt",
+		"Translations/EN/perks.txt",
 		"Translations/EN/bandit_ravager.txt",
 		"Translations/EN/mimic_ravager.txt",
 		"Translations/EN/slime_ravager.txt",

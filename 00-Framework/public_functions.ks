@@ -920,3 +920,8 @@ window.RFRollConditionChance = function(val, func_args = [], condition_dict = Ra
     return Math.random() < condval
   return false
 }
+
+// Helper to check if player has a perk or framework controls has it enabled
+window.RFHasPerk = function(perkName) {
+  return Boolean(HasPerk(perkName) || RavagerData.Variables.RFControl.PerkSwitches[perkName])
+}

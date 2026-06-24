@@ -1,0 +1,8 @@
+; Categories
+- KDCategoryRFPreferences = Ravager Experience
+; Perks
+- KinkyDungeonStatRFEasyEscape = Easy Escape
+- KinkyDungeonStatRFQuickRun = Get Up and Run
+; Descriptions
+- KinkyDungeonStatDescRFEasyEscape = Stun all enemies surrounding you when you escape from a pin
+- KinkyDungeonStatDescRFQuickRun = Get up quickly and take your chance at escape

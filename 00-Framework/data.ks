@@ -90,6 +90,7 @@ window.RavagerData = {
     KDDropItems: KDDropItems,
     DrawCheckboxKDEx: DrawCheckboxKDEx,
     KinkyDungeonSendTextMessage: KinkyDungeonSendTextMessage,
+    KDCanAddRestraint: KDCanAddRestraint,
     // Compatibility reference to RFStringFormat
     NameFormat: (...args) => { return window.RFStringFormat(...args); },
     // Compatibility reference to RFGetRestraint
@@ -543,6 +544,7 @@ window.RavagerData = {
           }
         },
       ],
+      PerkSwitches: [],
       Killswitches: [],
       Band: [
         {
@@ -740,10 +742,13 @@ window.RavagerData = {
       Customization_BorderColor: "#6100cf",
       // Notification buffer
       Notifications: [],
+      // Perk switches to enable them mid-save
+      PerkSwitches: {},
     },
     DebugWasTurnedOn: false,
     DebugWasTurnedOff: false,
     MimicBurstPossibleDress: [ "Leotard", "GreenLeotard", "Bikini", "Lingerie" ],
+    PassoutStripLayers: [ "Panties" ],
     IWantToHelpDebug: false,
     IWantToHelpDebugBuffer: []
   },
@@ -753,7 +758,8 @@ window.RavagerData = {
   // Feature killswitches
   Killswitches: {
     FullNude: true, // Mimic burst is crashing game with full nude enabled; TODO: Fix crash
-  }
+    ForceStrip: false, // Prevent new Stripped events. If a uniform outfit item contains "Panties" layers and does not have Group set to "Uniform", the new behavior will strip the entire uniform. This hasn't happened with the player effect stripping code, so I'm not expecting this to be needed, but this killswitch is a fallback
+  },
 }
 
 // Slots that need to be stripped to occupy a given slot; slots to clear are in order

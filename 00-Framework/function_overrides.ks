@@ -155,6 +155,12 @@ KinkyDungeonDrawGame = function() {
       '#303'
     )
   }
+  // (Hopefully) Force KDGameData.MovePoints for RFQuickRun perk
+  else if (KinkyDungeonState == "Game" && RavagerData.Variables.ForceMovePoints) {
+    RFWarn("[RF][KinkyDungeonDrawGame] Forcing KDGameData.MovePoints")
+    KDGameData.MovePoints = RavagerData.Variables.ForceMovePoints
+    delete RavagerData.Variables.ForceMovePoints
+  }
   // Return whatever the original function returned, just in case KinkyDungeonDrawGame ever returns anything
   return ret
 }
@@ -388,4 +394,11 @@ KinkyDungeonDrawEnemiesHP = function(delta, canvasOffsetX, canvasOffsetY, CamX, 
   }
   //
   return ret
+}
+
+// Override to make sure Stripped can always be equipped, since it previously was unable to be applied while wearing chastity, rope belts, etc
+KDCanAddRestraint = function(restraint, Bypass, Lock, NoStack, r, Deep, noOverpower, securityEnemy, useAugmentedPower, curse, augmentedInventory, powerBonus = 0) {
+  if (restraint?.Group == "ItemPelvis" && r?.name == "Stripped")
+    noOverpower = false
+  return RavagerData.functions.KDCanAddRestraint(restraint, Bypass, Lock, NoStack, r, Deep, noOverpower, securityEnemy, useAugmentedPower, curse, augmentedInventory, powerBonus)
 }
