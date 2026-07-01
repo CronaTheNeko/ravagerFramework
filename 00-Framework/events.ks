@@ -560,22 +560,18 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
         function decideToDoModifiedNarration() {
           RFTrace("[RF][Effect][NarMod]: Deciding whether to do modified narration for entity", entity)
           const nmod = enemy.ravage.narrationModifier
-          const fparams = [
-            entity,
-            target,
-            {
-              damage,
-              playerEffect,
-              spell,
-              faction,
-              bullet,
-              stripOptions,
-              uncovered,
-              range,
-              slot: slotOfChoice,
-              caller: "NarrMod"
-            }
-          ]
+          const fparams = {
+            damage,
+            playerEffect,
+            spell,
+            faction,
+            bullet,
+            stripOptions,
+            uncovered,
+            range,
+            slot: slotOfChoice,
+            caller: "NarrMod"
+          }
           if (didExperiencedNarration) {
             RFTrace("[RF][Effect][NarMod]: Already chose to do EAM; Bailing")
             return
@@ -584,22 +580,22 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
             RFTrace("[RF][Effect][NarMod]: Enemy does not have a narration modifier; Bailing")
             return
           }
-          if (!(RFCheckConditionBool(nmod.sporadic, Object.assign({}, fparams, { caller: "NarrMod.sporadic" })) || entity.ravage.progress == 0)) {
+          if (!(RFCheckConditionBool(nmod.sporadic, [ entity, target, Object.assign({}, fparams, { caller: "NarrMod.sporadic" }) ]) || entity.ravage.progress == 0)) {
             RFTrace("[RF][Effect][NarMod]: Modifier is non-sporadic and we're not at the beginning of the encounter; Reusing result from the beginning of the encounter:", entity.ravage.narMod)
             return entity.ravage.narMod
           }
-          if (!RFCheckConditionBool(nmod.condition, Object.assign({}, fparams, { caller: "NarrMod.condition" }))) {
+          if (!RFCheckConditionBool(nmod.condition, [ entity, target, Object.assign({}, fparams, { caller: "NarrMod.condition" }) ])) {
             RFTrace("[RF][Effect][NarMod]: Modifier condition did not pass: ", nmod.condition)
             return
           }
           let modchance = (nmod.hasOwnProperty("chance") ? nmod.chance : 1.0)
-          if (!RFRollConditionChance(modchance, Object.assign({}, fparams, { caller: "NarrMod.chance" }))) {
+          if (!RFRollConditionChance(modchance, [ entity, target, Object.assign({}, fparams, { caller: "NarrMod.chance" }) ])) {
             RFTrace("[RF][Effect][NarMod]: Modifier chance did not pass: ", modchance)
             return
           }
           let pfx = (nmod.hasOwnProperty("linePrefix") ? nmod.linePrefix : "Mod")
           RFTrace("[RF][Effect][NarMod]: All checks passed; Returning linePrefix: ", pfx)
-          return RFGetConditionValue(pfx, Object.assign({}, fparams, { caller: "NarrMod.linePrefix" }))
+          return RFGetConditionValue(pfx, [ entity, target, Object.assign({}, fparams, { caller: "NarrMod.linePrefix" }) ])
         }
         let didModifiedNarration = false
         let narModPfx = decideToDoModifiedNarration()
