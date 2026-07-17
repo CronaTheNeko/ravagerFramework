@@ -1072,8 +1072,10 @@ if (!KDEventMapInventory.postRemoval) {
   RavagerData.PossibleStructuralErrors.MissingEventDictionaries.push("Inventory/postRemoval")
 }
 // Make sure clothing is un-hidden when stripped is removed
-KDEventMapInventory.postRemoval.RFStrip = function(_event, item, _data) {
+KDEventMapInventory.postRemoval.RFStrip = function(_event, item, data) {
   if (!RFAllowFeature("ForceStrip"))
+    return
+  if (item.name != data.item?.name)
     return
   let dress = KDGetDressList()[KinkyDungeonCurrentDress].filter(
     item => item.Group != "Uniform" && item.Lost && RavagerData.Variables.PassoutStripLayers.some(
