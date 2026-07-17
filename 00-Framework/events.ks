@@ -859,7 +859,7 @@ KDEventMapInventory.tickAfter.ravagerPinCheck = () => {
   RFTrace('[RF][Inventory/tickAfter/ravagerPinCheck]: nearby: ', nearby)
   nearby.forEach(enemy => {
     RFTrace('[RF][Inventory/tickAfter/ravagerPinCheck]: enemy: ', enemy, '; ravage: ', enemy.ravage, '; stun: ', enemy.stun, '; ravageRefractory: ', enemy.ravageRefractory)
-    if (enemy.ravage && !enemy.stun && !enemy.ravageRefractory) {
+    if (enemy.ravage && !enemy.stun && !enemy.ravageRefractory && !(KDBoundEffects(enemy) > 3)) {
       RFTrace(`[RF][Inventory/tickAfter/ravagerPinCheck]: Found enemy playing with player! (${enemy.id})`)
       cleared = false
       enemy.playWithPlayer = 5 // Keep them playing until they're done
