@@ -402,3 +402,39 @@ KDCanAddRestraint = function(restraint, Bypass, Lock, NoStack, r, Deep, noOverpo
     noOverpower = false
   return RavagerData.functions.KDCanAddRestraint(restraint, Bypass, Lock, NoStack, r, Deep, noOverpower, securityEnemy, useAugmentedPower, curse, augmentedInventory, powerBonus)
 }
+
+// Made to create my own delayed actions, which do not auto-tick the game, so it doesn't take control from the player
+KinkyDungeonAdvanceTime = function(delta, NoUpdate, NoMsgTick) {
+  let ret = RavagerData.functions.KinkyDungeonAdvanceTime(delta, NoUpdate, NoMsgTick)
+  // Tick and run delayed actions; these are different than the game's delayed actions, as those seem to auto-tick the world, while these do not
+  for (let action of RavagerData.Variables.DelayedActions) {
+    // Decrease timeout
+    action.timeout--
+    // Potentially run when timeout reaches zero
+    if (action.timeout <= 0) {
+      // Condition for whether or not to run
+      let conditionPass = false
+      // Not providing action.condition will make action.action always run
+      if (!action.hasOwnProperty("condition"))
+        conditionPass = true
+      else if (typeof action.condition == "function")
+        conditionPass = action.condition(action)
+      else
+        conditionPass = Boolean(action.condition)
+      if (conditionPass) {
+        // Actually run the delayed action.
+        // Return true in your action if you want to keep the action in the queue for the next tick. Your action.action function is given the action object incase you want to modify or read it
+        let keep = action.action(action)
+        if (!keep) {
+          let index = RavagerData.Variables.DelayedActions.findIndex(v => v == action)
+          if (index == -1)
+            RFWarn("[RF][KinkyDungeonAdvanceTime]: Removing delayed action: Failed to find index for action", action)
+          else
+            RavagerData.Variables.DelayedActions.splice(index, 1)
+        }
+      }
+    }
+  }
+  //
+  return ret
+}

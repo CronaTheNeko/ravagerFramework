@@ -91,6 +91,7 @@ window.RavagerData = {
     DrawCheckboxKDEx: DrawCheckboxKDEx,
     KinkyDungeonSendTextMessage: KinkyDungeonSendTextMessage,
     KDCanAddRestraint: KDCanAddRestraint,
+    KinkyDungeonAdvanceTime: KinkyDungeonAdvanceTime,
     // Compatibility reference to RFStringFormat
     NameFormat: (...args) => { return window.RFStringFormat(...args); },
     // Compatibility reference to RFGetRestraint
@@ -805,7 +806,8 @@ window.RavagerData = {
     MimicBurstPossibleDress: [ "Leotard", "GreenLeotard", "Bikini", "Lingerie" ],
     PassoutStripLayers: [ "Panties" ],
     IWantToHelpDebug: false,
-    IWantToHelpDebugBuffer: []
+    IWantToHelpDebugBuffer: [],
+    DelayedActions: [],
   },
   Translations: {
     raw: {}
