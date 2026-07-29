@@ -11,3 +11,9 @@
 - KinkyDungeonInventoryItemRavagedCookieUse = You slowly eat the cookie, feeling a weird sensation throughout your body.
 - KinkyDungeonInventoryItemRavagedCookieDesc = It looks like there might be something wrong with this one...
 - KinkyDungeonInventoryItemRavagedCookieDesc2 = What's this weird substance in the chocolate..?
+; Coffee
+- KinkyDungeonInventoryItemRFCoffee = Cup of Coffee
+- KinkyDungeonInventoryItemRFCoffeeDesc = A cup delicious and energizing coffee. Wonder how this got here?
+- KinkyDungeonInventoryItemRFCoffeeDesc2 = Someone may have been looking forward to this
+- ItemPickupRFCoffee = You find a steaming hot cup of coffee!
+- KinkyDungeonInventoryItemRFCoffeeUse = Even just a sip of the coffee boosts your energy

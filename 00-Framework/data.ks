@@ -600,6 +600,35 @@ window.RavagerData = {
           }
         },
       ],
+      Perk: [
+        {
+          type: "button",
+          name: "UnlockCoffee",
+          click: () => {
+            KDUnlockPerk("RFCoffeeLover")
+            RavagerData.Variables.CoffeePerkUnlocked = KDUnlockedPerks.includes("RFCoffeeLover")
+          },
+          block: () => RavagerData.Variables.CoffeePerkUnlocked
+        },
+        {
+          type: "button",
+          name: "ResetCoffee",
+          click: () => {
+            KDUnlockedPerks = KDUnlockedPerks.filter(v => v != "RFCoffeeLover")
+            localStorage.setItem("KDUnlockedPerks", JSON.stringify(KDUnlockedPerks))
+            KDLoadPerks()
+            RavagerData.Variables.CoffeePerkUnlocked = KDUnlockedPerks.includes("RFCoffeeLover")
+            if (!RavagerData.Variables.CoffeePerkUnlocked)
+              RavagerFrameworkRFCNotify("Locked Coffee Lover perk")
+          },
+          block: () => !RavagerData.Variables.CoffeePerkUnlocked
+        },
+        {
+          type: "boolean",
+          refvar: "BlockCoffeePerkUnlock",
+          block: () => RavagerData.Variables.CoffeePerkUnlocked
+        },
+      ],
       PerkSwitches: [],
       Killswitches: [],
       Band: [
@@ -808,6 +837,7 @@ window.RavagerData = {
     IWantToHelpDebug: false,
     IWantToHelpDebugBuffer: [],
     DelayedActions: [],
+    CoffeePerkUnlocked: KDUnlockedPerks.includes("CoffeeLover"),
   },
   Translations: {
     raw: {}
@@ -815,6 +845,7 @@ window.RavagerData = {
   // Feature killswitches
   Killswitches: {
     FullNude: true, // Mimic burst is crashing game with full nude enabled; TODO: Fix crash
+    RFCoffeeLover: false,
     ForceStrip: false, // Prevent new Stripped events. If a uniform outfit item contains "Panties" layers and does not have Group set to "Uniform", the new behavior will strip the entire uniform. This hasn't happened with the player effect stripping code, so I'm not expecting this to be needed, but this killswitch is a fallback
   },
   PossibleStructuralErrors: {

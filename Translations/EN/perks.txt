@@ -3,6 +3,8 @@
 ; Perks
 - KinkyDungeonStatRFEasyEscape = Easy Escape
 - KinkyDungeonStatRFQuickRun = Get Up and Run
+- KinkyDungeonStatRFCoffeeLover = Coffee Lover
 ; Descriptions
 - KinkyDungeonStatDescRFEasyEscape = Stun all enemies surrounding you when you escape from a pin
 - KinkyDungeonStatDescRFQuickRun = Get up quickly and take your chance at escape
+- KinkyDungeonStatDescRFCoffeeLover = A delightful brew has been discovered in the depths of the dungeon. Maybe you'll enjoy it too.
