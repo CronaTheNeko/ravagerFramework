@@ -1,3 +1,4 @@
+if (!window.hasOwnProperty("RavagerData")) { // TODO: Fix indentation once unstaged changes are cleaned up
 // Flag to know when we finish initializing
 window._RavagerFrameworkInInit = true;
 // Check for heavy debugging during initialization
@@ -851,6 +852,8 @@ window.RavagerData = {
   PossibleStructuralErrors: {
     MissingEventDictionaries: [],
   },
+  // Directory structure broken flag
+  Tainted: false,
 }
 
 // Slots that need to be stripped to occupy a given slot; slots to clear are in order
@@ -860,4 +863,5 @@ window.ravageEquipmentSlotTargets = {
   ItemVulva: ["ItemPelvis", "ItemVulva"],
   ItemMouth: ["ItemHead", "ItemMouth"],
   ItemHead: ["ItemHead"]
+}
 }

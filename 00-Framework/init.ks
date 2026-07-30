@@ -1,5 +1,9 @@
 // Keep track of our own mod.json
-fetch(KDModFiles['Game/mod.json']).then(response => response.blob()).then(blob => {
+fetch(KDModFiles['Game/mod.json']).then(response => {
+  if (!response.ok)
+    throw new Error(`[RF][Init] HTTP fetch error. Status: ${response.status}`)
+  return response.blob()
+}).then(blob => {
   const reader = new FileReader();
   reader.onload = () => {
     window.RavagerData.ModInfo = JSON.parse(reader.result);

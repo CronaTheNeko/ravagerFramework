@@ -76,7 +76,8 @@ window.RavagerFrameworkIWantToHelpDebug = function(reason) {
     let logLine = {
       level: "VER",
       KD: TextGet("KDVersionStr"),
-      RF: RavagerData.ModInfo.modbuild
+      RF: RavagerData.ModInfo.modbuild,
+      Tainted: RavagerData.Tainted
     }
     RavagerData.Variables.IWantToHelpDebugBuffer = [ logLine, ...RavagerData.Variables.IWantToHelpDebugBuffer ]
     // Save the buffer to a file
