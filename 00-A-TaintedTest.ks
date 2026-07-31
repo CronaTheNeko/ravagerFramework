@@ -41,5 +41,10 @@ if (!window.hasOwnProperty("RavagerData")) {
     RavagerFrameworkShowModal("rf-tainted", "Ravager Framework Structure Broken", body)
     RavagerData.Tainted = true
   }
+  let len = 10000000000
+  console.log(`[RF] Looping ${len} times`)
+  for (let i = 0; i < len; i++) {
+    i = i
+  }
   console.error("TAINTED TESTER DONE")
 }
