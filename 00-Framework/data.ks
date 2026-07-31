@@ -862,6 +862,8 @@ window.ravageEquipmentSlotTargets = {
   ItemButt: ["ItemPelvis", "ItemButt"],
   ItemVulva: ["ItemPelvis", "ItemVulva"],
   ItemMouth: ["ItemHead", "ItemMouth"],
-  ItemHead: ["ItemHead"]
+  ItemHead: ["ItemHead"],
+  ItemBreast: [ "ItemBreast" ],
+  ItemNipples: [ "ItemBreast", "ItemNipples" ],
 }
 }

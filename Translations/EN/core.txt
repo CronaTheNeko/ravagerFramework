@@ -83,6 +83,9 @@ ConfigHoverravagerHelpDebug = Turn on heavy debugging mode so that you can provi
 - RestraintStripped = Stripped!
 - RestraintStrippedDesc = Your panties got torn away...
 - RestraintStrippedDesc2 = You can just put them back on, but maybe don't worry about that if you're currently pinned down...
+- RestraintStrippedBreast = Stripped!
+- RestraintStrippedBreastDesc = Your top got torn away...
+- RestraintStrippedBreastDesc2 = You can just put it back on, but maybe don't worry about that if you're currently pinned down...
 - RestraintPinned = Pinned!
 - RestraintPinnedDesc = Something or someone is having their way with you.
 - RestraintPinnedDesc2 = You can't move unless you get them off you! Freeing yourself will stun nearby enemies.
@@ -98,6 +101,12 @@ ConfigHoverravagerHelpDebug = Turn on heavy debugging mode so that you can provi
 - RestraintRavagerOccupiedHead = Gripped!
 - RestraintRavagerOccupiedHeadDesc = Someone or something is having their way with you...
 - RestraintRavagerOccupiedHeadDesc2 = Don't worry about this restraint. Instead, try to escape "Pinned!"
+- RestraintRavagerOccupiedBreast = Gripped!
+- RestraintRavagerOccupiedBreastDesc = Someone or something is having their way with you...
+- RestraintRavagerOccupiedBreastDesc2 = Don't worry about this restraint. Instead, try to escape "Pinned!"
+- RestraintRavagerOccupiedNipples = Gripped!
+- RestraintRavagerOccupiedNipplesDesc = Someone or something is having their way with you...
+- RestraintRavagerOccupiedNipplesDesc2 = Don't worry about this restraint. Instead, try to escape "Pinned!"
 
 ; Restraint actions
 ; ; Since it's supposed to be impossible to struggle out of "Occupied!", and you have to use debug mode to get one to equip to yourself, you should just use debug mode to give yourself a "Pinned!" and equip it
@@ -144,6 +153,24 @@ ConfigHoverravagerHelpDebug = Turn on heavy debugging mode so that you can provi
 - KinkyDungeonStruggleStruggleSuccessRavagerStripped = You feel relaxed with your panties on again
 - KinkyDungeonStruggleRemoveSuccessRavagerStripped = You feel relaxed with your panties on again
 - KinkyDungeonSelfBondageRavagerStripped = You slowly slip off your panties
+; ; Stripped keys
+; ; The 'Impossible' keys may not actually get used ever, but I've made them obvious incase someone finds a way to get them triggered
+- KinkyDungeonStruggleRemoveFailRavagerStrippedBreast = You try to pull your top back on despite your restraints...
+- KinkyDungeonStruggleRemoveFailRavagerStrippedBreastAroused = You try to pull your top back on, but your arousal makes you clumsy...
+- KinkyDungeonStruggleStruggleFailRavagerStrippedBreast = You struggle to get your top back in place despite your restraints...
+- KinkyDungeonStruggleStruggleFailRavagerStrippedBreastAroused = You struggle to get your top back in place, but your arousal makes you clumsy...
+- KinkyDungeonStruggleRemoveImpossibleRavagerStrippedBreast = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -BStripRI
+- KinkyDungeonStruggleRemoveImpossibleRavagerStrippedBreastAroused = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -BStripRIA
+- KinkyDungeonStruggleRemoveImpossibleBoundRavagerStrippedBreast = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -BStripRIB
+- KinkyDungeonStruggleRemoveImpossibleBoundRavagerStrippedBreastAroused = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -BStripRIBA
+- KinkyDungeonStruggleStruggleImpossibleRavagerStrippedBreast = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -BStripSI
+- KinkyDungeonStruggleStruggleImpossibleRavagerStrippedBreastAroused = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -BStripSIA
+- KinkyDungeonStruggleStruggleImpossibleBoundRavagerStrippedBreast = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -BStripSIB
+- KinkyDungeonStruggleStruggleImpossibleBoundRavagerStrippedBreastAroused = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -BStripSIBA
+; ; Custom escape and equip keys just added in 5.4-nightly7b
+- KinkyDungeonStruggleStruggleSuccessRavagerStrippedBreast = You feel relaxed with your top on again
+- KinkyDungeonStruggleRemoveSuccessRavagerStrippedBreast = You feel relaxed with your top on again
+- KinkyDungeonSelfBondageRavagerStrippedBreast = You slowly slip off your top
 ; ; I can't seem to modify the Impossible2 and Impossible3 keys that are used *sometimes* when struggling against an impossible restraint repeatedly
 ; ; I'm adding all of these keys to act as an alert if they ever start working
 - KinkyDungeonStruggleStruggleImpossible2RavagerOccupied = POST SCREENSHOT OF THIS TO THE RAVAGER FRAMEWORK THREAD -Struggle1

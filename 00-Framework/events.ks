@@ -180,7 +180,26 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
       if(["Hat"].some(str => article.Item.includes(str)))
         return true
     })
-    RFDebug('[Ravager Framework]: Clothing targets: Pelvis: ', clothingTargetsPelvis, '; Mouth: ', clothingTargetsMouth, '; Head: ', clothingTargetsHead)
+    let clothingTargetsBreast = KDGetDressList()[KinkyDungeonCurrentDress].filter(article => {
+      if (window.PureWindOutfitsList?.includes(KinkyDungeonCurrentDress))
+        return false
+      if (enemy.ravage.bypassAll)
+        return false
+      if (article.Lost)
+        return false
+      if (article.Item.includes("Braid"))
+        return false
+      // console.warn(article)
+      if (article.Group == "Uniform")
+        return true
+      if (ModelDefs[article.Item] && ModelDefs[article.Item].Categories && ModelDefs[article.Item].Categories.includes("Tops"))
+        return true
+      if ([ "Bra", "Top", "Bustier", "Upper" ].some(str => article.Item.includes(str)))
+        return true
+      if ([ "MilitaryUniform", "UniformShirt" ].some(str => article.Item == str))
+        return true
+    })
+    RFDebug('[Ravager Framework]: Clothing targets: Pelvis: ', clothingTargetsPelvis, '; Mouth: ', clothingTargetsMouth, '; Head: ', clothingTargetsHead, "; Breast: ", clothingTargetsBreast)
 
     // Equipment/clothing targets object
     // Has an array for each slot of specific stuff to remove
@@ -189,13 +208,17 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
         ItemButt: [],
         ItemVulva: [],
         ItemMouth: [],
-        ItemHead: []
+        ItemHead: [],
+        ItemBreast: [],
+        ItemNipples: [],
       },
       clothing: {
         ItemButt: clothingTargetsPelvis,
         ItemVulva: clothingTargetsPelvis,
         ItemMouth: clothingTargetsMouth,
-        ItemHead: clothingTargetsHead
+        ItemHead: clothingTargetsHead,
+        ItemBreast: clothingTargetsBreast,
+        ItemNipples: clothingTargetsBreast,
       }
     } 
     // Returns true on a given restraint unless it is bypassed
@@ -226,6 +249,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
         if(
           restraintInSlot && 
           restraintInSlot.name != "Stripped" && 
+          restraintInSlot.name != "StrippedBreast" &&
           !restraintInSlot.name.includes("RavagerOccupied") &&
           !bypassed(restraintInSlot) &&
           !enemy.ravage.bypassAll // Allows a ravager to not remove clothing
@@ -247,7 +271,9 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
     let uncovered = {
       ItemButt: stripOptions.equipment.ItemButt.length == 0 && stripOptions.clothing.ItemButt.length == 0,
       ItemVulva: stripOptions.equipment.ItemVulva.length == 0 && stripOptions.clothing.ItemVulva.length == 0,
-      ItemMouth: stripOptions.equipment.ItemMouth.length == 0 && stripOptions.clothing.ItemMouth.length == 0
+      ItemMouth: stripOptions.equipment.ItemMouth.length == 0 && stripOptions.clothing.ItemMouth.length == 0,
+      ItemBreast: stripOptions.equipment.ItemBreast.length == 0 && stripOptions.clothing.ItemBreast.length == 0,
+      ItemNipples: stripOptions.equipment.ItemNipples.length == 0 && stripOptions.clothing.ItemNipples.length ==0
     }
     RFDebug('[Ravager Framework]: Slot state: stripOptions: ', stripOptions, '; uncovered: ', uncovered)
 
@@ -266,7 +292,9 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
         slots: {
           ItemVulva: false,
           ItemMouth: false,
-          ItemButt: false
+          ItemButt: false,
+          ItemBreast: false,
+          ItemNipples: false,
         },
         narrationBuffer: [], // We store narration to be done in here and do it after tick, so it's all together
         submissionLevel: 0,
@@ -737,6 +765,9 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
           if (!entity.Enemy.ravage.bypassAll)
             KinkyDungeonAddRestraintIfWeaker("Stripped") // Since panties are sacred normally
         }
+        if (["ItemBreast", "ItemNipples"].some(str => entity.ravage.slot == str) && !KinkyDungeonGetRestraintItem("ItemBreast") && !entity.Enemy.ravage.bypassAll) {
+          KinkyDungeonAddRestraintIfWeaker("StrippedBreast")
+        }
         KinkyDungeonSendTextMessage(10, RFStringFormat(RFGetText("NarrationsClothingTear"), entity, undefined, stripped), "#f00", 4) // TODO: Maybe make this controllable for a rav dev?
         RFTrace('[Ravager Framework DBG]: PlayerEffect stripping clothing; stripped.Lost = ', stripped.Lost)
         stripped.Lost = true
@@ -1088,6 +1119,18 @@ KDEventMapInventory.postRemoval.RFStrip = function(_event, item, data) {
   dress.forEach(item => {
     item.Lost = false
   })
+}
+KDEventMapInventory.postRemoval.RFStripBreast = function(_e, item, data) {
+  if (!RFAllowFeature("ForceStrip"))
+    return
+  if (item.name != data.item?.name)
+    return
+  let dress = KDGetDressList()[KinkyDungeonCurrentDress].filter(
+    item => item.Lost &&
+    GetModelLayers(item.Item).some(layer => layer.Layer.includes("Chest"))
+  )
+  // console.error(dress)
+  dress.forEach(item => { item.Lost = false })
 }
 if (!KDEventMapInventory.afterDress) {
   RFWarn("[RF][Events]: KDEventMapInventory.afterDress does not exist. We'll create it and hope the game will still call it.")
