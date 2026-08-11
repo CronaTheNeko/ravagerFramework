@@ -637,7 +637,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
           pRav.narrationBuffer.push(RFStringFormat(RFGetText(rangeData.narration[slotOfChoice], false), entity))
         // Use count based taunts
         let didExperiencedTaunt = false
-        if (checkPreviousUseCount(slotOfChoice) && rangeData.experiencedTaunts) {
+        if (checkPreviousUseCount(slotOfChoice) && rangeData.experiencedTaunts && !(didModifiedNarration && rangeData[narModPfx + "Taunts"])) {
           let eTaunt = rangeData.experiencedTaunts.findLast((range) => { if (range[0] <= target.ravagedCounts[slotOfChoice]) return true; })
           if (decideToDoExperiencedText(eTaunt, slotOfChoice, rangeData)) {
             KinkyDungeonSendDialogue(entity, RFStringFormat(RFGetText(eTaunt[1][slotOfChoice], false), entity), KDGetColor(entity), 6, 6)
@@ -645,7 +645,10 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
           }
         }
         if (rangeData.taunts && !didExperiencedNarration)
-          KinkyDungeonSendDialogue(entity, RFStringFormat(RFGetText(rangeData.taunts, false), entity), KDGetColor(entity), 6, 6)
+          if (narModPfx && rangeData[narModPfx + "Taunts"])
+            KinkyDungeonSendDialogue(entity, RFStringFormat(RFGetText(rangeData[narModPfx + "Taunts"], false), entity), KDGetColor(entity), 6, 6)
+          else
+            KinkyDungeonSendDialogue(entity, RFStringFormat(RFGetText(rangeData.taunts, false), entity), KDGetColor(entity), 6, 6)
         if(rangeData.dp) { // Only do floaty sound effects if DP is being applied, since that means action is happening
           if(enemy.ravage.onomatopoeia)
             KinkyDungeonSendFloater(entity, RFGetText(enemy.ravage.onomatopoeia, false), "#ff00ff", 2);
