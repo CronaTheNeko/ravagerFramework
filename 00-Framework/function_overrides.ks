@@ -438,3 +438,11 @@ KinkyDungeonAdvanceTime = function(delta, NoUpdate, NoMsgTick) {
   //
   return ret
 }
+
+// Here to enable the Mimic (and possible future non-humanoids) having taunts
+KDEnemyCanTalk = function(enemy) {
+  if (enemy?.Enemy?.ravage && KinkyDungeonPlayerEntity?.ravage?.slots && Object.keys(KinkyDungeonPlayerEntity.ravage.slots).filter(v => KinkyDungeonPlayerEntity.ravage.slots[v] == enemy).length)
+    return true
+  else
+    return RavagerData.functions.KDEnemyCanTalk(enemy)
+}

@@ -93,6 +93,7 @@ window.RavagerData = {
     KinkyDungeonSendTextMessage: KinkyDungeonSendTextMessage,
     KDCanAddRestraint: KDCanAddRestraint,
     KinkyDungeonAdvanceTime: KinkyDungeonAdvanceTime,
+    KDEnemyCanTalk: KDEnemyCanTalk,
     // Compatibility reference to RFStringFormat
     NameFormat: (...args) => { return window.RFStringFormat(...args); },
     // Compatibility reference to RFGetRestraint
