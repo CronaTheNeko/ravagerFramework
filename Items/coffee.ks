@@ -18,7 +18,7 @@ KinkyDungeonConsumables.RFCoffee = {
 }
 
 // Perk entry
-KinkyDungeonStatsPresets.CoffeeLover = {
+KinkyDungeonStatsPresets.RFCoffeeLover = {
   startPriority: 10,
   category: "Boss",
   id: "RFCoffeeLover",
