@@ -460,6 +460,7 @@ let mimicRavager = {
   },
   noFlip: true,
   nonHumanoid: true,
+  color: "#f6f",
   noLeash: true,
 }
 RavagerData.Definitions.Enemies.MimicRavager = structuredClone(mimicRavager)
