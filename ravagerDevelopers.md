@@ -720,6 +720,17 @@ Notes:
 - Declaring this callback will completely override the normal fallback actions. Using this callback means you want to do your own fallback actions and the framework will do nothing as a fallback. [Issue 7](https://github.com/CronaTheNeko/ravagerFramework/issues/7) is a plan to change this behavior
 - A current limitation of the framework's fallback actions, and thus a reason you may want to use this, is that the restraints added during the fallback actions are currently limited to jail restraints, but a change to this is planned.
 
+#### Post-Effect callback
+Property path: `enemy.ravage.postEffectCallback`
+
+When is this called: At the end of the ravage effect function, so long as the [Effect callback](#effect-callback) does not return true.
+
+Parameters:
+- `entity` - The enemy entity taking the action
+- `target` - The target entity of the enemy
+
+Expected return: None
+
 ## Ravager Bubbles
 A new event has been added to allow custom bubbles for ravagers, with an image, duration, chance, and condition.
 

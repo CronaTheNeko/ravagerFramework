@@ -839,6 +839,16 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
         }
       }
     }
+    // Post-event callback
+    if (
+      typeof enemy.ravage.postEffectCallback == 'string' &&
+      KDEventMapEnemy['ravagerCallbacks'] &&
+      typeof KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.postEffectCallback] == 'function'
+    ) {
+      RFDebug("[RF][Effect] Running post-effect callback \"" + enemy.ravage.postEffectCallback + "\" with entity: ", entity, "; and target: ", target)
+      KDEventMapEnemy['ravagerCallbacks'][enemy.ravage.postEffectCallback](entity, target)
+    }
+    //
     return {sfx: "Struggle", effect: true};
   }
   return {sfx: "Struggle", effect: true};
