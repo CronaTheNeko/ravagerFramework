@@ -77,6 +77,9 @@ KDEventMapGeneric.afterModSettingsLoad.RavagerFramework = () => {
 }
 // Refresh outfit incases player is wearing heart hairpin
 KDEventMapGeneric.afterModSettingsLoad.RavagerOutfitRefresh = () => {
+  // Ditch if not wearing a custom outfit
+  if (!localStorage.hasOwnProperty("kinkydungeonappearance" + KDCurrentOutfit))
+    return
   // "Change" the character appearance to the saved appearance
   CharacterAppearanceRestore(KinkyDungeonPlayer, localStorage.getItem("kinkydungeonappearance" + KDCurrentOutfit), false, true)
   // Tell the game to refresh the players outfit
