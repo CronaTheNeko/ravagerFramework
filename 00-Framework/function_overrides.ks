@@ -53,7 +53,7 @@ KDDropItems = function(enemy, mapData) {
 }
 
 // Here so I can have a colored button in mod config and description popups for my mod configs
-DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options) {
+DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options, Hover) {
   // Record Ravager Control entrance buttons and all buttons drawn within Ravager Control for the purpose of making sound on click
   if (KinkyDungeonState == "RavagerControl" || name == "ravagerControl") {
     RFButtonsCache[name] = {
@@ -87,7 +87,7 @@ DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, 
     }
   }
   // Run and return the original DrawButtonKDEx
-  return RavagerData.functions.DrawButtonKDEx(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options)
+  return RavagerData.functions.DrawButtonKDEx(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options, Hover)
 }
 
 // Just here so I can have custom checkbox images in mod config
