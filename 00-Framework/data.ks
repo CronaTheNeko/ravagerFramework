@@ -473,6 +473,11 @@ window.RavagerData = {
           click: () => { RavagerFrameworkRFCNotify("Loading saved function overrides from file ..."); RavagerFrameworkCheckFunctionOverrides() }
         },
         {
+          name: "CheckFunctionSignatures",
+          type: "button",
+          click: () => { RavagerFrameworkRFCNotify("Checking function signatures ..."); RavagerFrameworkCompareFuncOverrideSigs() }
+        },
+        {
           // This just completely breaks when reloading data.ks; it would take a major rework to fix, since this file just fully replaces window.RavagerData, leading to stack overlows, since our function overrides get set to themselves
           // This is also very dangerous, as it literally just calls eval on any file chosen
           type: "button",

@@ -1292,3 +1292,76 @@ window.RavagerFrameworkShowModal = function(id, title = "Ravager Framework", pre
 window.RavagerFrameworkRFCNotify = function(msg) {
   RavagerData.Variables.RFControl.Notifications.push(msg)
 }
+
+// Identify a function's arguments and whether or not it returns anything, generating a custom function signature
+window.RavagerFrameworkGenFuncSig = function(func) {
+  if (typeof func != "function")
+    throw new TypeError("Cannot generate signature for non-function.")
+  let str = func.toString()
+  let hasReturn = str.includes("return")
+  let arr = str.split("\n")
+  let args = arr[0].replace("function", "").replace(func.name, "").replace("{", "").trim().replace("(", "").replace(")", "").replaceAll(" ", "").split(",")
+  return { hasReturn, args }
+}
+
+// Compare signatures of two functions
+window.RavagerFrameworkCompareFuncSigs = function(f1, f2, returnSigs = false) {
+  let sig1 = RavagerFrameworkGenFuncSig(f1)
+  let sig2 = RavagerFrameworkGenFuncSig(f2)
+  let doprint = false
+  if (sig1.hasReturn != sig2.hasReturn) {
+    RFWarn("Mismatched returns")
+    doprint = true
+  }
+  if (sig1.args.length != sig2.args.length) {
+    RFWarn("Mismatched number of args")
+    doprint = true
+  } else {
+    let argmatch = true
+    for (let i = 0; i < sig1.args.length; i++) {
+      if (sig1.args[i].includes("=")) {
+        sig1.args[i] = sig1.args[i].substr(0, sig1.args[i].indexOf("="))
+      }
+      if (sig2.args[i].includes("=")) {
+        sig2.args[i] = sig2.args[i].substr(0, sig2.args[i].indexOf("="))
+      }
+      if (sig1.args[i] != sig2.args[i]) {
+        argmatch = false
+        RFWarn(`Mismatched argument between A (${sig1.args[i]}) and B (${sig2.args[i]})`)
+      }
+    }
+    if (!argmatch) {
+      RFWarn("Mismatched arguments")
+      doprint = true
+    }
+  }
+  if (doprint)
+    RFWarn(sig1, sig2)
+  if (!returnSigs)
+    return !doprint
+  else
+    return { match: !doprint, sig1, sig2 }
+}
+
+// Compare signatures between KD's versions and my versions of all overridden functions
+// Intended to be used from Ravager Control, but there are more messages available in browser console
+window.RavagerFrameworkCompareFuncOverrideSigs = function() {
+  let funcs = []
+  for (let key of Object.keys(RavagerData.functions)) {
+    if (key.match(/(KinkyDungeo.*|.*KD.*)/)) {
+      funcs.push(key)
+    }
+  }
+  let mismatches = {}
+  funcs.forEach(fname => {
+    RFInfo(`Checking ${fname} ...`)
+    let check = RavagerFrameworkCompareFuncSigs(RavagerData.functions[fname], window[fname], true)
+    if (!check.match) {
+      mismatches[fname] = { match: check.match, original: check.sig1, override: check.sig2 }
+    }
+  })
+  if (Object.keys(mismatches).length) {
+    RFWarn("Found mismatching function signatures", mismatches)
+    RavagerFrameworkShowModal("function-sig-check", "RF Function Check", "Some problems were found with the Framework's function overrides. This may range in severity from not causing problems, to causing some features to misbehave, to crashing the game.", JSON.stringify(mismatches, undefined, '  ').replace(/\[([\s\S]*?)\]/g, (match) => match.replace(/\s*\n\s*/g, ' ')))
+  }
+}
