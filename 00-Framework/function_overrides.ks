@@ -49,7 +49,7 @@ KDDropItems = function(enemy, mapData) {
       RFTrace(`[Ravager Framework][DBG][KDDropItems]: Has enemy ${enemy.Enemy.name}(${enemy.x}, ${enemy.y}) dropped items? ` + enemy.droppedItems)
     }
   }
-  return RavagerData.functions.KDDropItems(enemy, mapData)
+  RavagerData.functions.KDDropItems(enemy, mapData)
 }
 
 // Here so I can have a colored button in mod config and description popups for my mod configs
@@ -91,10 +91,10 @@ DrawButtonKDEx = function(name, func, enabled, Left, Top, Width, Height, Label, 
 }
 
 // Just here so I can have custom checkbox images in mod config
-DrawCheckboxKDEx = function(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, _CheckImage, options) {
+DrawCheckboxKDEx = function(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, CheckImage, options) {
   if (KinkyDungeonState == "ModConfig" && KDModToggleTab == "RavagerFramework")
-    _CheckImage = "UI/HeartChecked.png"
-  return RavagerData.functions.DrawCheckboxKDEx(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, _CheckImage, options)
+    CheckImage = "UI/HeartChecked.png"
+  RavagerData.functions.DrawCheckboxKDEx(name, func, enabled, Left, Top, Width, Height, Text, IsChecked, Disabled, TextColor, CheckImage, options)
 }
 
 // Override so I can draw a custom button on the in-game pause menu
@@ -344,9 +344,9 @@ KinkyDungeonHandleClick = function(event) {
 }
 
 // Currently just used for the mimic spoiler, but there's other ideas of how this can be used, so I've attempted to generalize it
-KinkyDungeonDrawEnemiesHP = function(delta, canvasOffsetX, canvasOffsetY, CamX, CamY, _CamXoffset, _CamYoffset) {
+KinkyDungeonDrawEnemiesHP = function(delta, canvasOffsetX, canvasOffsetY, CamX, CamY, _CamXoffset, CamYoffset) {
   // Firstly, call the original function; we'll probably have some bailing happening later
-  const ret = RavagerData.functions.KinkyDungeonDrawEnemiesHP(delta, canvasOffsetX, canvasOffsetY, CamX, CamY, _CamXoffset, _CamYoffset)
+  const ret = RavagerData.functions.KinkyDungeonDrawEnemiesHP(delta, canvasOffsetX, canvasOffsetY, CamX, CamY, _CamXoffset, CamYoffset)
   // Get all enemies
   const nearby = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, KDGameData.MaxVisionDist + 1, undefined, true)
   // Loop enemies
@@ -397,10 +397,10 @@ KinkyDungeonDrawEnemiesHP = function(delta, canvasOffsetX, canvasOffsetY, CamX, 
 }
 
 // Override to make sure Stripped can always be equipped, since it previously was unable to be applied while wearing chastity, rope belts, etc
-KDCanAddRestraint = function(restraint, Bypass, Lock, NoStack, r, Deep, noOverpower, securityEnemy, useAugmentedPower, curse, augmentedInventory, powerBonus = 0) {
+KDCanAddRestraint = function(restraint, Bypass, Lock, NoStack, r, Deep, noOverpower, securityEnemy, useAugmentedPower, curse, augmentedInventory, powerBonus, options) {
   if (restraint?.Group == "ItemPelvis" && r?.name == "Stripped")
     noOverpower = false
-  return RavagerData.functions.KDCanAddRestraint(restraint, Bypass, Lock, NoStack, r, Deep, noOverpower, securityEnemy, useAugmentedPower, curse, augmentedInventory, powerBonus)
+  return RavagerData.functions.KDCanAddRestraint(restraint, Bypass, Lock, NoStack, r, Deep, noOverpower, securityEnemy, useAugmentedPower, curse, augmentedInventory, powerBonus, options)
 }
 
 // Made to create my own delayed actions, which do not auto-tick the game, so it doesn't take control from the player
