@@ -554,7 +554,7 @@ window.RavagerFrameworkControlRun = function() {
     // Title
     DrawTextFitKD(RFGetText("RFCTitle"), 1250, Ystart - 120, 1000, KDBaseWhite, undefined, 40)
     // Return button
-    DrawButtonKDEx("RFCReturn", () => { RFDebug("[RFC] Leaving ravager control"); RavagerData.Variables.State = RavagerData.Variables.PrevState; RavagerData.Variables.DrawState = RavagerData.Variables.PrevDrawState; RavagerData.Variables.MaybeDrawDebugTextBoxes = true }, true, 975, 900, 550, 64, RFGetText("RFCReturn"), KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+    DrawButtonKDEx("RFCReturn", () => { RFDebug("[RFC] Leaving ravager control"); RavagerData.Variables.State = RavagerData.Variables.PrevState; RavagerData.Variables.DrawState = RavagerData.Variables.PrevDrawState; RavagerData.Variables.MaybeDrawDebugTextBoxes = true }, !RavagerData.Variables.RFControl.HoverData.InModal, 975, 900, 550, 64, RFGetText("RFCReturn"), KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
     // Categories
     let confCategories = Object.keys(RavagerData.Definitions.FrameworkControls).splice(RavagerData.Variables.RFControl._CategoryPage * confRows, confRows) // Select just the page we are on
     // Categories box
@@ -563,15 +563,15 @@ window.RavagerFrameworkControlRun = function() {
     DrawTextFitKD(RFGetText("RFCCategories"), Xstart + 150, Ystart - 75, 1000, KDBaseWhite, undefined, 28)
     // Draw category buttons
     confCategories.forEach((currentCategory) => {
-      DrawButtonKDEx("RFCCat" + currentCategory, () => { console.log("[RFC] Pressed button for category " + currentCategory); RavagerData.Variables.RFControl._ConfPage = 0; RavagerData.Variables.RFControl._ConfCategory = currentCategory }, true, Xstart, Y, 300, 64, RFGetText("RFCCategory" + currentCategory), KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: (RavagerData.Variables.RFControl._ConfCategory == currentCategory ? RFHexPlusHex(bordercolor, "#666") : bordercolor) })
+      DrawButtonKDEx("RFCCat" + currentCategory, () => { console.log("[RFC] Pressed button for category " + currentCategory); RavagerData.Variables.RFControl._ConfPage = 0; RavagerData.Variables.RFControl._ConfCategory = currentCategory }, !RavagerData.Variables.RFControl.HoverData.InModal, Xstart, Y, 300, 64, RFGetText("RFCCategory" + currentCategory), KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: (RavagerData.Variables.RFControl._ConfCategory == currentCategory ? RFHexPlusHex(bordercolor, "#666") : bordercolor) })
       Y += Ystep
     })
     if (Object.keys(RavagerData.Definitions.FrameworkControls).length > confRows) {
       if (RavagerData.Variables.RFControl._CategoryPage != 0) {
-        DrawButtonKDEx("RFCCatListUp", (b) => { RavagerData.Variables.RFControl._CategoryPage-- }, true, Xstart + 105, Ystart - 50, 90, 40, "", KDBaseWhite, KinkyDungeonRootDirectory + "UI/RavUp.png", undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+        DrawButtonKDEx("RFCCatListUp", (b) => { RavagerData.Variables.RFControl._CategoryPage-- }, !RavagerData.Variables.RFControl.HoverData.InModal, Xstart + 105, Ystart - 50, 90, 40, "", KDBaseWhite, KinkyDungeonRootDirectory + "UI/RavUp.png", undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
       }
       if (RavagerData.Variables.RFControl._CategoryPage < (!(Object.keys(RavagerData.Definitions.FrameworkControls).length % confRows) ? Object.keys(RavagerData.Definitions.FrameworkControls).length / confRows - 1 : Math.floor(Object.keys(RavagerData.Definitions.FrameworkControls).length / confRows))) {
-        DrawButtonKDEx("RFCCatListDown", (b) => { RavagerData.Variables.RFControl._CategoryPage++ }, true, Xstart + 105, Ystart + (Ystep * confRows), 90, 40, "", KDBaseWhite, KinkyDungeonRootDirectory + "UI/RavDown.png", undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+        DrawButtonKDEx("RFCCatListDown", (b) => { RavagerData.Variables.RFControl._CategoryPage++ }, !RavagerData.Variables.RFControl.HoverData.InModal, Xstart + 105, Ystart + (Ystep * confRows), 90, 40, "", KDBaseWhite, KinkyDungeonRootDirectory + "UI/RavDown.png", undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
       }
     }
     Y = Ystart
@@ -580,10 +580,10 @@ window.RavagerFrameworkControlRun = function() {
       let categoryConfs = RavagerData.Definitions.FrameworkControls[currentCategory]
       if (categoryConfs.length > confRows * 2) {
         if (RavagerData.Variables.RFControl._ConfPage != 0) {
-          DrawButtonKDEx("RFCToggleListUp", (b) => { RavagerData.Variables.RFControl._ConfPage-- }, true, Xstart + 105 + confXOffset * 2, Ystart - 50, 90, 40, "", KDBaseWhite, KinkyDungeonRootDirectory + "UI/RavUp.png", undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+          DrawButtonKDEx("RFCToggleListUp", (b) => { RavagerData.Variables.RFControl._ConfPage-- }, !RavagerData.Variables.RFControl.HoverData.InModal, Xstart + 105 + confXOffset * 2, Ystart - 50, 90, 40, "", KDBaseWhite, KinkyDungeonRootDirectory + "UI/RavUp.png", undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
         }
         if (RavagerData.Variables.RFControl._ConfPage < (categoryConfs.length % (confRows * 2) == 0 ? categoryConfs.length / (confRows * 2) - 1 : Math.floor(categoryConfs.length / (confRows * 2)))) {
-          DrawButtonKDEx("RFCToggleListDown", (b) => { RavagerData.Variables.RFControl._ConfPage++ }, true, Xstart + 105 + confXOffset * 2, Ystart + ((Ystep) * confRows), 90, 40, "", KDBaseWhite, KinkyDungeonRootDirectory + "UI/RavDown.png", undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+          DrawButtonKDEx("RFCToggleListDown", (b) => { RavagerData.Variables.RFControl._ConfPage++ }, !RavagerData.Variables.RFControl.HoverData.InModal, Xstart + 105 + confXOffset * 2, Ystart + ((Ystep) * confRows), 90, 40, "", KDBaseWhite, KinkyDungeonRootDirectory + "UI/RavDown.png", undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
         }
       }
       let categoryConfsSlice = categoryConfs.slice(RavagerData.Variables.RFControl._ConfPage * (confRows * 2), RavagerData.Variables.RFControl._ConfPage * (confRows * 2) + (confRows * 2))
@@ -607,7 +607,7 @@ window.RavagerFrameworkControlRun = function() {
           let click = confEntry.onclick ? confEntry.onclick : (bdata) => { if (confEntry.refvar) RavagerData.Variables.RFControl[confEntry.refvar] = !RavagerData.Variables.RFControl[confEntry.refvar]; if (confEntry.postclick) confEntry.postclick(RavagerData.Variables.RFControl[confEntry.refvar]) }
           // When declaring your own on-click function, you'll may not be using a reference variable in the normal refvar location, so you can declare `checked` as a function that returns true or false for the checked value
           let checked = (confEntry.hasOwnProperty('checked') && typeof confEntry.checked == "function") ? confEntry.checked() : RavagerData.Variables.RFControl[confEntry.refvar]
-          DrawCheckboxRFEx("RFCToggle_" + name, click, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 64, 64, RFGetText("RFCBool" + currentCategory + name), checked, false, blocking ? "#888" : KDBaseWhite, undefined, { bordercolor: bordercolor })
+          DrawCheckboxRFEx("RFCToggle_" + name, click, !blocking && !RavagerData.Variables.RFControl.HoverData.InModal, Xstart + confXOffset + confSecondColumnOffset, Y, 64, 64, RFGetText("RFCBool" + currentCategory + name), checked, false, blocking ? "#888" : KDBaseWhite, undefined, { bordercolor: bordercolor })
           // Setup description popup
           if (RFHasText("RFCHover" + currentCategory + name) && !RavagerData.Variables.RFControl.HoverData.BoxData[name]) {
             RavagerData.Variables.RFControl.HoverData.BoxData[name] = {
@@ -641,7 +641,7 @@ window.RavagerFrameworkControlRun = function() {
               RavagerData.Variables.RFControl[confEntry.refvar] = parseFloat((RavagerData.Variables.RFControl[confEntry.refvar] - confEntry.stepcount).toFixed(significantDigits))
             if (typeof confEntry.postclick == "function")
               confEntry.postclick(RavagerData.Variables.RFControl[confEntry.refvar])
-          }, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 64, 64, "<", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+          }, !blocking && !RavagerData.Variables.RFControl.HoverData.InModal, Xstart + confXOffset + confSecondColumnOffset, Y, 64, 64, "<", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
           // Label
           DrawTextFitKD(`${RFGetText("RFCRange" + currentCategory + name)}: ${RavagerData.Variables.RFControl[confEntry.refvar]}`, Xstart + confXOffset + 64 + 190 + confSecondColumnOffset, Y + 32, 360, blocking ? "#888" : KDBaseWhite, undefined, 30)
           // Increment
@@ -650,7 +650,7 @@ window.RavagerFrameworkControlRun = function() {
               RavagerData.Variables.RFControl[confEntry.refvar] = parseFloat((RavagerData.Variables.RFControl[confEntry.refvar] + confEntry.stepcount).toFixed(significantDigits))
             if (typeof confEntry.postclick == "function")
               confEntry.postclick(RavagerData.Variables.RFControl[confEntry.refvar])
-          }, !blocking, Xstart + confXOffset + 64 + 360 + 20 + confSecondColumnOffset, Y, 64, 64, ">", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+          }, !blocking && !RavagerData.Variables.RFControl.HoverData.InModal, Xstart + confXOffset + 64 + 360 + 20 + confSecondColumnOffset, Y, 64, 64, ">", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
           // Setup description popup
           if (RFHasText("RFCHover" + currentCategory + name) && !RavagerData.Variables.RFControl.HoverData.BoxData[name]) {
             RavagerData.Variables.RFControl.HoverData.BoxData[name] = {
@@ -668,7 +668,7 @@ window.RavagerFrameworkControlRun = function() {
           Y += Ystep
         } else if (confEntry.type == "button") { // Custom button to run custom code when clicked
           let blocking = (typeof confEntry.block == "function") ? confEntry.block() : undefined
-          DrawButtonKDEx(confEntry.name, confEntry.click, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 370, 64, RFGetText("RFCButton" + currentCategory + confEntry.name), blocking ? "#888" : KDBaseWhite, confEntry.image, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+          DrawButtonKDEx(confEntry.name, confEntry.click, !blocking && !RavagerData.Variables.RFControl.HoverData.InModal, Xstart + confXOffset + confSecondColumnOffset, Y, 370, 64, RFGetText("RFCButton" + currentCategory + confEntry.name), blocking ? "#888" : KDBaseWhite, confEntry.image, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
           // Setup description popup
           if (RFHasText("RFCHover" + currentCategory + confEntry.name) && !RavagerData.Variables.RFControl.HoverData.BoxData[confEntry.name]) {
             RavagerData.Variables.RFControl.HoverData.BoxData[confEntry.name] = {
@@ -707,8 +707,10 @@ window.RavagerFrameworkControlRun = function() {
             // Custom get-value function; don't mind how wasteful this all is :)
             if (RavagerData.Variables.RFControl[confEntry.refvar] == undefined && typeof confEntry.getval == "function")
               RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.getval()
-            let elem = KDTextField(confEntry.refvar, Xstart + confXOffset + confSecondColumnOffset, Y, 480, 64, undefined, RavagerData.Variables.RFControl[confEntry.refvar], 10000).Element
-            elem.addEventListener("input", () => { RavagerData.Variables.RFControl[confEntry.refvar] = elem.value })
+            if (!RavagerData.Variables.RFControl.HoverData.InModal) {
+              let elem = KDTextField(confEntry.refvar, Xstart + confXOffset + confSecondColumnOffset, Y, 480, 64, undefined, RavagerData.Variables.RFControl[confEntry.refvar], 10000).Element
+              elem.addEventListener("input", () => { RavagerData.Variables.RFControl[confEntry.refvar] = elem.value })
+            }
             // Setup description popup
             if (RFHasText("RFCHover" + currentCategory + confEntry.refvar) && !RavagerData.Variables.RFControl.HoverData.BoxData[confEntry.refvar]) {
               RavagerData.Variables.RFControl.HoverData.BoxData[confEntry.refvar] = {
@@ -740,7 +742,7 @@ window.RavagerFrameworkControlRun = function() {
             RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.options[newindex]
             if (typeof confEntry.postclick == "function")
               confEntry.postclick(RavagerData.Variables.RFControl[confEntry.refvar])
-          }, !blocking, Xstart + confXOffset + confSecondColumnOffset, Y, 64, 64, "<", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+          }, !blocking && !RavagerData.Variables.RFControl.HoverData.InModal, Xstart + confXOffset + confSecondColumnOffset, Y, 64, 64, "<", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
           // Label
           DrawTextFitKD(`${RFGetText("RFCList" + currentCategory + name)}: ${RavagerData.Variables.RFControl[confEntry.refvar]}`, Xstart + confXOffset + 64 + 190 + confSecondColumnOffset, Y + 32, 360, blocking ? "#888" : KDBaseWhite, undefined, 30)
           // Increment
@@ -749,7 +751,7 @@ window.RavagerFrameworkControlRun = function() {
             RavagerData.Variables.RFControl[confEntry.refvar] = confEntry.options[newindex]
             if (typeof confEntry.postclick == "function")
               confEntry.postclick(RavagerData.Variables.RFControl[confEntry.refvar])
-          }, !blocking, Xstart + confXOffset + 64 + 360 + 20 + confSecondColumnOffset, Y, 64, 64, ">", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
+          }, !blocking && !RavagerData.Variables.RFControl.HoverData.InModal, Xstart + confXOffset + 64 + 360 + 20 + confSecondColumnOffset, Y, 64, 64, ">", blocking ? "#888" : KDBaseWhite, undefined, undefined, false, false, undefined, undefined, undefined, { bordercolor: bordercolor })
           // Setup description popup
           if (RFHasText("RFCHover" + currentCategory + name) && !RavagerData.Variables.RFControl.HoverData.BoxData[name]) {
             RavagerData.Variables.RFControl.HoverData.BoxData[name] = {
@@ -780,7 +782,7 @@ window.RavagerFrameworkControlRun = function() {
     let isHovering = false
     for (let data in hoverblocks.BoxData) {
       let o = hoverblocks.BoxData[data]
-      if (o.category != RavagerData.Variables.RFControl._ConfCategory)
+      if (o.category != RavagerData.Variables.RFControl._ConfCategory || RavagerData.Variables.RFControl.HoverData.InModal)
         continue
       if (MouseIn(o.Left, o.Top, o.Width, o.Height)) {
         isHovering = true
