@@ -172,6 +172,11 @@ window.RavagerData = {
       type: 'boolean',
       refvar: 'ravagerSpicyTendril',
     },
+    ravagerActiveSprites: {
+      type: "boolean",
+      refvar: "ravagerActiveSprites",
+      default: true
+    },
     ravagerSlimeAddChance: {
       type: 'range',
       name: 'ravagerSlimeAddChance', // A workaround for the game's code requiring ranges to have a name property for all but the last range; should be temporary
@@ -854,6 +859,7 @@ window.RavagerData = {
     FullNude: true, // Mimic burst is crashing game with full nude enabled; TODO: Fix crash
     RFCoffeeLover: false,
     ForceStrip: false, // Prevent new Stripped events. If a uniform outfit item contains "Panties" layers and does not have Group set to "Uniform", the new behavior will strip the entire uniform. This hasn't happened with the player effect stripping code, so I'm not expecting this to be needed, but this killswitch is a fallback
+    ActiveSprites: false, // Changeable sprites, currently used for Mimic's coffee narration
   },
   PossibleStructuralErrors: {
     MissingEventDictionaries: [],
