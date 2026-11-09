@@ -191,7 +191,7 @@ function pitTendrilEffect(enemy, target) {
 		if (Math.random() < enemy.Enemy.ravage.caressChance) {
 			RFDebug('[Ravager Framework][Ravager Tendril] Carressing player before ravaging')
 			let msg = ''
-			switch (enemy.ravage.slot) {
+			switch (enemy.ravage.slot) { // TODO: Add new slots Breast and Nipples? Probably just generalize this instead. Check for text key from enemy.ravage.slot.replace("Item", "TendrilEvent"), defaulting to "TendrilEvent" when text key doesn't exist
 			case 'ItemVulva':
 				msg = "TendrilEventVulva"
 				break;

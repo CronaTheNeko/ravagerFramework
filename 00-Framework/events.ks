@@ -110,6 +110,7 @@ KDEventMapGeneric.afterModConfig.RavagerFramework = () => {
 }
 
 // This whole nightmare references KinkyDungeonPlayerEntity all over the place, instead of just using target. Changing this would need testing to make sure nothing goes wrong, but could allow ravagers to go after other entities, or stay player targetted (with an early exit if target != KinkyDungeonPlayerEntity) while being easier to read
+// Seems we're not even using the 'damage' parameter except when sending it to narration mod functions; same for 'playerEffect', 'spell', 'faction', 'bullet'; we're only actually using 'target' and 'entity'
 KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bullet, entity) => {
   RFDebug('[Ravager Framework]: Effect: Ravage; Ravaging entity is', entity, 'target is', target)
   RFTrace('[Ravager Framework DBG]: Ravager PlayerEffect; target: ', target, '; damage: ', damage, '; playerEffect: ', playerEffect, '; spell: ', spell, '; faction: ', faction, '; bullet: ', bullet, '; entity: ', entity)
@@ -603,6 +604,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
             slot: slotOfChoice,
             caller: "NarrMod"
           }
+          // TODO: Make a chance to decide between EAM and mods. Current approach means a ravager that includes both EAM and narration mods will never use mods if EAM is available
           if (didExperiencedNarration) {
             RFTrace("[RF][Effect][NarMod]: Already chose to do EAM; Bailing")
             return
@@ -702,7 +704,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
           entity.ravageRefractory = enemy.ravage.refractory
           KDBreakTether(KinkyDungeonPlayerEntity) // Chances are, this enemy was holding the tether
           delete entity.ravage
-          KinkyDungeonSendActionMessage(45, RFStringFormat(RFGetText("NarrationsRelease"), entity), "#e0e", 4) // Maybe make this controllable by a rav dev?
+          KinkyDungeonSendActionMessage(45, RFStringFormat(RFGetText("NarrationsRelease"), entity), "#e0e", 4) // TODO: Maybe make this controllable by a rav dev?
         } else { // Pass out!
           KinkyDungeonSendActionMessage(45, RFGetText("NarrationsPassout"), "#ee00ee", 4);
           KinkyDungeonPassOut()
@@ -710,7 +712,7 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
         }
         // Check for increasing ravaged count
         RFDebug('[Ravager Framework]: Attempting to increment slot use count at end of session...')
-        increasePlayerRavagedCount(getPreviousRange(range, enemy), slotOfChoice, target, enemy, !(enemy.ravage.ranges.filter(v => v[1].useCount).length > 0))
+        increasePlayerRavagedCount(getPreviousRange(range, enemy), slotOfChoice, target, enemy, !(enemy.ravage.ranges.filter(v => v[1].useCount).length > 0)) // TODO: Make sure incrementing use counts works on breasts and nipples. New slots and it's not obvious that increasePlayerRavagedCount dynamically creates the needed entries for every slot
         if (enemy.ravage.doneTaunts)
           KinkyDungeonSendDialogue(entity, RFStringFormat(RFGetText(enemy.ravage.doneTaunts, false), entity), KDGetColor(entity), 6, 6)
         if (

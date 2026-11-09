@@ -253,7 +253,7 @@ window.RavagerData = {
       refvar: "ravagerCustomDrop",
       default: true,
     },
-    ravagerEnableNudeOutfit: {
+    ravagerEnableNudeOutfit: { // Nude outfit is crashing the game, at least with the mimic burst
       type: "boolean",
       refvar: "ravagerEnableNudeOutfit",
     },
