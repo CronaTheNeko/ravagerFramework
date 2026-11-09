@@ -908,6 +908,8 @@ window.RFGetConditionValue = function(val, func_args = [], condition_dict = Rava
 
 // Check a boolean that *might* be a condition callback
 window.RFCheckConditionBool = function(val, func_args = [], condition_dict = RavagerData.conditions) {
+  if (val == undefined || !condition_dict.hasOwnProperty(val))
+    return false
   return Boolean(RFGetConditionValue(val, func_args, condition_dict))
 }
 
