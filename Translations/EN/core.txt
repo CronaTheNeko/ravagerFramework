@@ -270,6 +270,7 @@ RFCRangeMimicMimic_SpawnW8 = Spawn Weight
 RFCBoolMimicExposeMimics = Expose Mimics
 RFCBoolMimicPassiveMimics = Oblivious Mimics
 RFCBoolMimicTrackMimics = Track Mimics
+RFCBoolMimicMimicActiveSprite = Changeable Sprite
 ; ; Ravager Control hover descriptions
 RFCHoverDebugHeavyDebug = Enables a LOT more console messages. Most players don't need this, but this will be enabled by the Help Debug mode
 RFCHoverDebugNameFormatDebug = Enables debug messages for the RFStringFormat function, which is used to format all strings used by the framework. Players don't need to enable this. Enabling this while having the browser console open WILL degrade performance and has the possibility to crash the browser. 
@@ -295,3 +296,4 @@ RFCHoverBandMaxStartingBandits = The maximum number of bandits allowed to exist 
 RFCHoverMimicExposeMimics = Makes the mimic's spoiler bubble always shown, revealing all mimics as you approach them
 RFCHoverMimicPassiveMimics = Makes the mimics never notice you, even if you attack them
 RFCHoverMimicTrackMimics = Tracks the state of each mimic on the map and prints the info the browser console
+RFCHoverMimicMimicActiveSprite = Enable changeable sprite in some situations

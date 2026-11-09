@@ -764,6 +764,11 @@ window.RavagerData = {
           postclick: (val) => { return RavagerFrameworkSetMimicTracking(val); },
           block: () => RFGetSetting("ravagerDisableMimic")
         },
+        {
+          refvar: "MimicActiveSprite",
+          type: "boolean",
+          default: true
+        },
       ],
     },
     PureWindKnownOutfits: [ "InnocentDesireSuit", "NightCatSuit", "MikosSuitLV1", "MikosSuitLV2", "MikosSuitLV3", "Nake", "EtherMageSuit" ],
@@ -833,6 +838,7 @@ window.RavagerData = {
       ControlBanditsFirstLevel: true,
       // Max number of bandit ravs on floor 1
       MaxStartingBandits: 2,
+      MimicActiveSprite: true,
       _ConfCategory: "Main", // Hold the current RFControl tab we're in
       _CategoryPage: 0, // Operates as KDModListPage, for scrolling through category tabs in RFControl
       _ConfPage: 0, // The page of the current RFControl category we're on
