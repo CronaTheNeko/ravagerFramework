@@ -6,33 +6,33 @@ window.RFDebugEnabled = function() {
 // Verbosity function for normal level debugging
 // This is just console.log wrapped in a function to see if we're debugging
 window.RFDebug = (...args) => {
-  RavagerFrameworkPushToLogBuffer(args)
-  RFDebugEnabled() && console.log(...args)
+  RavagerFrameworkPushToLogBuffer(args);
+  RFDebugEnabled() && (RavagerData.Variables.ConsoleTrapped ? RavagerData.functions.CLog : console.log)(...args)
 }
 
 // Verbosity function for extreme level debugging
 // This is just console.log wrapped in a function to see if we're doing heavy debugging
 window.RFTrace = (...args) => {
-  RavagerFrameworkPushToLogBuffer(args, "TRACE")
-  _RavagerFrameworkDebugEnabled && console.log(...args)
+  RavagerFrameworkPushToLogBuffer(args, "TRACE");
+  _RavagerFrameworkDebugEnabled && (RavagerData.Variables.ConsoleTrapped ? RavagerData.functions.CLog : console.log)(...args)
 }
 
 // Wrapper around console.warn
 window.RFWarn = (...args) => {
-  RavagerFrameworkPushToLogBuffer(args, "WARN")
-  console.warn(...args)
+  RavagerFrameworkPushToLogBuffer(args, "WARN");
+  (RavagerData.Variables.ConsoleTrapped ? RavagerData.functions.CWarn : console.warn)(...args)
 }
 
 // Wrapper around console.error
 window.RFError = (...args) => {
-  RavagerFrameworkPushToLogBuffer(args, "ERROR")
-  console.error(...args)
+  RavagerFrameworkPushToLogBuffer(args, "ERROR");
+  (RavagerData.Variables.ConsoleTrapped ? RavagerData.functions.CError : console.error)(...args)
 }
 
 // Wrapper around console.log, but this one will always print the message
 window.RFInfo = (...args) => {
-  RavagerFrameworkPushToLogBuffer(args, "INFO")
-  console.log(...args)
+  RavagerFrameworkPushToLogBuffer(args, "INFO");
+  (RavagerData.Variables.ConsoleTrapped ? RavagerData.functions.CLog : console.log)(...args)
 }
 
 // Function to get a mod setting value

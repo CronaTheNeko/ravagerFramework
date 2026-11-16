@@ -378,6 +378,13 @@ window.RavagerData = {
           checked: () => { return _RavagerFrameworkDebugEnabled },
         },
         {
+          name: "TrapConsole",
+          type: "boolean",
+          onclick: () => { RavagerFrameworkToggleConsoleTrap() },
+          checked: () => RavagerData.Variables.ConsoleTrapped,
+          block: () => !KDModSettings.RavagerFramework.ravagerHelpDebug
+        },
+        {
           refvar: "NameFormatDebug",
           type: "boolean",
         },
@@ -860,6 +867,7 @@ window.RavagerData = {
     PassoutStripLayers: [ "Panties" ],
     IWantToHelpDebug: false,
     IWantToHelpDebugBuffer: [],
+    ConsoleTrapped: false,
     DelayedActions: [],
     CoffeePerkUnlocked: KDUnlockedPerks.includes("CoffeeLover"),
   },

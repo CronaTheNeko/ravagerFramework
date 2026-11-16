@@ -1,10 +1,11 @@
 // Helper for pushing to debug log buffer
-window.RavagerFrameworkPushToLogBuffer = function(msg, level = "INFO") {
+window.RavagerFrameworkPushToLogBuffer = function(msg, level = "INFO", trapped_console = false) {
   // Check if we actually want to add logs to a potential log file (assuming yes during initialization)
   if (RavagerData.Variables.IWantToHelpDebug || _RavagerFrameworkInInit) {
     // A structured log line, with extra info so we can know when it happened while reading a log after the events
     let logLine = {
       level: level,
+      console: trapped_console,
       gameState: {
         currentTick: KinkyDungeonCurrentTick,
         state: KinkyDungeonState, // State tracks things like Menu, NewGame, Wardrobe, Game
@@ -22,7 +23,7 @@ window.RavagerFrameworkPushToLogBuffer = function(msg, level = "INFO") {
     stack_str_base.split("\n").forEach(v => {
       v = v.trim()
       // Only add the current function call to the call stack if it's not one of the console message wrappers and not this function
-      if (!v.match(/window\.(RF(Error|Warn|Info|Debug|Trace)|RavagerFrameworkPushToLogBuffer)/))
+      if (!v.match(/(window\.(RF(Error|Warn|Info|Debug|Trace)|RavagerFrameworkPushToLogBuffer)|console\.(debug|error|info|log|trace|warn))/))
         stack_str += v.split(" ")[0] + " <= "
     })
     // - Save our call stack, but remove the trailing " <= " from it
@@ -1365,4 +1366,50 @@ window.RavagerFrameworkCompareFuncOverrideSigs = function() {
     RFWarn("Found mismatching function signatures", mismatches)
     RavagerFrameworkShowModal("function-sig-check", "RF Function Check", "Some problems were found with the Framework's function overrides. This may range in severity from not causing problems, to causing some features to misbehave, to crashing the game.", JSON.stringify(mismatches, undefined, '  ').replace(/\[([\s\S]*?)\]/g, (match) => match.replace(/\s*\n\s*/g, ' ')))
   }
+}
+
+// Toggle grabbing all console messages and putting them in our debug buffer
+window.RavagerFrameworkToggleConsoleTrap = function() {
+  let trapped = !RavagerData.Variables.ConsoleTrapped
+  if (trapped) {
+    RavagerData.functions.CDebug = console.debug
+    console.debug = (...args) => {
+      RavagerFrameworkPushToLogBuffer(args, "TRACE", true)
+      return RavagerData.functions.CDebug(...args)
+    }
+    RavagerData.functions.CError = console.error
+    console.error = (...args) => {
+      RavagerFrameworkPushToLogBuffer(args, "ERROR", true)
+      return RavagerData.functions.CError(...args)
+    }
+    RavagerData.functions.CInfo = console.info
+    console.info = (...args) => {
+      RavagerFrameworkPushToLogBuffer(args, "INFO", true)
+      return RavagerData.functions.CInfo(...args)
+    }
+    RavagerData.functions.CLog = console.log
+    console.log = (...args) => {
+      RavagerFrameworkPushToLogBuffer(args, "INFO", true)
+      return RavagerData.functions.CLog(...args)
+    }
+    RavagerData.functions.CTrace = console.trace
+    console.trace = (...args) => {
+      RavagerFrameworkPushToLogBuffer(args, "TRACE", true)
+      return RavagerData.functions.CTrace(...args)
+    }
+    RavagerData.functions.CWarn = console.warn
+    console.warn = (...args) => {
+      RavagerFrameworkPushToLogBuffer(args, "WARN", true)
+      return RavagerData.functions.CWarn(...args)
+    }
+  } else {
+    console.debug = RavagerData.functions.CDebug
+    console.error = RavagerData.functions.CError
+    console.info = RavagerData.functions.CInfo
+    console.log = RavagerData.functions.CLog
+    console.trace = RavagerData.functions.CTrace
+    console.warn = RavagerData.functions.CWarn
+  }
+  RavagerData.Variables.ConsoleTrapped = trapped
+  return trapped
 }

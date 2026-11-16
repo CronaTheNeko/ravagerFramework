@@ -230,6 +230,7 @@ RFCCategoryMimic = Mimic
 RFCCategoryTranslate = Translations
 ; ; Ravager Control buttons
 RFCBoolDebugHeavyDebug = Heavy Debugging
+RFCBoolDebugTrapConsole = Capture console messages
 RFCBoolDebugNameFormatDebug = Debug RFStringFormat function
 RFCBoolDebugDebugVanillaTextOverrides = Debug Text Replacements
 RFCBoolDebugUnravelTextDebug = Debug Text Unravel
@@ -274,6 +275,7 @@ RFCBoolMimicTrackMimics = Track Mimics
 RFCBoolMimicMimicActiveSprite = Changeable Sprite
 ; ; Ravager Control hover descriptions
 RFCHoverDebugHeavyDebug = Enables a LOT more console messages. Most players don't need this, but this will be enabled by the Help Debug mode
+RFCHoverDebugTrapConsole = Overrides console functions in order to capture all console messages in debug log.\nWarning: The game prints a lot of messages, including sometimes crashing the console by printing an error and a warning message every frame while the in-game pause menu is shown. I have attempted to prevent that specific error spam from happening, but if something similar happens while this is enabled, the debug log buffer will grow VERY quickly.
 RFCHoverDebugNameFormatDebug = Enables debug messages for the RFStringFormat function, which is used to format all strings used by the framework. Players don't need to enable this. Enabling this while having the browser console open WILL degrade performance and has the possibility to crash the browser. 
 RFCHoverDebugDebugVanillaTextOverrides = Enables debug messages for when the framework overrides text that the base game is using. These messages are currently only sent during KinkyDungeonSendTextMessage
 RFCHoverDebugUnravelTextDebug = Enables debug messages for the RFUnravelText function, as well as the Translate > Unravel and Translate > Unravel All Keys buttons.\nNOTE: The RFUnravelText produces an absurd amount of console messages, which DRASTICALLY slows down the function (roughly 400 times slower in my testing). This exists for me to debug that function and you REALLY don't want to be unravelling text while this is enabled.
