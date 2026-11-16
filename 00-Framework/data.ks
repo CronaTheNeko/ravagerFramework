@@ -441,6 +441,12 @@ window.RavagerData = {
           click: () => { RavagerFrameworkRevertFunctions() },
         },
         {
+          name: "StartDebugLog",
+          type: "button",
+          click: () => { RavagerFrameworkRFCNotify("Starting debug log ..."); KDModSettings.RavagerFramework.ravagerHelpDebug = true; RavagerFrameworkIWantToHelpDebug("RFC") },
+          block: () => KDModSettings?.RavagerFramework?.ravagerHelpDebug
+        },
+        {
           name: "EndDebugLog",
           type: "button",
           click: () => { RavagerFrameworkRFCNotify("Saving debug log ..."); KDModSettings.RavagerFramework.ravagerHelpDebug = false; RavagerFrameworkIWantToHelpDebug('Finish') },

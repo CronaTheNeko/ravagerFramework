@@ -240,6 +240,7 @@ RFCButtonDebugExportAnnounceData = Export Ravager Counts
 RFCButtonDebugSaveFunctionOverrides = Save Overridden Functions
 RFCButtonDebugCheckFunctionOverrides = Check Overridden Functions
 RFCButtonDebugRevertFunctions = Revert Functions
+RFCButtonDebugStartDebugLog = Start Debug Log
 RFCButtonDebugEndDebugLog = End Debug Log
 RFCBoolDebugUseOldRFControl = Use old RFControl layout
 RFCBoolDebugLoadDevMode = Start in Dev Mode
@@ -278,6 +279,7 @@ RFCHoverDebugDebugVanillaTextOverrides = Enables debug messages for when the fra
 RFCHoverDebugUnravelTextDebug = Enables debug messages for the RFUnravelText function, as well as the Translate > Unravel and Translate > Unravel All Keys buttons.\nNOTE: The RFUnravelText produces an absurd amount of console messages, which DRASTICALLY slows down the function (roughly 400 times slower in my testing). This exists for me to debug that function and you REALLY don't want to be unravelling text while this is enabled.
 RFCHoverDebugAnnounceRavagers = Announce the number of ravagers on the map to the in-game text log and the browser console
 RFCHoverDebugRevertFunctions = Revert all functions overridden by the framework. If the game updates, something isn't acting right, and compatibility mode isn't fixing the problem, this button may be able to resolve the issue.\nNOTE: Reverting functions should not impact the framework's ability to function, but some features may be missing, such as extra text lines being shown in the in-game text log, framework mod config button customizations missing, and Ravager Control menu being inaccessible
+RFCHoverDebugStartDebugLog = Start a debug log that can be saved later with the button below or via mod config
 RFCHoverDebugEndDebugLog = End the debug log you're generating and save it to disk
 RFCHoverDebugUseOldRFControl = Revert this settings page to the old, <=6.2.1 layout
 RFCHoverDebugLoadDevMode = After mod loading, set the game into test/debug mode and show the Ravager Controls buttons on both the title screen and in-game pause menu

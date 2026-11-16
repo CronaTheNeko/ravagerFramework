@@ -64,13 +64,14 @@ window.RavagerFrameworkIWantToHelpDebug = function(reason) {
     // Set my own variables to track debugging
     RavagerData.Variables.IWantToHelpDebug = true
     RavagerFrameworkToggleDebug(true)
+    RFInfo("[Ravager Framework][RavagerFrameworkIWantToHelpDebug]: Enabled debug logging for reason: " + reason)
     // Reset ravagerHelpDebug in localStorage, as we don't want this to be persistent
     let j = JSON.parse(localStorage.KDModSettings)
     j.RavagerFramework.ravagerHelpDebug = false
     localStorage.KDModSettings = JSON.stringify(j)
   } else if (RavagerData.Variables.IWantToHelpDebug) {
     // Disable help debugging mode in variable
-    RFDebug("[Ravager Framework][RavagerFrameworkIWantToHelpDebug]: Disabling debug logging and saving the log")
+    RFDebug(`[Ravager Framework][RavagerFrameworkIWantToHelpDebug](${reason}): Disabling debug logging and saving the log`)
     RavagerData.Variables.IWantToHelpDebug = false
     // Save version info log
     let logLine = {
