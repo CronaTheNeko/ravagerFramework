@@ -514,19 +514,6 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
       // If rangeData is null, the encounter is over, and doneDialogue should be used.
       if(range) {
         let rangeData = range[1]
-        // Handle stat changes
-        if(rangeData.sp)
-          KDChangeStamina(undefined, undefined, undefined, pRav.submitting ? rangeData.sp * 0.25 : rangeData.sp)
-        if(rangeData.wp)
-          KDChangeWill(undefined, undefined, undefined, rangeData.wp)
-        if(rangeData.sub)
-          KinkyDungeonChangeRep("Ghost", rangeData.sub); // "Ghost" is submissiveness for some reason
-        else if (pRav.submitting)
-          KinkyDungeonChangeRep("Ghost", 0.25)
-        if(rangeData.dp) { // We only try orgasm if DP is affected
-          KDChangeDistraction(undefined, undefined, undefined, rangeData.dp)
-          KinkyDungeonDoTryOrgasm((rangeData.orgasmBonus || 0) + slotsOccupied, 1)
-        }
         // Helpers for use count based text
         function checkPreviousUseCount(slot) {
           return target.ravagedCounts && typeof target.ravagedCounts[slotOfChoice] == "number" && target.ravagedCounts[slot] > 0
@@ -638,6 +625,114 @@ KDPlayerEffects["Ravage"] = (target, damage, playerEffect, spell, faction, bulle
           entity.ravage.narMod = narModPfx
           didModifiedNarration = true
         }
+        // Interrupt narration flow so we can have modified stat changes
+        // - SP
+        let rangeSP = 0;
+        if (rangeData.hasOwnProperty("sp"))
+          rangeSP = pRav.submitting ? rangeData.sp * 0.25 : rangeData.sp
+        if (didModifiedNarration && rangeData.hasOwnProperty("modSp")) {
+          if (typeof rangeData.modSp == "number")
+            rangeSP = pRav.submitting ? rangeData.modSp * 0.25 : rangeData.modSp
+          else if (
+            typeof rangeData.modSp == "string" &&
+            KDEventMapEnemy["ravagerCallbacks"] &&
+            typeof KDEventMapEnemy["ravagerCallbacks"][rangeData.modSp] == "function"
+          ) {
+            let temp_modSp = KDEventMapEnemy["ravagerCallbacks"][rangeData.modSp](/*Type*/ "sp", /*Original value*/ rangeData.sp, /*Submitting*/ pRav.submitting, /*Current value (after submitting modification*/ rangeSP, rangeData, entity, target)
+            if (typeof temp_modSp == "number")
+              rangeSP = temp_modSp
+            else
+              RFWarn(`[RF][Ravage Event][RangeData SP callback]: Callback "${rangeData.modSp}" did not return a number. Ignoring result.`)
+          }
+        }
+        KDChangeStamina(undefined, undefined, undefined, rangeSP)
+        // - WP
+        let rangeWP = 0;
+        if (rangeData.hasOwnProperty("wp"))
+          rangeWP = rangeData.wp
+        if (didModifiedNarration && rangeData.hasOwnProperty("modWp")) {
+          if (typeof rangeData.modWp == "number")
+            rangeWP = rangeData.modWp
+          else if (
+            typeof rangeData.modWp == "string" &&
+            KDEventMapEnemy["ravagerCallbacks"] &&
+            typeof KDEventMapEnemy["ravagerCallbacks"][rangeData.modWp] == "function"
+          ) {
+            let temp_modWp = KDEventMapEnemy["ravagerCallbacks"][rangeData.modWp]("wp", rangeData.wp, pRav.submitting, rangeWP, rangeData, entity, target)
+            if (typeof temp_modWp == "number")
+              rangeWP = temp_modWp
+            else
+              RFWarn(`[RF][Ravage Event][RangeData WP callback]: Callback "${rangeData.modWp}" did not return a number. Ignoring result.`)
+          }
+        }
+        KDChangeWill(undefined, undefined, undefined, rangeWP)
+        // - Sub
+        if(rangeData.hasOwnProperty("sub") || rangeData.hasOwnProperty("modSub")) {
+          let rangeSub = 0;
+          if (rangeData.hasOwnProperty("sub"))
+            rangeSub = rangeData.sub
+          if (didModifiedNarration && rangeData.hasOwnProperty("modSub")) {
+            if (typeof rangeData.modSub == "number")
+              rangeSub = rangeData.modSub
+            else if (
+              typeof rangeData.modSub == "string" &&
+              KDEventMapEnemy["ravagerCallbacks"] &&
+              typeof KDEventMapEnemy["ravagerCallbacks"][rangeData.modSub] == "function"
+            ) {
+              let temp_modSub = KDEventMapEnemy["ravagerCallbacks"][rangeData.modSub]("sub", rangeData.sub, pRav.submitting, rangeSub, rangeData, entity, target)
+              if (typeof temp_modSub == "number")
+                rangeSub = temp_modSub
+              else
+                RFWarn(`[RF][Ravage Event][RangeData sub callback]: Callback "${rangeData.modSub}" did not return a number. Ignoring result.`)
+            }
+          }
+          KinkyDungeonChangeRep("Ghost", rangeSub); // "Ghost" is submissiveness for some reason
+        } else if (pRav.submitting) {
+          KinkyDungeonChangeRep("Ghost", 0.25)
+        }
+        // - DP
+        if(rangeData.hasOwnProperty("dp") || rangeData.hasOwnProperty("modDp")) { // We only try orgasm if DP is affected
+          let rangeDP = 0;
+          if (rangeData.hasOwnProperty("dp"))
+            rangeDP = rangeData.dp
+          if (didModifiedNarration && rangeData.hasOwnProperty("modDp")) {
+            if (typeof rangeData.modDp == "number")
+              rangeDP = rangeData.modDp
+            else if (
+              typeof rangeData.modDp == "string" &&
+              KDEventMapEnemy["ravagerCallbacks"] &&
+              typeof KDEventMapEnemy["ravagerCallbacks"][rangeData.modDp] == "function"
+            ) {
+              let temp_modDp = KDEventMapEnemy["ravagerCallbacks"][rangeData.modDp]("dp", rangeData.dp, pRav.submitting, rangeDP, rangeData, entity, target)
+              if (typeof temp_modDp == "number")
+                rangeDP = temp_modDp
+              else
+                RFWarn(`[RF][Ravage Event][RangeData DP callback]: Callback "${rangeData.modDp}" did not return a number. Ignoring result.`)
+            }
+          }
+          KDChangeDistraction(undefined, undefined, undefined, rangeDP)
+          // -- Orgasm bonus
+          let rangeOB = slotsOccupied
+          if (rangeData.hasOwnProperty("orgasmBonus"))
+            rangeOB = rangeData.orgasmBonus + slotsOccupied
+          if (didModifiedNarration && rangeData.hasOwnProperty("modOrgasmBonus")) {
+            if (typeof rangeData.modOrgasmBonus == "number")
+              rangeDP = rangeData.modOrgasmBonus + slotsOccupied
+            else if (
+              typeof rangeData.modOrgasmBonus == "string" &&
+              KDEventMapEnemy["ravagerCallbacks"] &&
+              typeof KDEventMapEnemy["ravagerCallbacks"][rangeData.modOrgasmBonus] == "function"
+            ) {
+              let temp_modOB = KDEventMapEnemy["ravagerCallbacks"][rangeData.modOrgasmBonus]("orgasmBonus", rangeData.dp, pRav.submitting, rangeOB, rangeData, entity, target) // Chosen to always add slotsOccupied to the returned value. If a dev wants to negate orgasmBonus in a callback, they have target.ravage.slots available
+              if (typeof temp_modOB == "number")
+                rangeOB = temp_modOB + slotsOccupied
+              else
+                RFWarn(`[RF][Ravage Event][RangeData OrgasmBonus callback]: Callback "${rangeData.modOrgasmBonus}" did not return a number. Ignoring result.`)
+            }
+          }
+          KinkyDungeonDoTryOrgasm(rangeOB, 1)
+        }
+        // Continue narration flow
         if (rangeData.narration && !didExperiencedNarration && !didModifiedNarration)
           pRav.narrationBuffer.push(RFStringFormat(RFGetText(rangeData.narration[slotOfChoice], false), entity))
         // Use count based taunts

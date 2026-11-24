@@ -587,6 +587,7 @@ The following are the currently available callbacks that you can bind functions 
 - [effectCallback](#effect-callback)
 - [allRangeCallback](#all-range-callback)
 - [Range specific callbacks](#range-specific-callbacks)
+- [Range specific stat change callbacks](#range-specific-stat-change-callbacks)
 - [submitChanceModifierCallback](#submit-chance-modifier-callback)
 - [completionCallback](#completion-callback)
 - [fallbackCallback](#fallback-callback)
@@ -675,6 +676,36 @@ Expected return: None
 
 Notes:
 - Current possibilities for `slot` parameter are `ItemVulva`, `ItemMouth`, `ItemButt`, and `ItemHead`
+- See [Range Data](#range-data) for what the property path `rangeData` means
+
+#### Range-specific stat change callbacks
+Property path: `rangeData.modSp`
+               `rangeData.modWp`
+               `rangeData.modDp`
+               `rangeData.modSub`
+               `rangeData.modOrgasmBonus`
+
+When are these called: When taking a ravaging action inside a matching range, while narration modifiers are being used
+
+Parameters:
+- `type` - The stat being potentially changed in the current call of the callback. Possible options are `sp`, `wp`, `dp`, `sub`, and `orgasmBonus`
+- `originalValue` - The value defined in `sp`, `wp`, `dp`, `sub`, or `orgasmBonus` inside of `rangeData`, depending on which callback is being used
+- `submitting` - Whether or not the player is submitting
+- `currentValue` - The current value of the stat change to be done. See notes
+- `rangeData` - The [Range Data](#range-data) the callback is being called from
+- `entity` - The enemy entity taking the action
+- `target` - The target entity of the enemy
+
+Expected return: A number, which will be the modified value to change the current stat by
+
+Notes:
+- The value of `currentValue` may being the same as `originalValue`, depending on the stat being changed.
+  + For `sp` type, `currentValue` will be `originalValue * 0.25` if `submitting` is true
+  + For `orgasmBonus` type, `currentValue` will be `originalValue + NumberOfSlotsOccupied`
+- Return value range/scale changes depending on what stat is being changed
+  + For `sp`, `wp`, and `dp` types, the game multiplies the given number by 10 when changing each of those stats, so returning 1 will raise the stat being modified by 10
+  + For `sub` type, the number is used as the change to the "Submissiveness" in the "Rep" section of the Journal. Decimals are valid. The default value the Framework uses if `0.25`
+  + For `orgasmBonus` type, I don't even understand how the number is actually used by the game. The default value used by the Framework is the number of slots occupied. If `rangeData.orgasmBonus` is declared, that number is added on top of the occupied slots
 - See [Range Data](#range-data) for what the property path `rangeData` means
 
 #### Submit chance modifier callback
