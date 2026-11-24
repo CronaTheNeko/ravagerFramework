@@ -675,7 +675,7 @@ Parameters:
 Expected return: None
 
 Notes:
-- Current possibilities for `slot` parameter are `ItemVulva`, `ItemMouth`, `ItemButt`, and `ItemHead`
+- Current possibilities for `slot` parameter are `ItemVulva`, `ItemMouth`, `ItemButt`, `ItemHead`, `ItemBreast`, and `ItemNipples`
 - See [Range Data](#range-data) for what the property path `rangeData` means
 
 #### Range-specific stat change callbacks
