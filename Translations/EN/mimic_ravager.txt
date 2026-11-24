@@ -55,6 +55,20 @@ MimicR20VulvaSpicy = You {moan loudly|cry out}, your womb {stretching|swelling} 
 MimicR20ButtSpicy = {You {moan loudly|cry out} and your|Your} belly {grows round|swells out} as you're {filled with|pumped full of} the {mimic|tendril|tentacle}'s {cum|seed}...!
 MimicR20MouthSpicy = You {whimper and gag|gag and choke} as the {mimic|tendril|tentacle} {pumps its {cum|seed} down your throat|{pumps|fills} your throat and stomach with its {cum|seed}}...!
 
+; Coffee Ranges -- I've been struggling to write this narration for TOO LONG, so it's only for ItemMouth for now; TODO: Write narration for other slots and make narration variations
+; ; 1
+MimicR1CoffeeMouth = The mimic's slick tendril hovers above your face, dripping a dark, tasty fluid...
+; ; 5
+MimicR5CoffeeMouth = You're shocked by the taste of coffee as the tendril {wiggles past your lips|thrusts down your throat}...
+; ; 12
+MimicR12CoffeeMouth = Another tendril emerges to wrap around your neck, dripping coffee onto your skin...
+; ; 16
+MimicR16CoffeeMouth = You try to moan out as the mimic's coffee flavored tendril fills your mouth and throat!
+; ; 17
+;MimicR17CoffeeMouth = Mimic R17 Coffee Mouth
+; ; 20
+MimicR20CoffeeMouth = You helplessly swallow wave after wave of the tendril's coffee...!
+
 ; Keys used by game
 - NameMimicRavager = Mimic Ravager
 - KillMimicRavager = The Mimic Ravager spills its moist contents.

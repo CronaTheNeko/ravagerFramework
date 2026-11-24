@@ -168,6 +168,12 @@ let mimicRavager = {
       weight: 1
     },
     {
+      name: "RFCoffee",
+      amountMin: 1,
+      amountMax: 2,
+      weight: 0.5
+    },
+    {
       name: "SlimeWalkers",
       weight: 0.7
     },
@@ -372,6 +378,13 @@ let mimicRavager = {
   noswap: true,
   focusPlayer: true,
   ravage: {
+    postEffectCallback: "MimicPostEffectCallback",
+    narrationModifier: {
+      condition: "mimicNModCondition",
+      chance: 1/6,
+      linePrefix: "Coffee",
+      sporadic: false,
+    },
     bubbleCondition: "mimicRavSpoiler", // Condition name that leads to window.RavagerData.conditions.mimicRavSpoiler. This condition is built into the framework, as I'd like to make more mimic ravagers
     targets: [ "ItemVulva", "ItemMouth", "ItemButt" ], // Disabled head until I figure out what to make of it //, "ItemHead" ], // Will need to test ItemHead, as I'd like to use it for either hypnosis or some form of tentacle engulfing the head
     refractory: 20,
@@ -386,6 +399,7 @@ let mimicRavager = {
           ItemVulva: "MimicR1Vulva",
           ItemButt: "MimicR1Butt",
           ItemMouth: "MimicR1Mouth",
+          CoffeeItemMouth: "MimicR1CoffeeMouth",
         }
       } ],
       [ 5, {
@@ -396,9 +410,11 @@ let mimicRavager = {
           TameItemMouth: "MimicR5MouthTame",
           SpicyItemVulva: "MimicR5VulvaSpicy",
           SpicyItemButt: "MimicR5ButtSpicy",
-          SpicyItemMouth: "MimicR5MouthSpicy"
+          SpicyItemMouth: "MimicR5MouthSpicy",
+          CoffeeItemMouth: "MimicR5CoffeeMouth",
         },
         sp: -0.1,
+        modSp: "MimicCoffeSP",
         dp: 1,
         orgasmBonus: 0
       } ],
@@ -408,8 +424,10 @@ let mimicRavager = {
           ItemVulva: "MimicR12Vulva",
           ItemButt: "MimicR12Butt",
           ItemMouth: "MimicR12Mouth",
+          CoffeeItemMouth: "MimicR12CoffeeMouth",
         },
         sp: -0.15,
+        modSp: "MimicCoffeSP",
         dp: 1.5,
         orgasmBonus: 1
       } ],
@@ -421,9 +439,11 @@ let mimicRavager = {
           TameItemMouth: "MimicR16MouthTame",
           SpicyItemVulva: "MimicR16VulvaSpicy",
           SpicyItemButt: "MimicR16ButtSpicy",
-          SpicyItemMouth: "MimicR16MouthSpicy"
+          SpicyItemMouth: "MimicR16MouthSpicy",
+          CoffeeItemMouth: "MimicR16CoffeeMouth",
         },
         sp: -0.2,
+        modSp: "MimicCoffeSP",
         dp: 2,
         orgasmBonus: 2
       } ],
@@ -435,9 +455,10 @@ let mimicRavager = {
           TameItemMouth: "MimicR17MouthTame",
           SpicyItemVulva: "MimicR17VulvaSpicy",
           SpicyItemButt: "MimicR17ButtSpicy",
-          SpicyItemMouth: "MimicR17MouthSpicy"
+          SpicyItemMouth: "MimicR17MouthSpicy",
         },
         sp: -0.2,
+        modSp: "MimicCoffeSP",
         dp: 5,
         orgasmBonus: 3
       } ],
@@ -449,8 +470,10 @@ let mimicRavager = {
           TameItemMouth: "MimicR20MouthTame",
           SpicyItemVulva: "MimicR20VulvaSpicy",
           SpicyItemButt: "MimicR20ButtSpicy",
-          SpicyItemMouth: "MimicR20MouthSpicy"
+          SpicyItemMouth: "MimicR20MouthSpicy",
+          CoffeeItemMouth: "MimicR20CoffeeMouth",
         },
+        modSp: "MimicCoffeSP",
         dp: 10,
         wp: -1,
         orgasmBonus: 4,
@@ -605,3 +628,24 @@ KDEventMapEnemy.tickAfter.ravagerForceMimicAI = function(e, enemy, data) {
     enemy.AI = "ambush"
   }
 }
+// EventCallback to give the mimic a custom sprite while using coffee narration modifier
+RFAddCallback("MimicPostEffectCallback", (entity) => {
+  if (
+    entity?.ravage?.narMod && // Currently using narration mod
+    RFGetSetting("ravagerActiveSprites") && // Mod config for active sprites enabled
+    RFAllowFeature("ActiveSprites") && // Kill switch for active sprites not enabled
+    RavagerData.Variables.RFControl.MimicActiveSprite // Mimic's active sprite enabled in Ravager Control
+  )
+    entity.CustomSprite = "MimicRavager-coffee"
+  else if (entity.CustomSprite)
+    delete entity.CustomSprite
+})
+// SP Mod callback
+RFAddCallback("MimicCoffeSP", (_type, originalValue, submitting) => {
+  let newsp = 1
+  if (originalValue)
+    newsp = originalValue * -5
+  if (submitting)
+    newsp = newsp * 1.25
+  return newsp
+})

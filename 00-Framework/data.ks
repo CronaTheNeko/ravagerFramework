@@ -140,7 +140,10 @@ window.RavagerData = {
   // Currently just used for the MimicRavager spoiler
   conditions: {
     // Checked to make the MimicRavager spoiler only show when the mimic has not ambushed the player
-    mimicRavSpoiler: enemy => !enemy.ambushtrigger
+    mimicRavSpoiler: enemy => !enemy.ambushtrigger,
+    // Mimic coffe narration mod
+    // TODO: Remove/modify the limit to ItemMouth when I get more narration written
+    mimicNModCondition: (entity) => RFAllowFeature("RFCoffeeLover") && KDUnlockedPerks.includes("RFCoffeeLover") && entity.ravage.slot == "ItemMouth",
   },
   // Default mod settings values
   ModConfig: {
